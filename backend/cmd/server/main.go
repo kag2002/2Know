@@ -49,12 +49,19 @@ func main() {
 	app.Post("/api/auth/register", handler.Register)
 	app.Post("/api/auth/login", handler.Login)
 
+	// Public test submission endpoint
+	app.Post("/api/test/submit", handler.SubmitTest)
+
 	// Protected block
 	api := app.Group("/api", middleware.Protected())
+	
 	// Quiz endpoints
 	api.Get("/quizzes", handler.GetQuizzes)
 	api.Post("/quizzes", handler.CreateQuiz)
 	api.Get("/quizzes/:id", handler.GetQuizByID)
+	
+	// Results analytics endpoints (Teacher)
+	api.Get("/quizzes/:quizId/results", handler.GetQuizResults)
 
 	// Question endpoints
 	api.Get("/quizzes/:quizId/questions", handler.GetQuizQuestions)

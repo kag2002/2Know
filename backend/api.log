@@ -1,410 +1,523 @@
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[21.068ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND table_type = 'BASE TABLE'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[33.232ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND table_type = 'BASE TABLE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.098ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.611ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[36.641ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'users'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[61.520ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'users'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[7.883ms] [34;1m[rows:-][0m SELECT * FROM "users" LIMIT 5
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.476ms] [34;1m[rows:-][0m SELECT * FROM "users" LIMIT 5
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[31.040ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users' AND constraint_type = 'UNIQUE'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[76.699ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users' AND constraint_type = 'UNIQUE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[22.084ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[29.260ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.928ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[5.268ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
 		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
 		WHERE a.attnum > 0 -- hide internal columns
 		AND NOT a.attisdropped -- hide deleted columns
 		AND b.relname = 'users'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[12.772ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[22.481ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[6.090ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[11.399ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[6.819ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'password_hash') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[11.469ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'password_hash') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[5.739ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'full_name') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[8.909ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'full_name') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[9.596ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'avatar_url') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[10.486ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'avatar_url') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[8.844ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'role') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[6.857ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'role') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[9.451ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'plan_tier') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.472ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'plan_tier') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.633ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'preferences') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.926ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'preferences') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.354ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'is_active') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.599ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'is_active') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.683ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email_verified') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.521ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email_verified') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.627ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'last_login_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.899ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'last_login_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.153ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.768ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[8.147ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.784ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.505ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[3.507ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[6.612ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_email' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[14.920ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_email' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[3.657ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_deleted_at' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[5.132ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_deleted_at' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.243ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND table_type = 'BASE TABLE'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[3.394ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND table_type = 'BASE TABLE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[0.635ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[0.911ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[35.526ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[20.131ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[3.579ms] [34;1m[rows:-][0m SELECT * FROM "quizzes" LIMIT 5
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[5.500ms] [34;1m[rows:-][0m SELECT * FROM "quizzes" LIMIT 5
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[23.297ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'quizzes' AND constraint_type = 'UNIQUE'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[24.952ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'quizzes' AND constraint_type = 'UNIQUE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[26.980ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'quizzes'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[33.040ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'quizzes'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.780ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.922ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
 		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
 		WHERE a.attnum > 0 -- hide internal columns
 		AND NOT a.attisdropped -- hide deleted columns
 		AND b.relname = 'quizzes'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.398ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.528ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.424ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'teacher_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.717ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'teacher_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.499ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'title') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.370ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'title') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.504ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'description') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.956ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'description') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.913ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'subject') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.071ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'subject') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.753ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'grade_level') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.621ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'grade_level') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[12.715ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'time_limit_minutes') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.488ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'time_limit_minutes') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.883ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'max_attempts') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[9.868ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'max_attempts') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.364ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'open_time') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.454ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'open_time') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.281ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'close_time') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[17.930ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'close_time') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.435ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'show_answers_after') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[3.246ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'show_answers_after') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.808ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'penalty_on_wrong') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[12.293ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'penalty_on_wrong') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[6.378ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'quiz_type') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.167ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'quiz_type') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.340ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'omr_template') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.480ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'omr_template') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.279ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'require_fullscreen') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.604ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'require_fullscreen') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.835ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'disable_copy_paste') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.836ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'disable_copy_paste') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.275ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'access_type') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.038ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'access_type') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.122ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'assigned_classes') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.757ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'assigned_classes') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.066ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'status') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.675ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'status') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.364ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.386ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.180ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[12.787ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.661ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.409ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'quizzes' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'quizzes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.578ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'quizzes' AND indexname = 'idx_quizzes_teacher_id' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.554ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'quizzes' AND indexname = 'idx_quizzes_teacher_id' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[3.585ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'quizzes' AND indexname = 'idx_quizzes_deleted_at' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[6.024ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'quizzes' AND indexname = 'idx_quizzes_deleted_at' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[3.620ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND table_type = 'BASE TABLE'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.840ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND table_type = 'BASE TABLE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.012ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[0.999ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[16.574ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'questions'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[36.559ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'questions'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[4.038ms] [34;1m[rows:-][0m SELECT * FROM "questions" LIMIT 5
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.283ms] [34;1m[rows:-][0m SELECT * FROM "questions" LIMIT 5
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[14.871ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions' AND constraint_type = 'UNIQUE'
+2026/03/25 23:38:15 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[21.772ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions' AND constraint_type = 'UNIQUE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[21.264ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[27.658ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.801ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.654ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
 		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
 		WHERE a.attnum > 0 -- hide internal columns
 		AND NOT a.attisdropped -- hide deleted columns
 		AND b.relname = 'questions'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.499ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.488ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.331ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'quiz_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.956ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'quiz_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.126ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'type') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.033ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'type') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m
-[0m[33m[0.705ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+2026/03/25 23:38:16 [32m
+[0m[33m[1.201ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
 
-2026/03/25 23:30:28 [32m
-[0m[33m[22.167ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'questions'
+2026/03/25 23:38:16 [32m
+[0m[33m[18.336ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'questions'
 
-2026/03/25 23:30:28 [32m
-[0m[33m[1.061ms] [34;1m[rows:-][0m SELECT * FROM "questions" LIMIT 5
+2026/03/25 23:38:16 [32m
+[0m[33m[11.472ms] [34;1m[rows:-][0m SELECT * FROM "questions" LIMIT 5
 
-2026/03/25 23:30:28 [32m
-[0m[33m[17.676ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions' AND constraint_type = 'UNIQUE'
+2026/03/25 23:38:16 [32m
+[0m[33m[18.706ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions' AND constraint_type = 'UNIQUE'
 
-2026/03/25 23:30:28 [32m
-[0m[33m[14.404ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions'
+2026/03/25 23:38:16 [32m
+[0m[33m[17.718ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'questions'
 
-2026/03/25 23:30:28 [32m
-[0m[33m[1.274ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+2026/03/25 23:38:16 [32m
+[0m[33m[1.837ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
 		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
 		WHERE a.attnum > 0 -- hide internal columns
 		AND NOT a.attisdropped -- hide deleted columns
 		AND b.relname = 'questions'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[3.332ms] [34;1m[rows:0][0m ALTER TABLE "questions" ALTER COLUMN "points" SET DEFAULT 10
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[10.694ms] [34;1m[rows:0][0m ALTER TABLE "questions" ALTER COLUMN "points" SET DEFAULT 10
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.038ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'points') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.895ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'points') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.053ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'content') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.195ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'content') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.510ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'explanation') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.648ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'explanation') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.230ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'order_index') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.523ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'order_index') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[5.343ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.250ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.233ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[5.199ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.528ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.697ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'questions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[4.293ms] [34;1m[rows:1][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND constraint_name = 'fk_quizzes_questions'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.859ms] [34;1m[rows:1][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'questions' AND constraint_name = 'fk_quizzes_questions'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.145ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'questions' AND indexname = 'idx_questions_quiz_id' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.748ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'questions' AND indexname = 'idx_questions_quiz_id' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[4.430ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'questions' AND indexname = 'idx_questions_deleted_at' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[10.769ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'questions' AND indexname = 'idx_questions_deleted_at' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.049ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND table_type = 'BASE TABLE'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[11.967ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND table_type = 'BASE TABLE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[0.697ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.697ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[10.207ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'options'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[33.909ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'options'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[5.496ms] [34;1m[rows:-][0m SELECT * FROM "options" LIMIT 5
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.193ms] [34;1m[rows:-][0m SELECT * FROM "options" LIMIT 5
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[10.980ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'options' AND constraint_type = 'UNIQUE'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[35.518ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'options' AND constraint_type = 'UNIQUE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[12.841ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'options'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[24.340ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'options'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.855ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.777ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
 		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
 		WHERE a.attnum > 0 -- hide internal columns
 		AND NOT a.attisdropped -- hide deleted columns
 		AND b.relname = 'options'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.164ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.627ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[6.464ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'question_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.739ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'question_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.569ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'label') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.553ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'label') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.659ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'content') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.624ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'content') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.905ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'is_correct') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.913ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'is_correct') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[1.498ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.639ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'options' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.303ms] [34;1m[rows:1][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND constraint_name = 'fk_questions_options'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[5.461ms] [34;1m[rows:1][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'options' AND constraint_name = 'fk_questions_options'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[0.835ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'options' AND indexname = 'idx_options_question_id' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.661ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'options' AND indexname = 'idx_options_question_id' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[3.562ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND table_type = 'BASE TABLE'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.654ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND table_type = 'BASE TABLE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[17.823ms] [34;1m[rows:0][0m CREATE TABLE "classes" ("id" uuid DEFAULT gen_random_uuid(),"teacher_id" uuid NOT NULL,"name" varchar(255) NOT NULL,"grade" varchar(50),"subject" varchar(100),"description" text,"school_year" varchar(20),"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[0.920ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
 
-2026/03/25 23:30:28 [32m
-[0m[33m[7.255ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_classes_deleted_at" ON "classes" ("deleted_at")
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[19.638ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'classes'
 
-2026/03/25 23:30:28 [32m
-[0m[33m[7.217ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_classes_teacher_id" ON "classes" ("teacher_id")
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.691ms] [34;1m[rows:-][0m SELECT * FROM "classes" LIMIT 5
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[2.086ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND table_type = 'BASE TABLE'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[17.775ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'classes' AND constraint_type = 'UNIQUE'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
-[0m[33m[16.750ms] [34;1m[rows:0][0m CREATE TABLE "students" ("id" uuid DEFAULT gen_random_uuid(),"class_id" uuid NOT NULL,"full_name" varchar(255) NOT NULL,"student_id" varchar(50) NOT NULL,"email" varchar(255),"phone" varchar(20),"date_of_birth" timestamptz,"created_at" timestamptz,"updated_at" timestamptz,PRIMARY KEY ("id"),CONSTRAINT "fk_classes_students" FOREIGN KEY ("class_id") REFERENCES "classes"("id"))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[29.674ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'classes'
 
-2026/03/25 23:30:28 [32m
-[0m[33m[5.924ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_students_student_id" ON "students" ("student_id")
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.045ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
+		WHERE a.attnum > 0 -- hide internal columns
+		AND NOT a.attisdropped -- hide deleted columns
+		AND b.relname = 'classes'
 
-2026/03/25 23:30:28 [32m
-[0m[33m[4.428ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_students_class_id" ON "students" ("class_id")
-2026/03/25 23:30:28 Connected to PostgreSQL successfully
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.566ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.617ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND table_type = 'BASE TABLE'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.260ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'teacher_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[0.493ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.995ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'name') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[18.521ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'users'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.858ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'grade') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[0.834ms] [34;1m[rows:-][0m SELECT * FROM "users" LIMIT 5
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.589ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'subject') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[15.409ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users' AND constraint_type = 'UNIQUE'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.599ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'description') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[17.870ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users'
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.794ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'school_year') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[8.281ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.248ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.375ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[4.817ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'classes' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'classes' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.765ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'classes' AND indexname = 'idx_classes_teacher_id' AND schemaname = CURRENT_SCHEMA()
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.916ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'classes' AND indexname = 'idx_classes_deleted_at' AND schemaname = CURRENT_SCHEMA()
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.732ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND table_type = 'BASE TABLE'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.016ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[18.938ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'students'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[5.488ms] [34;1m[rows:-][0m SELECT * FROM "students" LIMIT 5
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[3.283ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'students' AND constraint_type = 'UNIQUE'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.977ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'students'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.096ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
+		WHERE a.attnum > 0 -- hide internal columns
+		AND NOT a.attisdropped -- hide deleted columns
+		AND b.relname = 'students'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.964ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.502ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'class_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[6.795ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'full_name') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.686ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'student_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.425ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'email') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.891ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'phone') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.740ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'date_of_birth') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.018ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[5.048ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'students' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[6.515ms] [34;1m[rows:1][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'students' AND constraint_name = 'fk_classes_students'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[2.409ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'students' AND indexname = 'idx_students_class_id' AND schemaname = CURRENT_SCHEMA()
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.525ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'students' AND indexname = 'idx_students_student_id' AND schemaname = CURRENT_SCHEMA()
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[1.258ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'test_results' AND table_type = 'BASE TABLE'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/internal/config/db.go:35
+[0m[33m[25.699ms] [34;1m[rows:0][0m CREATE TABLE "test_results" ("id" uuid DEFAULT gen_random_uuid(),"quiz_id" uuid NOT NULL,"student_id" uuid,"student_name" varchar(255) NOT NULL,"student_identifier" varchar(100) NOT NULL,"score" decimal DEFAULT 0,"total_correct" bigint DEFAULT 0,"total_incorrect" bigint DEFAULT 0,"time_taken_seconds" bigint DEFAULT 0,"answers" text[],"status" varchar(50) DEFAULT 'completed',"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+
+2026/03/25 23:38:16 [32m
+[0m[33m[20.194ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_test_results_deleted_at" ON "test_results" ("deleted_at")
+
+2026/03/25 23:38:16 [32m
+[0m[33m[8.584ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_test_results_student_id" ON "test_results" ("student_id")
+
+2026/03/25 23:38:16 [32m
+[0m[33m[5.147ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_test_results_quiz_id" ON "test_results" ("quiz_id")
+2026/03/25 23:38:16 Connected to PostgreSQL successfully
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[0.782ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[0.468ms] [34;1m[rows:1][0m SELECT CURRENT_DATABASE()
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[4.336ms] [34;1m[rows:-][0m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description, c.identity_increment FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'quizlm_dev' AND table_schema = CURRENT_SCHEMA() AND table_name = 'users'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[4.620ms] [34;1m[rows:-][0m SELECT * FROM "users" LIMIT 5
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[6.479ms] [34;1m[rows:-][0m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users' AND constraint_type = 'UNIQUE'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[7.780ms] [34;1m[rows:-][0m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_catalog, table_name, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'quizlm_dev' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users'
+
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[2.330ms] [34;1m[rows:-][0m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
 		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
 		WHERE a.attnum > 0 -- hide internal columns
 		AND NOT a.attisdropped -- hide deleted columns
 		AND b.relname = 'users'
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[3.791ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[2.423ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[2.306ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.813ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.343ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'password_hash') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[2.445ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'password_hash') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.662ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'full_name') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[2.080ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'full_name') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.444ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'avatar_url') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.467ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'avatar_url') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.082ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'role') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[5.524ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'role') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.136ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'plan_tier') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.236ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'plan_tier') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.321ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'preferences') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.294ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'preferences') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.348ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'is_active') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.522ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'is_active') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.524ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email_verified') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.759ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email_verified') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[5.500ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'last_login_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.769ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'last_login_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.911ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.468ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.250ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.387ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.804ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[2.478ms] [34;1m[rows:0][0m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'deleted_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[1.266ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_email' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.255ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_email' AND schemaname = CURRENT_SCHEMA()
 
-2026/03/25 23:30:28 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
-[0m[33m[0.807ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_deleted_at' AND schemaname = CURRENT_SCHEMA()
-2026/03/25 23:30:28 Server starting on port 8080
+2026/03/25 23:38:16 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:28
+[0m[33m[1.270ms] [34;1m[rows:1][0m SELECT count(*) FROM pg_indexes WHERE tablename = 'users' AND indexname = 'idx_users_deleted_at' AND schemaname = CURRENT_SCHEMA()
+2026/03/25 23:38:16 Server starting on port 8080
 
     _______ __
    / ____(_) /_  ___  _____
@@ -413,8 +526,8 @@
 /_/   /_/_.___/\___/_/          v3.1.0
 --------------------------------------------------
 INFO Server started on: 	http://127.0.0.1:8080 (bound on host 0.0.0.0 and port 8080)
-INFO Total handlers: 		22
+INFO Total handlers: 		25
 INFO Prefork: 			Disabled
-INFO PID: 			40888
+INFO PID: 			42697
 INFO Total process count: 	1
 
