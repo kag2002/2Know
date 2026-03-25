@@ -37,6 +37,8 @@ func ConnectDB() {
 		&model.Quiz{},
 		&model.Question{},
 		&model.Option{},
+		&model.Class{},
+		&model.Student{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)

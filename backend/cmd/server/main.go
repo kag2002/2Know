@@ -61,6 +61,12 @@ func main() {
 	api.Post("/questions", handler.CreateQuestion)
 	api.Delete("/questions/:id", handler.DeleteQuestion)
 
+	// Class & Student endpoints
+	api.Get("/classes", handler.GetClasses)
+	api.Post("/classes", handler.CreateClass)
+	api.Get("/classes/:id", handler.GetClassByID)
+	api.Post("/classes/:id/students", handler.AddStudent)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
