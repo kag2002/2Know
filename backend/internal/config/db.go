@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"backend/internal/model"
 	"gorm.io/gorm/logger"
 )
 
@@ -29,6 +30,16 @@ func ConnectDB() {
 
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	err = db.AutoMigrate(
+		&model.User{},
+		&model.Quiz{},
+		&model.Question{},
+		&model.Option{},
+	)
+	if err != nil {
+		log.Fatal("Failed to migrate database:", err)
 	}
 
 	DB = db

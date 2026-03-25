@@ -11,6 +11,7 @@ import (
 
 	"backend/internal/config"
 	"backend/internal/handler"
+	"backend/internal/middleware"
 	"backend/internal/model"
 )
 
@@ -44,9 +45,15 @@ func main() {
 		})
 	})
 
-	// Auth routes
+	// Auth routes (public)
 	app.Post("/api/auth/register", handler.Register)
 	app.Post("/api/auth/login", handler.Login)
+
+	// Protected block
+	api := app.Group("/api", middleware.Protected())
+	api.Get("/quizzes", handler.GetQuizzes)
+	api.Post("/quizzes", handler.CreateQuiz)
+	api.Get("/quizzes/:id", handler.GetQuizByID)
 
 	port := os.Getenv("PORT")
 	if port == "" {

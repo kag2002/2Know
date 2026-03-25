@@ -18,8 +18,64 @@ const steps = [
   { id: 8, title: "Xuất bản", icon: Share2 },
 ];
 
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+
 export default function QuizBuilderWizard() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  // Form State
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    subject: "",
+    grade_level: "",
+    time_limit_minutes: 0,
+    max_attempts: 1,
+    quiz_type: "online",
+    omr_template: "",
+    access_type: "public",
+  });
+
+  const updateForm = (key: string, value: any) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = async (status: string = "draft") => {
+    if (!formData.title) {
+      alert("Vui lòng nhập tên bài kiểm tra");
+      setCurrentStep(1);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Get token from cookie manually for client component API calls if needed
+      // Or rely on passing it in headers if stored in localStorage
+      const token = localStorage.getItem("quizlm_token");
+      
+      const res = await fetch("http://localhost:8080/api/quizzes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ ...formData, status })
+      });
+
+      if (!res.ok) {
+        throw new Error("Lỗi lưu bài kiểm tra");
+      }
+
+      router.push("/quizzes");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
@@ -34,7 +90,12 @@ export default function QuizBuilderWizard() {
           <Link href="/quizzes" className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
             Hủy
           </Link>
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+          <Button 
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            onClick={() => handleSave("draft")}
+            disabled={loading}
+          >
+            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Lưu nháp
           </Button>
         </div>
@@ -104,6 +165,8 @@ export default function QuizBuilderWizard() {
                       <label className="text-sm font-medium">Tên bài kiểm tra <span className="text-rose-500">*</span></label>
                       <input 
                         type="text" 
+                        value={formData.title}
+                        onChange={(e) => updateForm("title", e.target.value)}
                         placeholder="VD: Kiểm tra Toán 15 Phút - Đại Số" 
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       />
@@ -111,6 +174,8 @@ export default function QuizBuilderWizard() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Mô tả hoặc Hướng dẫn bài làm</label>
                       <textarea 
+                        value={formData.description}
+                        onChange={(e) => updateForm("description", e.target.value)}
                         placeholder="VD: Đọc kỹ đề bài trước khi làm. Không được sử dụng tài liệu..."
                         className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       />
@@ -348,7 +413,12 @@ export default function QuizBuilderWizard() {
                     Tiếp tục
                   </Button>
                 ) : (
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <Button 
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={() => handleSave("published")}
+                    disabled={loading}
+                  >
+                    {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     Xuất bản ngay
                   </Button>
                 )}
