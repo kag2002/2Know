@@ -1,23 +1,56 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, ArrowLeft, Save, Sparkles } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import {
+  ArrowLeft, Save, Plus, Trash2, GripVertical, CheckCircle2,
+  Settings2, Image as ImageIcon, BookOpen, Tags
+} from "lucide-react";
 import Link from "next/link";
 
 export default function CreateQuestionPage() {
+  const router = useRouter();
+  const [qType, setQType] = useState("multiple_choice");
+  const [content, setContent] = useState("");
   const [options, setOptions] = useState([
     { id: 1, text: "", isCorrect: true },
     { id: 2, text: "", isCorrect: false },
     { id: 3, text: "", isCorrect: false },
     { id: 4, text: "", isCorrect: false },
   ]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const toggleCorrect = (id: number) => {
-    setOptions(options.map(opt => 
+    setOptions(options.map(opt =>
       opt.id === id ? { ...opt, isCorrect: true } : { ...opt, isCorrect: false }
     ));
+  };
+
+  const handleSave = async () => {
+    if (!content.trim()) return alert("Vui lòng nhập nội dung câu hỏi!");
+    setIsSaving(true);
+    try {
+      await apiFetch("/questions", {
+        method: "POST",
+        body: JSON.stringify({
+          type: qType,
+          content: content,
+          difficulty: "Trung bình",
+          folder: "Chưa phân loại",
+          options: options.map(o => ({ content: o.text, is_correct: o.isCorrect }))
+        })
+      });
+      alert("Đã lưu câu hỏi thành công!");
+      router.push("/question-bank");
+    } catch (err: any) {
+      alert("Lỗi khi lưu câu hỏi: " + err.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -33,12 +66,14 @@ export default function CreateQuestionPage() {
           </p>
         </div>
         <div className="ml-auto flex gap-3">
-          <Button variant="outline" className="gap-2 bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100">
-            <Sparkles className="w-4 h-4" /> Dùng AI Điền
-          </Button>
-          <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
-            <Save className="w-4 h-4" /> Lưu câu hỏi
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="bg-white gap-2" disabled>
+              Lưu nháp
+            </Button>
+            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 shadow-sm font-semibold" onClick={handleSave} disabled={isSaving}>
+              <Save className="w-4 h-4" /> {isSaving ? "Đang lưu..." : "Lưu vào Ngân hàng"}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -81,9 +116,11 @@ export default function CreateQuestionPage() {
               <Button variant="ghost" size="sm" className="h-8 px-2">{"{x}"}</Button>
               <Button variant="ghost" size="sm" className="h-8 px-2">📷</Button>
             </div>
-            <textarea 
+            <textarea
               className="w-full p-4 min-h-[120px] focus:outline-none resize-y"
               placeholder="Nhập nội dung câu hỏi..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
             ></textarea>
           </div>
         </div>
@@ -93,21 +130,21 @@ export default function CreateQuestionPage() {
             <label className="text-sm font-medium">Các đáp án</label>
             <span className="text-xs text-muted-foreground">Tích xanh vào đáp án đúng</span>
           </div>
-          
+
           <div className="space-y-3">
             {options.map((opt, i) => (
               <div key={opt.id} className={`flex items-start gap-3 p-3 border rounded-lg transition-colors ${opt.isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-white'}`}>
                 <div className="pt-2">
-                  <input 
-                    type="radio" 
-                    name="correct_answer" 
-                    checked={opt.isCorrect} 
+                  <input
+                    type="radio"
+                    name="correct_answer"
+                    checked={opt.isCorrect}
                     onChange={() => toggleCorrect(opt.id)}
-                    className="w-4 h-4 text-emerald-600 cursor-pointer" 
+                    className="w-4 h-4 text-emerald-600 cursor-pointer"
                   />
                 </div>
                 <div className="flex-1">
-                  <Input 
+                  <Input
                     placeholder={`Nhập đáp án ${String.fromCharCode(65 + i)}...`}
                     value={opt.text}
                     onChange={(e) => {

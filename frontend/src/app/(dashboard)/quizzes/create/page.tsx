@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Settings, Users, BookOpen, Flag, CheckCircle, Clock, Award, Share2 } from "lucide-react";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 import { QuestionBuilder } from "@/components/dashboard/QuestionBuilder";
 
 const steps = [
@@ -52,26 +53,13 @@ export default function QuizBuilderWizard() {
 
     setLoading(true);
     try {
-      // Get token from cookie manually for client component API calls if needed
-      // Or rely on passing it in headers if stored in localStorage
-      const token = localStorage.getItem("quizlm_token");
-      
-      const res = await fetch("http://localhost:8080/api/quizzes", {
+      await apiFetch("/quizzes", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
         body: JSON.stringify({ ...formData, status })
       });
-
-      if (!res.ok) {
-        throw new Error("Lỗi lưu bài kiểm tra");
-      }
-
       router.push("/quizzes");
     } catch (err: any) {
-      alert(err.message);
+      alert("Lỗi lưu bài kiểm tra: " + err.message);
     } finally {
       setLoading(false);
     }
