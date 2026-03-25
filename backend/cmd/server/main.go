@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"backend/internal/config"
+	"backend/internal/handler"
 	"backend/internal/model"
 )
 
@@ -42,6 +43,10 @@ func main() {
 			"message": "QuizLM API is running",
 		})
 	})
+
+	// Auth routes
+	app.Post("/api/auth/register", handler.Register)
+	app.Post("/api/auth/login", handler.Login)
 
 	port := os.Getenv("PORT")
 	if port == "" {

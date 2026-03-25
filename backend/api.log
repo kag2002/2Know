@@ -1,0 +1,27 @@
+2026/03/25 23:13:49 Connected to PostgreSQL successfully
+
+2026/03/25 23:13:49 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:27
+[0m[33m[25.904ms] [34;1m[rows:1][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2026/03/25 23:13:49 [32m/Users/vfx_3/Documents/Aivial/2Know/backend/cmd/server/main.go:27
+[0m[33m[28.004ms] [34;1m[rows:0][0m CREATE TABLE "users" ("id" uuid DEFAULT gen_random_uuid(),"email" varchar(255) NOT NULL,"password_hash" varchar(255) NOT NULL,"full_name" varchar(255) NOT NULL,"avatar_url" varchar(500),"role" varchar(20) DEFAULT 'teacher',"plan_tier" varchar(20) DEFAULT 'free',"preferences" jsonb DEFAULT '{}',"is_active" boolean DEFAULT true,"email_verified" boolean DEFAULT false,"last_login_at" timestamptz,"created_at" timestamptz,"updated_at" timestamptz,"deleted_at" timestamptz,PRIMARY KEY ("id"))
+
+2026/03/25 23:13:49 [32m
+[0m[33m[10.116ms] [34;1m[rows:0][0m CREATE INDEX IF NOT EXISTS "idx_users_deleted_at" ON "users" ("deleted_at")
+
+2026/03/25 23:13:49 [32m
+[0m[33m[4.329ms] [34;1m[rows:0][0m CREATE UNIQUE INDEX IF NOT EXISTS "idx_users_email" ON "users" ("email")
+2026/03/25 23:13:49 Server starting on port 8080
+
+    _______ __
+   / ____(_) /_  ___  _____
+  / /_  / / __ \/ _ \/ ___/
+ / __/ / / /_/ /  __/ /
+/_/   /_/_.___/\___/_/          v3.1.0
+--------------------------------------------------
+INFO Server started on: 	http://127.0.0.1:8080 (bound on host 0.0.0.0 and port 8080)
+INFO Total handlers: 		6
+INFO Prefork: 			Disabled
+INFO PID: 			36705
+INFO Total process count: 	1
+

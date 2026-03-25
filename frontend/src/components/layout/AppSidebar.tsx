@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -12,9 +13,11 @@ import {
   Tags, 
   StickyNote,
   Library,
-  Settings
+  Settings,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const sidebarLinks = [
   { icon: LayoutDashboard, label: "Tổng quan", href: "/overview" },
@@ -32,6 +35,24 @@ const sidebarLinks = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<{full_name?: string; email?: string} | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("quizlm_user");
+    if (stored) {
+      try {
+        setUser(JSON.parse(stored));
+      } catch (e) {}
+    }
+  }, []);
+
+  const handleLogout = () => {
+    document.cookie = "quizlm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    localStorage.removeItem("quizlm_token");
+    localStorage.removeItem("quizlm_user");
+    router.push("/login");
+  };
 
   return (
     <aside className="w-64 border-r bg-background min-h-screen flex flex-col">
@@ -89,18 +110,20 @@ export function AppSidebar() {
           </div>
         </div>
 
-        <Link
-          href="/settings"
-          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-muted transition-colors"
+        <div
+          className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center font-semibold">
-            M
+          <div className="w-8 h-8 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center font-semibold uppercase">
+            {user?.full_name ? user.full_name[0] : "U"}
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium leading-none">Ms.Tami</span>
-            <span className="text-xs text-muted-foreground mt-1">teacher@gmail.com</span>
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <span className="text-sm font-medium leading-none truncate">{user?.full_name || "User"}</span>
+            <span className="text-xs text-muted-foreground mt-1 truncate">{user?.email}</span>
           </div>
-        </Link>
+          <button onClick={handleLogout} className="p-1 hover:bg-slate-200 rounded text-slate-500 transition-colors">
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </aside>
   );
