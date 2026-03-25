@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,56 +12,41 @@ import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    setIsLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
+      const data = await apiFetch("/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        requireAuth: false,
         body: JSON.stringify({ email, password }),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Đăng nhập thất bại");
-      }
-
-      // Store token in cookie for middleware
-      document.cookie = `quizlm_token=${data.token}; path=/; max-age=259200; Secure; SameSite=Lax`;
-      // Store user data in localStorage for UI
-      localStorage.setItem("quizlm_user", JSON.stringify(data.user));
-
-      // Redirect
-      router.push("/overview");
+      // the api returns { token, user: {id, email, name} }
+      login(data.token, data.user);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-      <div className="space-y-2 text-center lg:text-left">
+      <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Chào mừng trở lại</h1>
-        <p className="text-sm text-slate-500">
-          Nhập email và mật khẩu của bạn để truy cập bảng điều khiển.
-        </p>
+        <p className="text-slate-500">Đăng nhập để vào trang quản trị 2Know</p>
       </div>
 
       <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100/50">
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-5">
           {error && (
             <div className="p-3 text-sm text-rose-600 border border-rose-200 bg-rose-50 rounded-md">
               {error}
@@ -75,14 +62,16 @@ export default function LoginPage() {
               placeholder="name@example.com" 
               required 
               className="h-11"
-              disabled={loading}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              disabled={isLoading}
             />
           </div>
           
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Mật khẩu</Label>
-              <Link href="/forgot-password" className="text-sm font-medium text-emerald-600 hover:text-emerald-500">
+              <Link href="/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                 Quên mật khẩu?
               </Link>
             </div>
@@ -93,26 +82,28 @@ export default function LoginPage() {
               autoComplete="current-password"
               required 
               className="h-11"
-              disabled={loading}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
           <Button 
-            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-medium" 
+            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium" 
             type="submit" 
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Đăng nhập
           </Button>
         </form>
+      </div>
 
-        <div className="mt-6 text-center text-sm text-slate-600">
-          Chưa có tài khoản?{" "}
-          <Link href="/register" className="font-semibold text-emerald-600 hover:text-emerald-500">
-            Đăng ký miễn phí
-          </Link>
-        </div>
+      <div className="text-center text-sm text-slate-500">
+        Chưa có tài khoản?{" "}
+        <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          Đăng ký miễn phí
+        </Link>
       </div>
     </div>
   );

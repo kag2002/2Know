@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Plus, Search, Filter, MoreHorizontal, BookOpen } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, FolderCode, Tags } from "lucide-react";
+import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 import {
   Table,
   TableBody,
@@ -19,116 +20,138 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const mockBank = [
-  { id: "1", content: "Nguyên nhân chính dẫn đến Chiến tranh thế giới thứ nhất là gì?", type: "Trắc nghiệm", subject: "Lịch sử", grade: "Lớp 11", date: "22 thg 3, 2026" },
-  { id: "2", content: "Giải phương trình logarit cơ bản", type: "Tự luận", subject: "Toán học", grade: "Lớp 12", date: "20 thg 3, 2026" },
-  { id: "3", content: "Tìm từ trái nghĩa với từ 'Abundant'", type: "Trắc nghiệm", subject: "Tiếng Anh", grade: "Đại học", date: "15 thg 3, 2026" },
-  { id: "4", content: "Sự bay hơi của nước phụ thuộc vào yếu tố nào?", type: "Đúng/Sai", subject: "Vật lý", grade: "Lớp 10", date: "10 thg 3, 2026" },
-];
+interface Question {
+  id: string;
+  type: string;
+  content: string;
+  folder: string;
+  difficulty: string;
+  tags: string[];
+}
 
 export default function QuestionBankPage() {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadQuestions();
+  }, []);
+
+  const loadQuestions = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch("/questions");
+      setQuestions(data || []);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="flex h-[calc(100vh-6rem)] gap-6">
+      
+      {/* Sidebar Filters */}
+      <div className="w-64 shrink-0 flex flex-col gap-6 hidden md:flex h-full">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Ngân hàng câu hỏi</h1>
-          <p className="text-muted-foreground mt-1">
-            Quản lý tài nguyên, phân loại và tái sử dụng câu hỏi cho nhiều bài kiểm tra khác nhau.
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Ngân hàng</h1>
+          <p className="text-sm text-muted-foreground mt-1">Quản lý kho câu hỏi dùng chung</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="gap-2 bg-white">
-            <Filter className="w-4 h-4" /> Bộ lọc
+
+        <Link href="/question-bank/create">
+          <Button className="w-full justify-start gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
+            <Plus className="w-4 h-4" /> Soạn câu hỏi mới
           </Button>
-          <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
-            <Plus className="w-4 h-4" /> Tạo câu hỏi mới
-          </Button>
+        </Link>
+        
+        {/* Navigations/Folders */}
+        <div className="space-y-1 overflow-y-auto flex-1 pr-2">
+          <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 px-2">Thư mục môn học</div>
+          {['Toán Đại Số 12', 'Hình Học Không Gian', 'Vật Lý Nâng Cao', 'Tiếng Anh B1'].map(folder => (
+            <button key={folder} className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors text-left">
+              <FolderCode className="w-4 h-4 text-slate-400" />
+              {folder}
+            </button>
+          ))}
+          
+          <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mt-6 mb-3 px-2">Bộ lọc theo Nhãn (Tags)</div>
+          <div className="flex flex-wrap gap-2 px-2">
+            {['#kho', '#trung-binh', '#de', '#thi-thu', '#chuong1'].map(tag => (
+              <span key={tag} className="inline-flex items-center px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold rounded-md cursor-pointer transition-colors">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Left Sidebar Filter/Categories */}
-        <div className="col-span-1 space-y-6">
-          <div className="bg-white border rounded-lg p-4">
-            <h3 className="font-semibold text-sm mb-3">Chủ đề môn học</h3>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li className="flex justify-between items-center bg-emerald-50 text-emerald-700 px-2 py-1.5 rounded-md font-medium cursor-pointer">
-                <span>Tất cả môn học</span>
-                <span className="bg-emerald-100 px-2 py-0.5 rounded-full text-xs">425</span>
-              </li>
-              <li className="flex justify-between items-center px-2 py-1.5 hover:bg-slate-50 rounded-md cursor-pointer">
-                <span>Toán học</span>
-                <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-xs">120</span>
-              </li>
-              <li className="flex justify-between items-center px-2 py-1.5 hover:bg-slate-50 rounded-md cursor-pointer">
-                <span>Ngữ văn</span>
-                <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-xs">85</span>
-              </li>
-              <li className="flex justify-between items-center px-2 py-1.5 hover:bg-slate-50 rounded-md cursor-pointer">
-                <span>Vật lý</span>
-                <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-xs">60</span>
-              </li>
-              <li className="flex justify-between items-center px-2 py-1.5 hover:bg-slate-50 rounded-md cursor-pointer">
-                <span>Tiếng Anh</span>
-                <span className="bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full text-xs">160</span>
-              </li>
-            </ul>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 bg-white border shadow-sm rounded-xl overflow-hidden relative">
+        {/* Toolbar */}
+        <div className="p-4 border-b bg-slate-50/80 flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input 
+              type="text"
+              placeholder="Tìm kiếm nội dung câu hỏi..." 
+              className="w-full pl-9 h-10 border border-input rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
           </div>
-          
-          <div className="bg-white border rounded-lg p-4">
-            <h3 className="font-semibold text-sm mb-3">Khối lớp</h3>
-            <div className="flex flex-wrap gap-2">
-              {["Lớp 10", "Lớp 11", "Lớp 12", "Luyện thi đại học"].map(level => (
-                <span key={level} className="text-xs px-2.5 py-1.5 rounded-full border bg-slate-50 text-slate-600 cursor-pointer hover:border-emerald-300">
-                  {level}
-                </span>
-              ))}
-            </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" className="gap-2 bg-white">
+              <Filter className="w-4 h-4" /> Lọc
+            </Button>
           </div>
         </div>
 
-        {/* Right Main Table */}
-        <div className="col-span-3 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="relative max-w-sm w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                type="search" 
-                placeholder="Tìm kiếm nội dung câu hỏi..." 
-                className="pl-9 h-9 bg-white"
-              />
-            </div>
-            <div className="text-sm text-slate-500">
-              Hiển thị <strong>4</strong> / 425 câu hỏi
-            </div>
-          </div>
-
-          <div className="border rounded-md bg-white overflow-hidden">
+        {/* Data Table */}
+        <div className="flex-1 overflow-auto">
+          {loading ? (
+             <div className="p-8 text-center text-slate-500">Đang tải câu hỏi...</div>
+          ) : questions.length === 0 ? (
+             <div className="p-12 text-center text-slate-500">Không tìm thấy câu hỏi nào.</div>
+          ) : (
             <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50 hover:bg-slate-50">
-                  <TableHead className="w-[450px]">Nội dung câu hỏi</TableHead>
-                  <TableHead>Chuyên mục</TableHead>
-                  <TableHead>Cấp độ</TableHead>
-                  <TableHead>Ngày tạo</TableHead>
-                  <TableHead className="text-right"></TableHead>
+              <TableHeader className="bg-white sticky top-0 z-10 shadow-sm">
+                <TableRow>
+                  <TableHead className="w-[50px] text-center">
+                    <input type="checkbox" className="rounded border-slate-300" />
+                  </TableHead>
+                  <TableHead className="w-[100px] font-semibold">Loại</TableHead>
+                  <TableHead className="font-semibold">Nội dung câu hỏi</TableHead>
+                  <TableHead className="font-semibold w-[150px]">Độ khó</TableHead>
+                  <TableHead className="font-semibold w-[120px]">Thư mục</TableHead>
+                  <TableHead className="text-right w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockBank.map((q) => (
-                  <TableRow key={q.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-start gap-2">
-                        <BookOpen className="w-4 h-4 text-slate-300 mt-0.5 flex-shrink-0" />
-                        <div className="flex flex-col gap-1">
-                          <span className="text-sm text-slate-800 line-clamp-2">{q.content}</span>
-                          <span className="text-xs text-muted-foreground w-fit bg-slate-100 px-1.5 py-0.5 rounded">{q.type}</span>
-                        </div>
+                {questions.map((q) => (
+                  <TableRow key={q.id} className="hover:bg-slate-50/50 group cursor-pointer transition-colors">
+                    <TableCell className="text-center">
+                      <input type="checkbox" className="rounded border-slate-300" />
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex px-2 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase rounded-md whitespace-nowrap">
+                        {q.type}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-[400px]">
+                        <p className="font-medium text-slate-800 line-clamp-2 leading-relaxed">
+                          {q.content}
+                        </p>
                       </div>
                     </TableCell>
-                    <TableCell className="text-slate-600 text-sm">{q.subject}</TableCell>
-                    <TableCell className="text-slate-600 text-sm">{q.grade}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{q.date}</TableCell>
+                    <TableCell>
+                      <span className={`inline-flex px-2 py-1 text-[11px] font-semibold rounded-md ${
+                        q.difficulty === 'Khó' ? 'bg-rose-100 text-rose-700' : 
+                        q.difficulty === 'Dễ' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {q.difficulty}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{q.folder || "Chưa phân loại"}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger className="h-8 w-8 p-0 flex items-center justify-center rounded-md hover:bg-slate-100 text-slate-500">
@@ -138,7 +161,6 @@ export default function QuestionBankPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
                           <DropdownMenuItem>Tạo bản sao</DropdownMenuItem>
-                          <DropdownMenuItem>Tạo đề thi từ câu này</DropdownMenuItem>
                           <DropdownMenuItem className="text-rose-600">Xóa vĩnh viễn</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -147,7 +169,12 @@ export default function QuestionBankPage() {
                 ))}
               </TableBody>
             </Table>
-          </div>
+          )}
+        </div>
+        
+        {/* Pagination Footer */}
+        <div className="p-3 border-t bg-slate-50/50 flex items-center justify-between text-xs text-slate-500">
+          <div>Hiển thị <span className="font-medium text-slate-900">{questions.length}</span> câu hỏi</div>
         </div>
       </div>
     </div>

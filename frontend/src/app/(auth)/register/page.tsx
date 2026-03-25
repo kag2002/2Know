@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,60 +11,44 @@ import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", password: "", confirm: "" });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    const formData = new FormData(e.currentTarget);
-    const fullName = formData.get("full_name");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const passwordConfirm = formData.get("password_confirm");
-
-    if (password !== passwordConfirm) {
-      setError("Mật khẩu xác nhận không khớp");
-      setLoading(false);
+    if (formData.password !== formData.confirm) {
+      setError("Mật khẩu xác nhận không khớp.");
       return;
     }
 
+    setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8080/api/auth/register", {
+      await apiFetch("/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, full_name: fullName }),
+        requireAuth: false,
+        body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password }),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Đăng ký thất bại");
-      }
-
-      // Automatically login after register or redirect to login
-      router.push("/login?registered=true");
+      // Auto redirect to login
+      router.push("/login?registered=success");
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Không thể đăng ký. Email có thể đã tồn tại.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-      <div className="space-y-2 text-center lg:text-left">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Bắt đầu miễn phí</h1>
-        <p className="text-sm text-slate-500">
-          Chỉ mất 1 phút để trải nghiệm tạo đề thi Siêu tốc 
-          bằng AI.
-        </p>
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Tạo tài khoản mới</h1>
+        <p className="text-slate-500">Trở thành đối tác giáo dục cùng 2Know</p>
       </div>
 
       <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100/50">
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={handleRegister} className="space-y-5">
           {error && (
             <div className="p-3 text-sm text-rose-600 border border-rose-200 bg-rose-50 rounded-md">
               {error}
@@ -79,7 +64,9 @@ export default function RegisterPage() {
               placeholder="Nguyễn Văn A" 
               required 
               className="h-11"
-              disabled={loading}
+              value={formData.name}
+              onChange={e => setFormData({...formData, name: e.target.value})}
+              disabled={isLoading}
             />
           </div>
 
@@ -92,7 +79,9 @@ export default function RegisterPage() {
               placeholder="name@example.com" 
               required 
               className="h-11"
-              disabled={loading}
+              value={formData.email}
+              onChange={e => setFormData({...formData, email: e.target.value})}
+              disabled={isLoading}
             />
           </div>
           
@@ -104,7 +93,9 @@ export default function RegisterPage() {
               type="password" 
               required 
               className="h-11"
-              disabled={loading}
+              value={formData.password}
+              onChange={e => setFormData({...formData, password: e.target.value})}
+              disabled={isLoading}
             />
           </div>
 
@@ -116,30 +107,32 @@ export default function RegisterPage() {
               type="password" 
               required 
               className="h-11"
-              disabled={loading}
+              value={formData.confirm}
+              onChange={e => setFormData({...formData, confirm: e.target.value})}
+              disabled={isLoading}
             />
           </div>
 
           <Button 
-            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-medium mt-2" 
+            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium mt-2" 
             type="submit" 
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Tạo tài khoản
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Đăng ký tài khoản
           </Button>
 
           <div className="text-xs text-center text-slate-500 mt-4 leading-relaxed">
             Bằng cách tạo tài khoản, bạn đồng ý với Điều khoản Dịch vụ và Chính sách Bảo mật của chúng tôi.
           </div>
         </form>
+      </div>
 
-        <div className="mt-6 text-center text-sm text-slate-600">
-          Đã có tài khoản?{" "}
-          <Link href="/login" className="font-semibold text-emerald-600 hover:text-emerald-500">
-            Đăng nhập
-          </Link>
-        </div>
+      <div className="text-center text-sm text-slate-500">
+        Đã có tài khoản?{" "}
+        <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          Đăng nhập
+        </Link>
       </div>
     </div>
   );
