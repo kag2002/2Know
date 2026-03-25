@@ -51,9 +51,15 @@ func main() {
 
 	// Protected block
 	api := app.Group("/api", middleware.Protected())
+	// Quiz endpoints
 	api.Get("/quizzes", handler.GetQuizzes)
 	api.Post("/quizzes", handler.CreateQuiz)
 	api.Get("/quizzes/:id", handler.GetQuizByID)
+
+	// Question endpoints
+	api.Get("/quizzes/:quizId/questions", handler.GetQuizQuestions)
+	api.Post("/questions", handler.CreateQuestion)
+	api.Delete("/questions/:id", handler.DeleteQuestion)
 
 	port := os.Getenv("PORT")
 	if port == "" {
