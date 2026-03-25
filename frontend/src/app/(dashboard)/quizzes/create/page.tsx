@@ -30,9 +30,9 @@ export default function QuizBuilderWizard() {
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" asChild>
-            <Link href="/quizzes">Hủy</Link>
-          </Button>
+          <Link href="/quizzes" className="inline-flex items-center justify-center rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+            Hủy
+          </Link>
           <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
             Lưu nháp
           </Button>
@@ -96,8 +96,102 @@ export default function QuizBuilderWizard() {
               </div>
               
               {/* Dynamic content for current step */}
-              {currentStep === 4 ? (
-                <div className="space-y-6">
+              {currentStep === 1 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Tên bài kiểm tra <span className="text-rose-500">*</span></label>
+                      <input 
+                        type="text" 
+                        placeholder="VD: Kiểm tra Toán 15 Phút - Đại Số" 
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Mô tả hoặc Hướng dẫn bài làm</label>
+                      <textarea 
+                        placeholder="VD: Đọc kỹ đề bài trước khi làm. Không được sử dụng tài liệu..."
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                        <label className="text-sm font-medium">Môn học / Chuyên mục</label>
+                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                          <option value="">-- Chọn Môn học --</option>
+                          <option>Toán học</option>
+                          <option>Ngữ văn</option>
+                          <option>Tiếng Anh</option>
+                          <option>Vật lý</option>
+                          <option>Khác</option>
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Lớp / Cấp độ</label>
+                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                          <option value="">-- Chọn Cấp độ --</option>
+                          <option>Tiểu học</option>
+                          <option>THCS</option>
+                          <option>THPT</option>
+                          <option>Đại học / Tự do</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 2 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="grid gap-6">
+                    <div className="border rounded-lg p-5 flex items-start gap-4">
+                      <div className="mt-0.5">
+                        <input type="radio" id="public" name="assign" value="public" className="w-4 h-4 text-emerald-600" defaultChecked />
+                      </div>
+                      <div className="grid gap-1">
+                        <label htmlFor="public" className="font-medium text-sm">Công khai (Ai có link cũng làm được)</label>
+                        <p className="text-xs text-muted-foreground">Phù hợp cho thi thử, làm bài tự do. Hệ thống có thể yêu cầu điền tên trước khi làm.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="border rounded-lg p-5 flex items-start gap-4 border-emerald-500 bg-emerald-50/30">
+                      <div className="mt-0.5">
+                        <input type="radio" id="assigned" name="assign" value="assigned" className="w-4 h-4 text-emerald-600" />
+                      </div>
+                      <div className="grid gap-4 w-full">
+                        <div>
+                          <label htmlFor="assigned" className="font-medium text-sm">Chỉ định lớp học</label>
+                          <p className="text-xs text-muted-foreground mt-1">Giao bài cho một hoặc nhiều lớp cụ thể, chỉ học sinh trong lớp mới xem và làm được.</p>
+                        </div>
+                        <div className="bg-white p-4 border rounded-md">
+                          <div className="flex flex-col gap-2">
+                            <label className="text-xs font-semibold text-slate-500">DANH SÁCH LỚP HỌC CỦA BẠN</label>
+                            <div className="space-y-2 mt-2 max-h-[150px] overflow-y-auto pr-2">
+                              {['Lớp 11A1 - Toán', 'Lớp 11A2 - Toán', 'Đội tuyển HSG Lớp 10'].map(cls => (
+                                <div key={cls} className="flex items-center space-x-2 border p-2.5 rounded-md hover:bg-slate-50 cursor-pointer">
+                                  <input type="checkbox" id={cls} className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                                  <label htmlFor={cls} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                                    {cls}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 3 && (
+                <div className="min-h-[400px] flex items-center justify-center border-2 border-dashed rounded-lg bg-slate-50 text-slate-500 text-sm">
+                  Giao diện soản thảo/chọn câu hỏi (Sẽ được xây dựng ở component riêng)
+                </div>
+              )}
+
+              {currentStep === 4 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="grid gap-4">
                     <div className="flex flex-col gap-2">
                       <label className="text-sm font-medium">Định dạng giấy OMR</label>
@@ -135,7 +229,9 @@ export default function QuizBuilderWizard() {
                     </div>
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {![1, 2, 3, 4].includes(currentStep) && (
                 <div className="min-h-[400px] flex items-center justify-center border-2 border-dashed rounded-lg bg-slate-50">
                   <p className="text-muted-foreground text-sm">
                     Form UI cho phần {steps[currentStep - 1].title} sẽ được render tại đây.
