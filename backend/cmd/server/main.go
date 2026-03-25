@@ -54,12 +54,12 @@ func main() {
 
 	// Protected block
 	api := app.Group("/api", middleware.Protected())
-	
+
 	// Quiz endpoints
 	api.Get("/quizzes", handler.GetQuizzes)
 	api.Post("/quizzes", handler.CreateQuiz)
 	api.Get("/quizzes/:id", handler.GetQuizByID)
-	
+
 	// Results analytics endpoints (Teacher)
 	api.Get("/quizzes/:quizId/results", handler.GetQuizResults)
 

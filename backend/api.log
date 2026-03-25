@@ -531,3 +531,4 @@ INFO Prefork: 			Disabled
 INFO PID: 			42697
 INFO Total process count: 	1
 
+00:00:55 | 401 |    3.550595ms |       127.0.0.1 | GET     | /api/v1/health                 

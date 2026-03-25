@@ -63,7 +63,7 @@ func GetQuizQuestions(c fiber.Ctx) error {
 
 func DeleteQuestion(c fiber.Ctx) error {
 	questionId := c.Params("id")
-	
+
 	// Complex authorization: check if the teacher owns the quiz the question belongs to
 	userId := getUserIdFromToken(c)
 

@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
+	"backend/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"backend/internal/model"
 	"gorm.io/gorm/logger"
 )
 
@@ -21,7 +21,7 @@ func ConnectDB() {
 	port := os.Getenv("DB_PORT")
 	sslmode := os.Getenv("DB_SSLMODE")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", 
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		host, user, password, dbname, port, sslmode)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{

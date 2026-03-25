@@ -22,7 +22,7 @@ func SubmitTest(c fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Quiz not found"})
 	}
 
-	// In a real application, score calculation happens on the backend here 
+	// In a real application, score calculation happens on the backend here
 	// based on the answers array mapping to the actual Question Models.
 	// For simulation, we trust the incoming object's scores or mock them.
 

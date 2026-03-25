@@ -31,7 +31,7 @@ func CreateQuiz(c fiber.Ctx) error {
 	if userId == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
-	
+
 	quiz.TeacherID = userId
 
 	// Use transaction to ensure full creation

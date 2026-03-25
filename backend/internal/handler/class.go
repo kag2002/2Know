@@ -39,7 +39,7 @@ func GetClasses(c fiber.Ctx) error {
 	}
 
 	var classes []model.Class
-	// Preload to get student count quickly 
+	// Preload to get student count quickly
 	if err := config.DB.Preload("Students").Where("teacher_id = ?", userId).Order("created_at desc").Find(&classes).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch classes"})
 	}
