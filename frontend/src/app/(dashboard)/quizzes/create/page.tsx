@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRight, Settings, Users, BookOpen, Flag, CheckCircle, Clock, Award, Share2 } from "lucide-react";
 import Link from "next/link";
+import { QuestionBuilder } from "@/components/dashboard/QuestionBuilder";
 
 const steps = [
   { id: 1, title: "Cài đặt chung", icon: Settings },
@@ -185,9 +186,7 @@ export default function QuizBuilderWizard() {
               )}
 
               {currentStep === 3 && (
-                <div className="min-h-[400px] flex items-center justify-center border-2 border-dashed rounded-lg bg-slate-50 text-slate-500 text-sm">
-                  Giao diện soản thảo/chọn câu hỏi (Sẽ được xây dựng ở component riêng)
-                </div>
+                <QuestionBuilder />
               )}
 
               {currentStep === 4 && (
@@ -231,11 +230,104 @@ export default function QuizBuilderWizard() {
                 </div>
               )}
 
-              {![1, 2, 3, 4].includes(currentStep) && (
-                <div className="min-h-[400px] flex items-center justify-center border-2 border-dashed rounded-lg bg-slate-50">
-                  <p className="text-muted-foreground text-sm">
-                    Form UI cho phần {steps[currentStep - 1].title} sẽ được render tại đây.
-                  </p>
+              {currentStep === 5 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Thời gian làm bài (Phút)</label>
+                        <input type="number" placeholder="Bỏ trống nếu không giới hạn" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Số lần làm lại tối đa</label>
+                        <input type="number" placeholder="Mặc định: 1" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Thời gian mở bài thi</label>
+                        <input type="datetime-local" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Thời gian đóng bài thi (Deadline)</label>
+                        <input type="datetime-local" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 6 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="grid gap-6">
+                    <div className="border rounded-lg p-5 flex items-center justify-between bg-slate-50">
+                      <div>
+                        <h4 className="font-medium text-sm">Hiển thị kết quả sau khi thi xong</h4>
+                        <p className="text-xs text-muted-foreground mt-1">Học sinh sẽ thấy điểm vả giải thích đáp án ngay lập tức</p>
+                      </div>
+                      <div className="w-10 h-5 bg-emerald-500 rounded-full relative cursor-pointer">
+                        <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                      </div>
+                    </div>
+
+                    <div className="border rounded-lg p-5 flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm">Hình phạt điểm (Trừ điểm khi làm sai)</h4>
+                        <p className="text-xs text-muted-foreground mt-1">Trừ % điểm của câu hỏi nếu học sinh chọn sai đáp án</p>
+                      </div>
+                      <div className="w-10 h-5 bg-slate-200 rounded-full relative cursor-pointer">
+                        <div className="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 7 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="grid gap-4">
+                    <div className="border rounded-lg p-5 flex items-center justify-between bg-emerald-50/50 border-emerald-200">
+                      <div>
+                        <h4 className="font-medium text-sm">Chế độ toàn màn hình (Fullscreen)</h4>
+                        <p className="text-xs text-muted-foreground mt-1">Cảnh báo và lưu log nếu thí sinh tự ý thoát tab bài làm ra ngoài</p>
+                      </div>
+                      <div className="w-10 h-5 bg-emerald-500 rounded-full relative cursor-pointer">
+                        <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                      </div>
+                    </div>
+                    <div className="border rounded-lg p-5 flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm">Chống sao chép (Copy / Paste)</h4>
+                        <p className="text-xs text-muted-foreground mt-1">Vô hiệu hóa chuột phải và tổ hợp phím sao chép văn bản trong lúc làm bài</p>
+                      </div>
+                      <div className="w-10 h-5 bg-emerald-500 rounded-full relative cursor-pointer">
+                        <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                      </div>
+                    </div>
+                    <div className="border rounded-lg p-5 flex items-center justify-between opacity-50 cursor-not-allowed">
+                      <div>
+                        <h4 className="font-medium text-sm flex gap-2 items-center">Chống gian lận bằng AI Camera <span className="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">PRO</span></h4>
+                        <p className="text-xs text-muted-foreground mt-1">Theo dõi hành vi và phát hiện nhiều khuôn mặt trước camera.</p>
+                      </div>
+                      <div className="w-10 h-5 bg-slate-200 rounded-full relative">
+                        <div className="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 8 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="flex flex-col items-center justify-center text-center p-8 bg-slate-50 border border-green-200 rounded-xl">
+                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
+                      <Share2 className="w-8 h-8 text-emerald-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900">Mọi thứ đã sẵn sàng!</h3>
+                    <p className="text-slate-500 mt-2 max-w-sm text-sm">
+                      Bài kiểm tra của bạn đã được lưu tự động. Bạn có thể xuất bản ngay bây giờ để gửi tới người tham gia.
+                    </p>
+                  </div>
                 </div>
               )}
 
