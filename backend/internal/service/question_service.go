@@ -1,0 +1,55 @@
+package service
+
+import (
+	"backend/internal/model"
+	"backend/internal/repository"
+)
+
+type QuestionService interface {
+	GetQuestions() ([]model.Question, error)
+	CreateQuestion(teacherID string, question *model.Question) error
+	GetQuizQuestions(teacherID, quizID string) ([]model.Question, error)
+	DeleteQuestion(teacherID, questionID string) error
+}
+
+type questionService struct {
+	repo repository.QuestionRepository
+}
+
+func NewQuestionService(repo repository.QuestionRepository) QuestionService {
+	return &questionService{repo: repo}
+}
+
+func (s *questionService) GetQuestions() ([]model.Question, error) {
+	return s.repo.GetQuestions()
+}
+
+func (s *questionService) CreateQuestion(teacherID string, question *model.Question) error {
+	// Verify the teacher owns the quiz if QuizID is present.
+	if question.QuizID != "" {
+		if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
+			return err
+		}
+	}
+	return s.repo.CreateQuestion(question)
+}
+
+func (s *questionService) GetQuizQuestions(teacherID, quizID string) ([]model.Question, error) {
+	if err := s.repo.VerifyQuizOwnership(quizID, teacherID); err != nil {
+		return nil, err
+	}
+	return s.repo.GetQuizQuestions(quizID)
+}
+
+func (s *questionService) DeleteQuestion(teacherID, questionID string) error {
+	question, err := s.repo.GetQuestionByID(questionID)
+	if err != nil {
+		return err
+	}
+
+	if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
+		return err
+	}
+
+	return s.repo.DeleteQuestion(question)
+}

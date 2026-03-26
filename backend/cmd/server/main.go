@@ -58,44 +58,56 @@ func main() {
 	// Initialize Repositories
 	userRepo := repository.NewUserRepository(config.DB)
 	statsRepo := repository.NewStatsRepository(config.DB)
+	classRepo := repository.NewClassRepository(config.DB)
+	quizRepo := repository.NewQuizRepository(config.DB)
+	questionRepo := repository.NewQuestionRepository(config.DB)
+	resultRepo := repository.NewResultRepository(config.DB)
 
 	// Initialize Services
 	authSvc := service.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
 	statsSvc := service.NewStatsService(statsRepo)
+	classSvc := service.NewClassService(classRepo)
+	quizSvc := service.NewQuizService(quizRepo)
+	questionSvc := service.NewQuestionService(questionRepo)
+	resultSvc := service.NewResultService(resultRepo)
 
 	// Initialize Handlers
 	authHandler := handler.NewAuthHandler(authSvc)
 	statsHandler := handler.NewStatsHandler(statsSvc)
+	classHandler := handler.NewClassHandler(classSvc)
+	quizHandler := handler.NewQuizHandler(quizSvc)
+	questionHandler := handler.NewQuestionHandler(questionSvc)
+	resultHandler := handler.NewResultHandler(resultSvc)
 
 	// Auth routes (public)
 	app.Post("/api/auth/register", authHandler.Register)
 	app.Post("/api/auth/login", authHandler.Login)
 
 	// Public test submission endpoint
-	app.Post("/api/test/submit", handler.SubmitTest)
+	app.Post("/api/test/submit", resultHandler.SubmitTest)
 
 	// Protected block
 	api := app.Group("/api", middleware.Protected())
 
 	// Quiz endpoints
-	api.Get("/quizzes", handler.GetQuizzes)
-	api.Post("/quizzes", handler.CreateQuiz)
-	api.Get("/quizzes/:id", handler.GetQuizByID)
+	api.Get("/quizzes", quizHandler.GetQuizzes)
+	api.Post("/quizzes", quizHandler.CreateQuiz)
+	api.Get("/quizzes/:id", quizHandler.GetQuizByID)
 
 	// Results analytics endpoints (Teacher)
-	api.Get("/quizzes/:quizId/results", handler.GetQuizResults)
+	api.Get("/quizzes/:quizId/results", resultHandler.GetQuizResults)
 
 	// Question endpoints
-	api.Get("/quizzes/:quizId/questions", handler.GetQuizQuestions)
-	api.Get("/questions", handler.GetQuestions)
-	api.Post("/questions", handler.CreateQuestion)
-	api.Delete("/questions/:id", handler.DeleteQuestion)
+	api.Get("/quizzes/:quizId/questions", questionHandler.GetQuizQuestions)
+	api.Get("/questions", questionHandler.GetQuestions)
+	api.Post("/questions", questionHandler.CreateQuestion)
+	api.Delete("/questions/:id", questionHandler.DeleteQuestion)
 
 	// Class & Student endpoints
-	api.Get("/classes", handler.GetClasses)
-	api.Post("/classes", handler.CreateClass)
-	api.Get("/classes/:id", handler.GetClassByID)
-	api.Post("/classes/:id/students", handler.AddStudent)
+	api.Get("/classes", classHandler.GetClasses)
+	api.Post("/classes", classHandler.CreateClass)
+	api.Get("/classes/:id", classHandler.GetClassByID)
+	api.Post("/classes/:id/students", classHandler.AddStudent)
 
 	// Stats/Dashboard endpoint
 	api.Get("/stats/dashboard", statsHandler.GetDashboardStats)
