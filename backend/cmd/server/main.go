@@ -83,6 +83,9 @@ func main() {
 	api.Get("/classes/:id", handler.GetClassByID)
 	api.Post("/classes/:id/students", handler.AddStudent)
 
+	// Stats/Dashboard endpoint
+	api.Get("/stats/dashboard", handler.GetDashboardStats)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
