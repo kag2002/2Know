@@ -13,6 +13,8 @@ import (
 	"backend/internal/handler"
 	"backend/internal/middleware"
 	"backend/internal/model"
+	"backend/internal/repository"
+	"backend/internal/service"
 )
 
 func main() {
@@ -53,9 +55,21 @@ func main() {
 		})
 	})
 
+	// Initialize Repositories
+	userRepo := repository.NewUserRepository(config.DB)
+	statsRepo := repository.NewStatsRepository(config.DB)
+
+	// Initialize Services
+	authSvc := service.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
+	statsSvc := service.NewStatsService(statsRepo)
+
+	// Initialize Handlers
+	authHandler := handler.NewAuthHandler(authSvc)
+	statsHandler := handler.NewStatsHandler(statsSvc)
+
 	// Auth routes (public)
-	app.Post("/api/auth/register", handler.Register)
-	app.Post("/api/auth/login", handler.Login)
+	app.Post("/api/auth/register", authHandler.Register)
+	app.Post("/api/auth/login", authHandler.Login)
 
 	// Public test submission endpoint
 	app.Post("/api/test/submit", handler.SubmitTest)
@@ -84,7 +98,7 @@ func main() {
 	api.Post("/classes/:id/students", handler.AddStudent)
 
 	// Stats/Dashboard endpoint
-	api.Get("/stats/dashboard", handler.GetDashboardStats)
+	api.Get("/stats/dashboard", statsHandler.GetDashboardStats)
 
 	port := os.Getenv("PORT")
 	if port == "" {
