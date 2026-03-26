@@ -1,10 +1,11 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Users, BarChart3, Mail, Search, MoreVertical, TrendingUp, Award } from "lucide-react";
+import { ArrowLeft, Users, BarChart3, Mail, Search, MoreVertical, TrendingUp, Award, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,41 +13,65 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const mockStudents = [
-  { id: "1", name: "Nguyễn Thị Mai", email: "mai.nt@school.edu.vn", avgScore: 9.2, testsCompleted: 8, status: "active" },
-  { id: "2", name: "Trần Văn Hoàng", email: "hoang.tv@school.edu.vn", avgScore: 8.7, testsCompleted: 7, status: "active" },
-  { id: "3", name: "Lê Thị Hương", email: "huong.lt@school.edu.vn", avgScore: 8.1, testsCompleted: 8, status: "active" },
-  { id: "4", name: "Phạm Đức Anh", email: "anh.pd@school.edu.vn", avgScore: 7.5, testsCompleted: 6, status: "active" },
-  { id: "5", name: "Võ Minh Tuấn", email: "tuan.vm@school.edu.vn", avgScore: 7.0, testsCompleted: 8, status: "warning" },
-  { id: "6", name: "Đặng Thị Lan", email: "lan.dt@school.edu.vn", avgScore: 6.3, testsCompleted: 5, status: "warning" },
-  { id: "7", name: "Bùi Quốc Khánh", email: "khanh.bq@school.edu.vn", avgScore: 5.8, testsCompleted: 4, status: "danger" },
-  { id: "8", name: "Hoàng Thị Yến", email: "yen.ht@school.edu.vn", avgScore: 5.2, testsCompleted: 3, status: "danger" },
-];
+interface Student {
+  id: string;
+  full_name: string;
+  email: string;
+  student_id: string; // SBD
+}
+
+interface ClassData {
+  id: string;
+  name: string;
+  subject: string;
+  grade: string;
+  school_year: string;
+  description: string;
+  students: Student[];
+}
 
 export default function ClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  
+  const [classData, setClassData] = useState<ClassData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const classInfo = {
-    name: "12A1 - Toán Học - Cô Lan",
-    subject: "Toán học",
-    grade: "Lớp 12",
-    year: "2025-2026",
-  };
+  useEffect(() => {
+    const fetchClassData = async () => {
+      try {
+        const data = await apiFetch(`/classes/${id}`);
+        // Ensure students array exists
+        if (!data.students) data.students = [];
+        setClassData(data);
+      } catch (err) {
+        console.error("Failed to load class data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClassData();
+  }, [id]);
 
-  const getScoreColor = (score: number) => {
-    if (score >= 8) return "text-emerald-600";
-    if (score >= 6.5) return "text-amber-600";
-    return "text-rose-600";
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active": return <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-semibold uppercase">Tốt</span>;
-      case "warning": return <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-semibold uppercase">Cần chú ý</span>;
-      case "danger": return <span className="px-2 py-0.5 bg-rose-50 text-rose-700 rounded-full text-[10px] font-semibold uppercase">Yếu</span>;
-      default: return null;
-    }
-  };
+  if (!classData) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-bold text-slate-800">Không tìm thấy Lớp học</h2>
+        <Link href="/classes">
+          <Button variant="outline" className="mt-4">Quay lại danh sách</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const { name, subject, grade, school_year, students } = classData;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -58,8 +83,8 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{classInfo.name}</h1>
-          <p className="text-muted-foreground mt-1">{classInfo.subject} • {classInfo.grade} • Năm học {classInfo.year}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{name}</h1>
+          <p className="text-muted-foreground mt-1">{subject || "Chưa có môn"} • {grade || "Chưa có khối"} • Năm học {school_year || "---"}</p>
         </div>
         <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
           <Mail className="w-4 h-4" /> Mời học sinh
@@ -69,10 +94,10 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Sĩ số", value: mockStudents.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
-          { label: "Điểm TB lớp", value: (mockStudents.reduce((a, s) => a + s.avgScore, 0) / mockStudents.length).toFixed(1), icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
-          { label: "HS xuất sắc", value: mockStudents.filter(s => s.avgScore >= 8).length, icon: Award, color: "text-amber-500", bg: "bg-amber-50" },
-          { label: "HS cần hỗ trợ", value: mockStudents.filter(s => s.status === "danger").length, icon: TrendingUp, color: "text-rose-500", bg: "bg-rose-50" },
+          { label: "Sĩ số", value: students.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
+          { label: "Điểm TB lớp", value: "---", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: "HS xuất sắc", value: "---", icon: Award, color: "text-amber-500", bg: "bg-amber-50" },
+          { label: "HS cần hỗ trợ", value: "---", icon: TrendingUp, color: "text-rose-500", bg: "bg-rose-50" },
         ].map((stat, i) => (
           <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
@@ -111,34 +136,32 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
               <thead>
                 <tr className="border-b text-left text-slate-500">
                   <th className="pb-3 font-semibold w-8">#</th>
+                  <th className="pb-3 font-semibold">Tên đăng nhập (SBD)</th>
                   <th className="pb-3 font-semibold">Họ và Tên</th>
                   <th className="pb-3 font-semibold">Email</th>
                   <th className="pb-3 font-semibold text-center">Điểm TB</th>
-                  <th className="pb-3 font-semibold text-center">Bài đã làm</th>
                   <th className="pb-3 font-semibold text-center">Trạng thái</th>
                   <th className="pb-3 font-semibold w-10"></th>
                 </tr>
               </thead>
               <tbody>
-                {mockStudents.map((student, i) => (
+                {students.map((student, i) => (
                   <tr key={student.id} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
                     <td className="py-3.5 text-slate-400">{i + 1}</td>
+                    <td className="py-3.5 font-medium text-indigo-600">{student.student_id}</td>
                     <td className="py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold uppercase">
-                          {student.name.split(' ').pop()?.[0]}
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold uppercase shrink-0">
+                          {student.full_name.split(' ').pop()?.[0] || "?"}
                         </div>
-                        <span className="font-medium text-slate-800">{student.name}</span>
+                        <span className="font-medium text-slate-800">{student.full_name}</span>
                       </div>
                     </td>
-                    <td className="py-3.5 text-slate-500">{student.email}</td>
+                    <td className="py-3.5 text-slate-500">{student.email || "---"}</td>
+                    <td className="py-3.5 text-center text-slate-400">---</td>
                     <td className="py-3.5 text-center">
-                      <span className={`font-bold ${getScoreColor(student.avgScore)}`}>
-                        {student.avgScore}
-                      </span>
+                       <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-semibold uppercase">Đang học</span>
                     </td>
-                    <td className="py-3.5 text-center text-slate-600">{student.testsCompleted}/8</td>
-                    <td className="py-3.5 text-center">{getStatusBadge(student.status)}</td>
                     <td className="py-3.5">
                       <DropdownMenu>
                         <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400">
@@ -146,13 +169,20 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>Xem hồ sơ chi tiết</DropdownMenuItem>
-                          <DropdownMenuItem>Gửi tin nhắn</DropdownMenuItem>
                           <DropdownMenuItem className="text-rose-600">Xóa khỏi lớp</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
                   </tr>
                 ))}
+                
+                {students.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-slate-500">
+                      Lớp học này chưa có học sinh nào.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

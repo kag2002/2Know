@@ -4,13 +4,16 @@ import { useState } from "react";
 import { Copy, GripVertical, MoreVertical, Plus, Sparkles, Trash2, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const mockQuestions = [
-  { id: 1, type: "Trắc nghiệm", points: 10, content: "Giải phương trình bậc 2 sau: x^2 - 4x + 4 = 0", options: ["x=2", "x=-2", "Vô nghiệm", "Phụ thuộc tham số"] },
-  { id: 2, type: "Tự luận", points: 20, content: "Viết mở bài phân tích nhân vật Mị trong đêm tình mùa xuân.", options: [] }
-];
+interface Question {
+  id: number | string;
+  type: string;
+  points: number;
+  content: string;
+  options: string[];
+}
 
 export function QuestionBuilder() {
-  const [questions, setQuestions] = useState(mockQuestions);
+  const [questions, setQuestions] = useState<Question[]>([]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
