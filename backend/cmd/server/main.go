@@ -35,6 +35,8 @@ func main() {
 		&model.Class{},
 		&model.Student{},
 		&model.TestResult{},
+		&model.Note{},
+		&model.Tag{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to auto-migrate: %v", err)
@@ -63,6 +65,8 @@ func main() {
 	questionRepo := repository.NewQuestionRepository(config.DB)
 	resultRepo := repository.NewResultRepository(config.DB)
 	studentRepo := repository.NewStudentRepository(config.DB)
+	noteRepo := repository.NewNoteRepository(config.DB)
+	tagRepo := repository.NewTagRepository(config.DB)
 
 	// Initialize Services
 	authSvc := service.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
@@ -73,6 +77,8 @@ func main() {
 	resultSvc := service.NewResultService(resultRepo, quizRepo)
 	studentSvc := service.NewStudentService(studentRepo)
 	aiSvc := service.NewAIService()
+	noteSvc := service.NewNoteService(noteRepo)
+	tagSvc := service.NewTagService(tagRepo)
 
 	// Initialize Handlers
 	authHandler := handler.NewAuthHandler(authSvc)
@@ -83,6 +89,8 @@ func main() {
 	resultHandler := handler.NewResultHandler(resultSvc)
 	studentHandler := handler.NewStudentHandler(studentSvc)
 	aiHandler := handler.NewAIHandler(aiSvc)
+	noteHandler := handler.NewNoteHandler(noteSvc)
+	tagHandler := handler.NewTagHandler(tagSvc)
 
 	// Auth routes (public)
 	app.Post("/api/auth/register", authHandler.Register)
@@ -122,6 +130,16 @@ func main() {
 	api.Get("/students", studentHandler.GetStudents)
 	api.Post("/students", studentHandler.CreateStudent)
 	api.Delete("/students/:id", studentHandler.DeleteStudent)
+
+	// Notes & Tags endpoints
+	api.Get("/notes", noteHandler.GetNotes)
+	api.Post("/notes", noteHandler.CreateNote)
+	api.Delete("/notes/:id", noteHandler.DeleteNote)
+	api.Patch("/notes/:id/pin", noteHandler.TogglePin)
+
+	api.Get("/tags", tagHandler.GetTags)
+	api.Post("/tags", tagHandler.CreateTag)
+	api.Delete("/tags/:id", tagHandler.DeleteTag)
 
 	// Stats/Dashboard endpoint
 	api.Get("/stats/dashboard", statsHandler.GetDashboardStats)

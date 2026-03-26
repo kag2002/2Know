@@ -1,45 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Tags, Search, X, Hash, BarChart3 } from "lucide-react";
+import { Plus, Tags, Search, X, Hash, BarChart3, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-const initialTags = [
-  { id: "1", name: "Đạo hàm", color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400", count: 24 },
-  { id: "2", name: "Tích phân", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", count: 18 },
-  { id: "3", name: "Hình không gian", color: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400", count: 15 },
-  { id: "4", name: "Grammar", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", count: 32 },
-  { id: "5", name: "Vocabulary", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", count: 28 },
-  { id: "6", name: "Thi thử", color: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400", count: 8 },
-  { id: "7", name: "Dễ", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", count: 45 },
-  { id: "8", name: "Trung bình", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", count: 38 },
-  { id: "9", name: "Khó", color: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400", count: 22 },
-  { id: "10", name: "Chương 1", color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300", count: 12 },
-  { id: "11", name: "Chương 2", color: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300", count: 16 },
-  { id: "12", name: "Writing", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", count: 14 },
-];
+import { apiFetch } from "@/lib/api";
 
 export default function TagsPage() {
-  const [tags, setTags] = useState(initialTags);
+  const [tags, setTags] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [newTag, setNewTag] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const filtered = tags.filter(t => t.name.toLowerCase().includes(search.toLowerCase()));
+  const loadTags = async () => {
+    try {
+      const data = await apiFetch("/tags");
+      if (data && Array.isArray(data)) setTags(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const addTag = () => {
+  useEffect(() => {
+    loadTags();
+  }, []);
+
+  const filtered = tags.filter(t => t.name?.toLowerCase().includes(search.toLowerCase()));
+
+  const addTag = async () => {
     if (!newTag.trim()) return;
     const colors = ["bg-indigo-100 text-indigo-700", "bg-emerald-100 text-emerald-700", "bg-violet-100 text-violet-700", "bg-amber-100 text-amber-700", "bg-rose-100 text-rose-700"];
-    setTags([...tags, { id: Date.now().toString(), name: newTag.trim(), color: colors[Math.floor(Math.random() * colors.length)], count: 0 }]);
-    setNewTag("");
-    toast.success(`Đã thêm thẻ "${newTag.trim()}"`);
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    
+    try {
+      const createdTag = await apiFetch("/tags", {
+        method: "POST",
+        body: JSON.stringify({ name: newTag.trim(), color, count: 0 })
+      });
+      setTags([createdTag, ...tags]);
+      setNewTag("");
+      toast.success(`Đã thêm thẻ "${newTag.trim()}"`);
+    } catch (err) {
+      toast.error("Thêm thẻ thất bại.");
+    }
   };
 
-  const deleteTag = (id: string) => {
-    setTags(tags.filter(t => t.id !== id));
-    toast.success("Đã xóa thẻ!");
+  const deleteTag = async (id: string) => {
+    try {
+      await apiFetch(`/tags/${id}`, { method: "DELETE" });
+      setTags(tags.filter(t => t.id !== id));
+      toast.success("Đã xóa thẻ!");
+    } catch (err) {
+      toast.error("Lỗi xóa thẻ.");
+    }
   };
+
+  if (loading) return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">

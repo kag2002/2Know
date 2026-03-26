@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, StickyNote, Search, MoreVertical, Pin, Trash2, Edit2 } from "lucide-react";
+import { Plus, StickyNote, Search, MoreVertical, Pin, Trash2, Edit2, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -11,36 +11,88 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const initialNotes = [
-  { id: "1", title: "Kế hoạch kiểm tra HK2", content: "Tuần 1: Kiểm tra 15 phút chương Đạo hàm\nTuần 3: Kiểm tra 45 phút tổng hợp\nTuần 5: Thi HK2 (120 phút)", color: "bg-amber-50 border-amber-200", pinned: true, date: "Hôm nay" },
-  { id: "2", title: "Lưu ý HS yếu lớp 12A1", content: "Bùi Quốc Khánh — yếu phần tích phân\nHoàng Thị Yến — vắng nhiều, cần gặp phụ huynh\nVõ Minh Tuấn — cần luyện thêm bài tập hình không gian", color: "bg-rose-50 border-rose-200", pinned: true, date: "Hôm qua" },
-  { id: "3", title: "Ý tưởng câu hỏi IELTS", content: "- Task 2: Should governments invest more in public transport?\n- Task 1: Bar chart comparison of renewable energy sources\n- Speaking Part 2: Describe a memorable journey", color: "bg-blue-50 border-blue-200", pinned: false, date: "20 thg 3" },
-  { id: "4", title: "Họp tổ Toán — Thứ 6", content: "Nội dung: Đánh giá tiến độ luyện thi\nĐịa điểm: Phòng 201\nThời gian: 14:00", color: "bg-emerald-50 border-emerald-200", pinned: false, date: "18 thg 3" },
-  { id: "5", title: "Cập nhật rubric chấm tự luận", content: "Mức 1 (0-2đ): Chưa hiểu đề, trình bày lộn xộn\nMức 2 (3-5đ): Hiểu đề, thiếu dẫn chứng\nMức 3 (6-8đ): Đầy đủ, có luận điểm rõ ràng\nMức 4 (9-10đ): Sáng tạo, có dẫn chứng phong phú", color: "bg-violet-50 border-violet-200", pinned: false, date: "15 thg 3" },
-];
+import { apiFetch } from "@/lib/api";
 
 export default function NotesPage() {
-  const [notes, setNotes] = useState(initialNotes);
+  const [notes, setNotes] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  
+  // Create state
+  const [isCreating, setIsCreating] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newContent, setNewContent] = useState("");
+
+  const loadNotes = async () => {
+    try {
+      const data = await apiFetch("/notes");
+      if (data && Array.isArray(data)) setNotes(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadNotes();
+  }, []);
+
+  const handleCreate = async () => {
+    if (!newTitle.trim() || !newContent.trim()) return toast.error("Vui lòng nhập cả tiêu đề và nội dung.");
+    try {
+      const colors = [
+        "bg-amber-50 border-amber-200", 
+        "bg-emerald-50 border-emerald-200", 
+        "bg-blue-50 border-blue-200", 
+        "bg-violet-50 border-violet-200", 
+        "bg-rose-50 border-rose-200"
+      ];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      const newNote = await apiFetch("/notes", {
+        method: "POST",
+        body: JSON.stringify({ title: newTitle, content: newContent, color, pinned: false })
+      });
+      setNotes([newNote, ...notes]);
+      setIsCreating(false);
+      setNewTitle("");
+      setNewContent("");
+      toast.success("Đã tạo ghi chú mới!");
+    } catch (err) {
+      toast.error("Tạo ghi chú thất bại.");
+    }
+  };
+
+  const deleteNote = async (id: string) => {
+    try {
+      await apiFetch(`/notes/${id}`, { method: "DELETE" });
+      setNotes(notes.filter(n => n.id !== id));
+      toast.success("Đã xóa ghi chú!");
+    } catch (err) {
+      toast.error("Lỗi xóa ghi chú.");
+    }
+  };
+
+  const togglePin = async (id: string) => {
+    try {
+      await apiFetch(`/notes/${id}/pin`, { method: "PATCH" });
+      setNotes(notes.map(n => n.id === id ? { ...n, pinned: !n.pinned } : n));
+      toast.success("Đã cập nhật trạng thái ghim!");
+    } catch (err) {
+      toast.error("Lỗi ghim ghi chú.");
+    }
+  };
 
   const filtered = notes.filter(n => 
-    n.title.toLowerCase().includes(search.toLowerCase()) || 
-    n.content.toLowerCase().includes(search.toLowerCase())
+    n.title?.toLowerCase().includes(search.toLowerCase()) || 
+    n.content?.toLowerCase().includes(search.toLowerCase())
   );
 
   const pinned = filtered.filter(n => n.pinned);
   const unpinned = filtered.filter(n => !n.pinned);
 
-  const deleteNote = (id: string) => {
-    setNotes(notes.filter(n => n.id !== id));
-    toast.success("Đã xóa ghi chú!");
-  };
-
-  const togglePin = (id: string) => {
-    setNotes(notes.map(n => n.id === id ? { ...n, pinned: !n.pinned } : n));
-    toast.success("Đã cập nhật ghim!");
-  };
+  if (loading) return <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -49,10 +101,38 @@ export default function NotesPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">Ghi chú cá nhân</h1>
           <p className="text-muted-foreground mt-1 text-sm">Lưu trữ ý tưởng, kế hoạch giảng dạy và nhắc nhở quan trọng.</p>
         </div>
-        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => toast.info("Tính năng tạo ghi chú đang phát triển!")}>
-          <Plus className="w-4 h-4" /> Tạo ghi chú
-        </Button>
+        {!isCreating && (
+          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => setIsCreating(true)}>
+            <Plus className="w-4 h-4" /> Tạo ghi chú
+          </Button>
+        )}
       </div>
+
+      {isCreating && (
+        <Card className="border-indigo-200 border-2 shadow-sm animate-in fade-in slide-in-from-top-2">
+          <CardHeader className="py-3 bg-indigo-50/50">
+            <input 
+              className="text-lg font-bold bg-transparent outline-none placeholder:text-slate-400" 
+              placeholder="Tiêu đề ghi chú..." 
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+              autoFocus
+            />
+          </CardHeader>
+          <CardContent className="pt-2 pb-3">
+            <textarea 
+               className="w-full text-sm bg-transparent outline-none resize-y min-h-[80px]" 
+               placeholder="Nhập nội dung..."
+               value={newContent}
+               onChange={e => setNewContent(e.target.value)}
+            />
+            <div className="flex justify-end gap-2 mt-2">
+              <Button variant="ghost" size="sm" onClick={() => setIsCreating(false)}>Hủy</Button>
+              <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 gap-1" onClick={handleCreate}><Save className="w-4 h-4" /> Lưu</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -99,7 +179,9 @@ function NoteCard({ note, onDelete, onTogglePin }: { note: typeof initialNotes[0
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div>
           <CardTitle className="text-base font-bold">{note.title}</CardTitle>
-          <p className="text-xs text-muted-foreground mt-1">{note.date}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {note.created_at ? new Date(note.created_at).toLocaleDateString("vi-VN") : "Hôm nay"}
+          </p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-white/50 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
