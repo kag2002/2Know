@@ -1,17 +1,10 @@
 "use client";
 
+import { use } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowLeft, UserPlus, FileUp, Search, Download, MoreHorizontal, GraduationCap, Settings } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Users, BarChart3, Mail, Search, MoreVertical, TrendingUp, Award } from "lucide-react";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,140 +13,151 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const mockStudents = [
-  { id: 1, sbd: "SV0124", name: "Nguyễn Văn An", dob: "12/05/2008", email: "an.nguyen@email.com", phone: "0912345678", joined: "12 thg 3, 2026" },
-  { id: 2, sbd: "SV0125", name: "Trần Thị Bích", dob: "24/11/2008", email: "bich.tran@email.com", phone: "0987654321", joined: "12 thg 3, 2026" },
-  { id: 3, sbd: "SV0126", name: "Lê Hoàng Phúc", dob: "05/01/2008", email: "phuc.le@email.com", phone: "0901112223", joined: "14 thg 3, 2026" },
-  { id: 4, sbd: "SV0127", name: "Phạm Diệu Linh", dob: "19/08/2008", email: "linh.pham@email.com", phone: "0933444555", joined: "15 thg 3, 2026" },
+  { id: "1", name: "Nguyễn Thị Mai", email: "mai.nt@school.edu.vn", avgScore: 9.2, testsCompleted: 8, status: "active" },
+  { id: "2", name: "Trần Văn Hoàng", email: "hoang.tv@school.edu.vn", avgScore: 8.7, testsCompleted: 7, status: "active" },
+  { id: "3", name: "Lê Thị Hương", email: "huong.lt@school.edu.vn", avgScore: 8.1, testsCompleted: 8, status: "active" },
+  { id: "4", name: "Phạm Đức Anh", email: "anh.pd@school.edu.vn", avgScore: 7.5, testsCompleted: 6, status: "active" },
+  { id: "5", name: "Võ Minh Tuấn", email: "tuan.vm@school.edu.vn", avgScore: 7.0, testsCompleted: 8, status: "warning" },
+  { id: "6", name: "Đặng Thị Lan", email: "lan.dt@school.edu.vn", avgScore: 6.3, testsCompleted: 5, status: "warning" },
+  { id: "7", name: "Bùi Quốc Khánh", email: "khanh.bq@school.edu.vn", avgScore: 5.8, testsCompleted: 4, status: "danger" },
+  { id: "8", name: "Hoàng Thị Yến", email: "yen.ht@school.edu.vn", avgScore: 5.2, testsCompleted: 3, status: "danger" },
 ];
 
-export default function ClassDetailPage({ params }: { params: { id: string } }) {
-  // In a real app we fetch class details based on params.id
+export default function ClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+
+  const classInfo = {
+    name: "12A1 - Toán Học - Cô Lan",
+    subject: "Toán học",
+    grade: "Lớp 12",
+    year: "2025-2026",
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 8) return "text-emerald-600";
+    if (score >= 6.5) return "text-amber-600";
+    return "text-rose-600";
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "active": return <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-semibold uppercase">Tốt</span>;
+      case "warning": return <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-semibold uppercase">Cần chú ý</span>;
+      case "danger": return <span className="px-2 py-0.5 bg-rose-50 text-rose-700 rounded-full text-[10px] font-semibold uppercase">Yếu</span>;
+      default: return null;
+    }
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/classes" className="p-2 border rounded-md hover:bg-slate-50 transition-colors bg-white">
-          <ArrowLeft className="w-5 h-5 text-slate-600" />
+        <Link href="/classes">
+          <Button variant="outline" size="icon" className="h-9 w-9">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
         </Link>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">12A1 - Toán Học - Cô Lan</h1>
-            <span className="bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full font-medium">Lớp 12</span>
-          </div>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Tạo lúc 12 thg 3, 2026 • Niên khóa 2025-2026
-          </p>
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{classInfo.name}</h1>
+          <p className="text-muted-foreground mt-1">{classInfo.subject} • {classInfo.grade} • Năm học {classInfo.year}</p>
         </div>
-        <div className="ml-auto flex gap-3">
-          <Button variant="outline" className="gap-2 bg-white">
-            <Settings className="w-4 h-4" /> Cài đặt lớp
-          </Button>
-          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
-            <UserPlus className="w-4 h-4" /> Thêm học sinh
-          </Button>
-        </div>
+        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Mail className="w-4 h-4" /> Mời học sinh
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Stats */}
-        <div className="col-span-1 space-y-4">
-          <div className="bg-white border rounded-xl p-5 shadow-sm space-y-4">
-            <div className="flex items-center gap-3 text-indigo-600 mb-6">
-              <div className="p-2.5 bg-indigo-50 rounded-lg">
-                <GraduationCap className="w-6 h-6" />
+      {/* Summary Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Sĩ số", value: mockStudents.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
+          { label: "Điểm TB lớp", value: (mockStudents.reduce((a, s) => a + s.avgScore, 0) / mockStudents.length).toFixed(1), icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: "HS xuất sắc", value: mockStudents.filter(s => s.avgScore >= 8).length, icon: Award, color: "text-amber-500", bg: "bg-amber-50" },
+          { label: "HS cần hỗ trợ", value: mockStudents.filter(s => s.status === "danger").length, icon: TrendingUp, color: "text-rose-500", bg: "bg-rose-50" },
+        ].map((stat, i) => (
+          <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${stat.bg}`}>
+                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase">{stat.label}</p>
+                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                </div>
               </div>
-              <h3 className="font-semibold">Thống kê lớp học</h3>
-            </div>
-            
-            <div className="flex flex-col">
-              <span className="text-sm text-slate-500 font-medium">Sĩ số hiện tại</span>
-              <span className="text-3xl font-bold text-slate-800">45 <span className="text-sm font-normal text-slate-400">học sinh</span></span>
-            </div>
-            <div className="w-full h-px bg-slate-100"></div>
-            <div className="flex flex-col">
-              <span className="text-sm text-slate-500 font-medium">Số bài kiểm tra đã giao</span>
-              <span className="text-xl font-bold text-slate-800">12</span>
-            </div>
-            <div className="w-full h-px bg-slate-100"></div>
-            <div className="flex flex-col">
-              <span className="text-sm text-slate-500 font-medium">Điểm trung bình lớp</span>
-              <span className="text-xl font-bold text-emerald-600">7.8</span>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        {/* Right Data Table */}
-        <div className="col-span-3 space-y-4">
-          <div className="bg-white p-4 border rounded-xl shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center z-10 sticky top-0">
-            <div className="relative w-full sm:max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input 
-                placeholder="Tìm kiếm theo Tên hoặc Mã học sinh (SBD)..." 
-                className="pl-10 h-10 bg-slate-50 border-transparent focus:bg-white transition-colors w-full"
-              />
-            </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" className="gap-2 flex-1 sm:flex-none">
-                <FileUp className="w-4 h-4 text-slate-500" /> Import Excel
-              </Button>
-              <Button variant="outline" className="gap-2 flex-1 sm:flex-none">
-                <Download className="w-4 h-4 text-slate-500" /> Xuất danh sách
-              </Button>
-            </div>
+      {/* Student Roster */}
+      <Card className="shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">Danh sách học sinh</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">Quản lý và theo dõi kết quả học tập của từng học sinh</p>
           </div>
-
-          <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50/80 hover:bg-slate-50/80">
-                  <TableHead className="w-[100px] font-semibold text-slate-600">Mã HS/SBD</TableHead>
-                  <TableHead className="font-semibold text-slate-600 w-[250px]">Họ và Tên</TableHead>
-                  <TableHead className="font-semibold text-slate-600">Ngày sinh</TableHead>
-                  <TableHead className="font-semibold text-slate-600">Liên hệ</TableHead>
-                  <TableHead className="font-semibold text-slate-600">Ngày thêm</TableHead>
-                  <TableHead className="text-right"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockStudents.map((st) => (
-                  <TableRow key={st.id} className="hover:bg-slate-50/50">
-                    <TableCell className="font-medium text-slate-700">{st.sbd}</TableCell>
-                    <TableCell>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              placeholder="Tìm học sinh..."
+              className="pl-9 h-9 w-full rounded-md border bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-colors px-3"
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left text-slate-500">
+                  <th className="pb-3 font-semibold w-8">#</th>
+                  <th className="pb-3 font-semibold">Họ và Tên</th>
+                  <th className="pb-3 font-semibold">Email</th>
+                  <th className="pb-3 font-semibold text-center">Điểm TB</th>
+                  <th className="pb-3 font-semibold text-center">Bài đã làm</th>
+                  <th className="pb-3 font-semibold text-center">Trạng thái</th>
+                  <th className="pb-3 font-semibold w-10"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockStudents.map((student, i) => (
+                  <tr key={student.id} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
+                    <td className="py-3.5 text-slate-400">{i + 1}</td>
+                    <td className="py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
-                          {st.name.charAt(0)}
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold uppercase">
+                          {student.name.split(' ').pop()?.[0]}
                         </div>
-                        <span className="font-semibold text-slate-800">{st.name}</span>
+                        <span className="font-medium text-slate-800">{student.name}</span>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-slate-600 text-sm">{st.dob}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="text-sm text-slate-700">{st.phone}</span>
-                        <span className="text-xs text-muted-foreground">{st.email}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{st.joined}</TableCell>
-                    <TableCell className="text-right">
+                    </td>
+                    <td className="py-3.5 text-slate-500">{student.email}</td>
+                    <td className="py-3.5 text-center">
+                      <span className={`font-bold ${getScoreColor(student.avgScore)}`}>
+                        {student.avgScore}
+                      </span>
+                    </td>
+                    <td className="py-3.5 text-center text-slate-600">{student.testsCompleted}/8</td>
+                    <td className="py-3.5 text-center">{getStatusBadge(student.status)}</td>
+                    <td className="py-3.5">
                       <DropdownMenu>
-                        <DropdownMenuTrigger className="h-8 w-8 p-0 flex items-center justify-center rounded-md hover:bg-slate-100 text-slate-500">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
+                        <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400">
+                          <MoreVertical className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Xem kết quả học tập</DropdownMenuItem>
-                          <DropdownMenuItem>Chỉnh sửa thông tin</DropdownMenuItem>
+                          <DropdownMenuItem>Xem hồ sơ chi tiết</DropdownMenuItem>
+                          <DropdownMenuItem>Gửi tin nhắn</DropdownMenuItem>
                           <DropdownMenuItem className="text-rose-600">Xóa khỏi lớp</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
