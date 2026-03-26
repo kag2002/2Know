@@ -63,7 +63,7 @@ export default function LandingPage() {
               </span>
             </h1>
             <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              2Know/QuizLM cung cấp giải pháp toàn diện cho Giáo viên và Nhà trường trong việc ra đề, giám sát thi online và chấm điểm tự động tích hợp bảng phân tích dữ liệu chuyên nghiệp.
+              2Know/2Know cung cấp giải pháp toàn diện cho Giáo viên và Nhà trường trong việc ra đề, giám sát thi online và chấm điểm tự động tích hợp bảng phân tích dữ liệu chuyên nghiệp.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <Link href="/register">

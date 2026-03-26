@@ -47,7 +47,7 @@ export default function ReportsPage() {
 
   const handleExportCSV = async () => {
     try {
-      const token = localStorage.getItem("quizlm_token");
+      const token = localStorage.getItem("2know_token");
       const res = await fetch("http://localhost:8080/api/stats/export", {
         headers: {
           Authorization: `Bearer ${token}`,

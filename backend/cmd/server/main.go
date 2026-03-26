@@ -53,7 +53,7 @@ func main() {
 	app.Get("/api/health", func(c fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"status":  "ok",
-			"message": "QuizLM API is running",
+			"message": "2Know API is running",
 		})
 	})
 

@@ -44,7 +44,7 @@ export function AppSidebar() {
   ];
 
   useEffect(() => {
-    const stored = localStorage.getItem("quizlm_user");
+    const stored = localStorage.getItem("2know_user");
     if (stored) {
       try {
         setUser(JSON.parse(stored));
@@ -53,9 +53,9 @@ export function AppSidebar() {
   }, []);
 
   const handleLogout = () => {
-    document.cookie = "quizlm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    localStorage.removeItem("quizlm_token");
-    localStorage.removeItem("quizlm_user");
+    document.cookie = "2know_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    localStorage.removeItem("2know_token");
+    localStorage.removeItem("2know_user");
     router.push("/login");
   };
 
@@ -66,7 +66,7 @@ export function AppSidebar() {
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
             Q
           </div>
-          QuizLM
+          2Know
         </Link>
       </div>
 

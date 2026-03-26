@@ -15,7 +15,7 @@ export default function AuthLayout({
             <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white text-xl shadow-lg">
               Q
             </div>
-            <span className="text-2xl font-bold tracking-tight">QuizLM Plus</span>
+            <span className="text-2xl font-bold tracking-tight">2Know Plus</span>
           </div>
           <p className="max-w-md mt-6 text-lg text-slate-300 leading-relaxed">
             Nền tảng thi và giáo dục trực tuyến toàn diện được tích hợp AI. Tiết kiệm 80% thời gian chấm thi và phân tích phổ điểm ngay tức thì.
@@ -40,7 +40,7 @@ export default function AuthLayout({
         </div>
         
         <div className="relative z-10 text-sm text-slate-500">
-          © {new Date().getFullYear()} QuizLM Clone System. All rights reserved.
+          © {new Date().getFullYear()} 2Know Clone System. All rights reserved.
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function AuthLayout({
         {/* Mobile Header */}
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white">Q</div>
-          <span className="font-bold text-slate-900 tracking-tight">QuizLM</span>
+          <span className="font-bold text-slate-900 tracking-tight">2Know</span>
         </div>
         
         <div className="w-full max-w-md">

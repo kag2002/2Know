@@ -23,7 +23,7 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
 
   useEffect(() => {
     // Read the securely calculated result from the previous submission step
-    const rawResult = sessionStorage.getItem("quizlm_latest_result");
+    const rawResult = sessionStorage.getItem("2know_latest_result");
     if (rawResult) {
       setResult(JSON.parse(rawResult));
     }

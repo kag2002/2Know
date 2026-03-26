@@ -24,7 +24,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("vi");
 
   useEffect(() => {
-    const savedLang = localStorage.getItem("quizlm_lang") as Language;
+    const savedLang = localStorage.getItem("2know_lang") as Language;
     if (savedLang && ["vi", "en"].includes(savedLang)) {
       setLanguageState(savedLang);
     }
@@ -32,7 +32,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem("quizlm_lang", lang);
+    localStorage.setItem("2know_lang", lang);
   };
 
   const t = (key: keyof Translations): string => {

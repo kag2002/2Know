@@ -20,7 +20,7 @@ func Protected() fiber.Handler {
 		authHeader := c.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			// Fallback to checking cookies
-			cookieToken := c.Cookies("quizlm_token")
+			cookieToken := c.Cookies("2know_token")
 			if cookieToken == "" {
 				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 					"error": "Missing or invalid token",

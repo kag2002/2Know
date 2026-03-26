@@ -25,8 +25,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for existing token and hydrated user data on mount
-    const token = localStorage.getItem("quizlm_token");
-    const storedUser = localStorage.getItem("quizlm_user");
+    const token = localStorage.getItem("2know_token");
+    const storedUser = localStorage.getItem("2know_user");
     
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
@@ -35,19 +35,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (token: string, userData: User) => {
-    localStorage.setItem("quizlm_token", token);
-    localStorage.setItem("quizlm_user", JSON.stringify(userData));
+    localStorage.setItem("2know_token", token);
+    localStorage.setItem("2know_user", JSON.stringify(userData));
     // Set cookie so Next.js middleware can detect auth state
-    document.cookie = `quizlm_token=${token}; path=/; max-age=${60 * 60 * 72}; SameSite=Lax`;
+    document.cookie = `2know_token=${token}; path=/; max-age=${60 * 60 * 72}; SameSite=Lax`;
     setUser(userData);
     router.push("/overview");
   };
 
   const logout = () => {
-    localStorage.removeItem("quizlm_token");
-    localStorage.removeItem("quizlm_user");
+    localStorage.removeItem("2know_token");
+    localStorage.removeItem("2know_user");
     // Clear the auth cookie
-    document.cookie = "quizlm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "2know_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     setUser(null);
     router.push("/login");
   };

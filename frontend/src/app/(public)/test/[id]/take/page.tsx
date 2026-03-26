@@ -158,7 +158,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         })
       });
       // Save backend computed result into session storage so the result page can render it safely
-      sessionStorage.setItem("quizlm_latest_result", JSON.stringify(resultObj));
+      sessionStorage.setItem("2know_latest_result", JSON.stringify(resultObj));
     } catch(err) {
       console.error("Failed to submit", err);
     }
