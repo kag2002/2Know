@@ -151,6 +151,110 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Social Proof Stats */}
+      <section className="py-16 bg-slate-900 text-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: "12,000+", label: "Giáo viên tin dùng" },
+              { value: "850K+", label: "Bài thi đã tạo" },
+              { value: "4.2M+", label: "Lượt làm bài" },
+              { value: "99.9%", label: "Uptime hệ thống" },
+            ].map((stat, i) => (
+              <div key={i}>
+                <div className="text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">{stat.value}</div>
+                <p className="text-slate-400 mt-2 text-sm font-medium">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">Bảng giá đơn giản, minh bạch</h2>
+            <p className="text-slate-600 text-lg">Bắt đầu miễn phí. Nâng cấp khi bạn cần mở rộng quy mô.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Free */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-lg transition-all">
+              <h3 className="text-lg font-bold text-slate-800">Miễn phí</h3>
+              <p className="text-slate-500 text-sm mt-1">Dành cho giáo viên cá nhân</p>
+              <div className="my-6">
+                <span className="text-4xl font-black text-slate-900">0đ</span>
+                <span className="text-slate-500 text-sm">/tháng</span>
+              </div>
+              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+                {["5 bài kiểm tra/tháng", "50 học sinh", "Chấm tự động trắc nghiệm", "Báo cáo cơ bản"].map(f => (
+                  <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />{f}</li>
+                ))}
+              </ul>
+              <Link href="/register">
+                <Button variant="outline" className="w-full h-11 font-semibold">Bắt đầu miễn phí</Button>
+              </Link>
+            </div>
+
+            {/* Pro — Highlighted */}
+            <div className="bg-white rounded-2xl border-2 border-indigo-500 p-8 shadow-xl relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">Phổ biến nhất</div>
+              <h3 className="text-lg font-bold text-slate-800">Pro</h3>
+              <p className="text-slate-500 text-sm mt-1">Dành cho tổ bộ môn & trường nhỏ</p>
+              <div className="my-6">
+                <span className="text-4xl font-black text-indigo-600">199K</span>
+                <span className="text-slate-500 text-sm">/tháng</span>
+              </div>
+              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+                {["Không giới hạn bài kiểm tra", "500 học sinh", "Chấm điểm OMR (AI)", "Chống gian lận nâng cao", "Thống kê phổ điểm", "Hỗ trợ ưu tiên"].map(f => (
+                  <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />{f}</li>
+                ))}
+              </ul>
+              <Link href="/register">
+                <Button className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-600/20">Nâng cấp Pro</Button>
+              </Link>
+            </div>
+
+            {/* Enterprise */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-lg transition-all">
+              <h3 className="text-lg font-bold text-slate-800">Enterprise</h3>
+              <p className="text-slate-500 text-sm mt-1">Dành cho trường học & sở GD</p>
+              <div className="my-6">
+                <span className="text-4xl font-black text-slate-900">Liên hệ</span>
+              </div>
+              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+                {["Mọi tính năng Pro", "Không giới hạn học sinh", "AI tạo đề tự động", "Tích hợp LMS/API", "SLA 99.9%", "Quản lý đa chi nhánh"].map(f => (
+                  <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />{f}</li>
+                ))}
+              </ul>
+              <Button variant="outline" className="w-full h-11 font-semibold">Liên hệ Sales</Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-indigo-600 to-purple-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 to-transparent"></div>
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4">Sẵn sàng nâng cấp trải nghiệm thi?</h2>
+          <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">Hơn 12,000 giáo viên đã tin tưởng 2Know để tổ chức hàng triệu bài thi. Tham gia ngay hôm nay.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/register">
+              <Button size="lg" className="h-14 px-10 text-base font-bold rounded-full bg-white text-indigo-700 hover:bg-indigo-50 shadow-xl w-full sm:w-auto">
+                Đăng ký miễn phí <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline" className="h-14 px-10 text-base font-bold rounded-full border-2 border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
+                Dùng thử Demo
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-slate-900 pt-20 pb-10 border-t border-slate-800 text-slate-400">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
