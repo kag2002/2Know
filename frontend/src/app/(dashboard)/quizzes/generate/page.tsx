@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api";
 
 export default function AIGeneratorPage() {
   const router = useRouter();
@@ -32,48 +33,40 @@ export default function AIGeneratorPage() {
     setGeneratedQuestions([]);
     setGenerationSteps([]);
 
-    // Simulate AI Generation Process
+    // Simulate AI Generation Process Steps for UI feedback
     const steps = [
       "Đang phân tích cấu trúc ngữ nghĩa Prompt...",
-      "Tìm kiếm cơ sở dữ liệu học thuật mở rộng...",
-      "Đang tối ưu hóa độ khó (Mức độ nhận biết, Thông hiểu)...",
-      "Tiến hành sinh đáp án nhiễu (Distractors)...",
-      "Hoàn tất! Định dạng lại đầu ra chuẩn 2Know..."
+      "Thực hiện truy vấn LLM Agentic Pipeline...",
+      "Trích xuất và chuẩn hóa bộ JSON đầu ra...",
     ];
 
-    for (let i = 0; i < steps.length; i++) {
-        await new Promise(r => setTimeout(r, 1200));
-        setGenerationSteps(prev => [...prev, steps[i]]);
+    // Show initial steps
+    setGenerationSteps(prev => [...prev, steps[0]]);
+    
+    try {
+        setGenerationSteps(prev => [...prev, steps[1]]);
+        const res = await apiFetch("/ai/generate-quiz", {
+            method: "POST",
+            body: JSON.stringify({ prompt })
+        });
+        
+        setGenerationSteps(prev => [...prev, steps[2]]);
+        
+        if (res && res.questions) {
+            // Assign sequential IDs to the AI questions
+            const formatted = res.questions.map((q: any, idx: number) => ({
+                id: idx + 1,
+                ...q
+            }));
+            setGeneratedQuestions(formatted);
+        } else {
+            alert("Lỗi: Không nhận được định dạng câu hỏi hợp lệ từ AI.");
+        }
+    } catch (err: any) {
+        alert("Lỗi khi kết nối tới AI: " + (err.message || "Unknown error"));
+    } finally {
+        setIsGenerating(false);
     }
-
-    // Mock API result
-    const mockOutput = [
-      {
-        id: 1,
-        question: "Từ khóa chính trong kiến trúc Microservices là gì?",
-        options: ["Độc lập (Independent)", "Nguyên khối (Monolithic)", "Tập trung (Centralized)", "Phụ thuộc (Coupled)"],
-        correctIndex: 0,
-        explanation: "Microservices chia ứng dụng thành các dịch vụ nhỏ, độc lập để dễ dàng triển khai và mở rộng."
-      },
-      {
-        id: 2,
-        question: "Docker Container khác với Virtual Machine (VM) ở điểm nào nổi bật nhất?",
-        options: ["Dùng chung Kernel của OS Host", "Bảo mật tuyệt đối 100%", "Cần cài đặt hệ điều hành đầy đủ cho mỗi App", "Chỉ chạy được trên hệ điều hành Linux"],
-        correctIndex: 0,
-        explanation: "Docker sử dụng chung Kernel hệ điều hành với Host, trong khi VM yêu cầu tải toàn bộ Guest OS riêng biệt, nên Docker nhẹ và khởi động nhanh hơn rất nhiều."
-      },
-      {
-        id: 3,
-        question: "Vòng đời của một Component trong React (React 16.8+) được quản lý chủ yếu bằng Hook nào?",
-        options: ["useState", "useContext", "useEffect", "useReducer"],
-        correctIndex: 2,
-        explanation: "useEffect bao quát trọn vẹn vòng đời gồm: Mounting, Updating và Unmounting."
-      }
-    ];
-
-    await new Promise(r => setTimeout(r, 600));
-    setGeneratedQuestions(mockOutput);
-    setIsGenerating(false);
   };
 
   const handleSaveToBank = () => {

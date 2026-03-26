@@ -8,6 +8,7 @@ import (
 type ResultService interface {
 	SubmitTest(result *model.TestResult) error
 	GetQuizResults(teacherID, quizID string) ([]model.TestResult, error)
+	GetPendingGradings(teacherID string) ([]PendingGradingResponse, error)
 }
 
 type resultService struct {
@@ -28,7 +29,12 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 
 	// Calculate Score securely on the server
 	correctOptionMap := make(map[string]bool)
+	hasEssay := false
+
 	for _, q := range quiz.Questions {
+		if q.Type == "essay" {
+			hasEssay = true
+		}
 		for _, opt := range q.Options {
 			if opt.IsCorrect {
 				correctOptionMap[opt.ID] = true
@@ -37,8 +43,9 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 	}
 
 	totalCorrect := 0
-	for _, answerID := range result.Answers {
-		if correctOptionMap[answerID] {
+	for _, answerValue := range result.Answers {
+		// answerValue is either an OptionUUID or raw essay text
+		if correctOptionMap[answerValue] {
 			totalCorrect++
 		}
 	}
@@ -57,6 +64,8 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 
 	if result.TabSwitchCount >= 3 {
 		result.Status = "cheating_flagged"
+	} else if hasEssay {
+		result.Status = "pending"
 	} else {
 		result.Status = "completed"
 	}
@@ -70,3 +79,51 @@ func (s *resultService) GetQuizResults(teacherID, quizID string) ([]model.TestRe
 	}
 	return s.repo.GetQuizResults(quizID)
 }
+
+// PendingGradingResponse maps directly to the React UI pendingSubmissions array
+type PendingGradingResponse struct {
+	ID          string  `json:"id"`
+	Student     string  `json:"student"`
+	Quiz        string  `json:"quiz"`
+	Question    string  `json:"question"`
+	Answer      string  `json:"answer"`
+	SubmittedAt string  `json:"submittedAt"`
+	MaxScore    float64 `json:"maxScore"`
+}
+
+func (s *resultService) GetPendingGradings(teacherID string) ([]PendingGradingResponse, error) {
+	var responses []PendingGradingResponse
+	
+	// Fast lookup of all pending results belonging to the teacher's quizzes
+	results, err := s.repo.GetPendingResults(teacherID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, res := range results {
+		quiz, err := s.quizRepo.GetPublicQuizByID(res.QuizID)
+		if err != nil {
+			continue
+		}
+
+		for _, q := range quiz.Questions {
+			if q.Type == "essay" {
+				// Check if the student answered this specific essay question
+				if answerText, exists := res.Answers[q.ID]; exists && answerText != "" {
+					responses = append(responses, PendingGradingResponse{
+						ID:          res.ID + "_" + q.ID, // Composite ID for the UI
+						Student:     res.StudentName,
+						Quiz:        quiz.Title,
+						Question:    q.Content,
+						Answer:      answerText,
+						SubmittedAt: res.CreatedAt.Format("02/01/2006 15:04"),
+						MaxScore:    q.Points,
+					})
+				}
+			}
+		}
+	}
+
+	return responses, nil
+}
+

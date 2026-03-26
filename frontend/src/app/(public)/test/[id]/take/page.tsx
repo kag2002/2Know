@@ -153,7 +153,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
           student_name: "Guest Student",
           student_identifier: "GUEST-" + Math.floor(Math.random() * 10000),
           time_taken_seconds: ((quiz?.time_limit_minutes || 0) * 60) - timeLeft,
-          answers: Object.values(answers), // Just the option IDs
+          answers: answers, // Map of QuestionID -> AnswerString/OptionID
           tab_switch_count: switches
         })
       });

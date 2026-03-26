@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, BarChart3, TrendingUp, Users, ArrowRight, Loader2, FileText } from "lucide-react";
+import { Search, Filter, BarChart3, TrendingUp, Users, ArrowRight, Loader2, FileText, Download } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
 
 interface DashboardStats {
   total_quizzes: number;
@@ -44,6 +45,31 @@ export default function ReportsPage() {
     fetchData();
   }, []);
 
+  const handleExportCSV = async () => {
+    try {
+      const token = localStorage.getItem("quizlm_token");
+      const res = await fetch("http://localhost:8080/api/stats/export", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Export failed");
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "2know_report.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Xuất dữ liệu CSV thành công!");
+    } catch (err: any) {
+      toast.error("Lỗi khi xuất CSV: " + err.message);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center flex-col items-center h-[60vh] text-slate-500">
@@ -62,6 +88,9 @@ export default function ReportsPage() {
             Theo dõi kết quả, phân tích phổ điểm và đánh giá chất lượng các bài kiểm tra.
           </p>
         </div>
+        <Button onClick={handleExportCSV} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Download className="w-4 h-4" /> Xuất dữ liệu (CSV)
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

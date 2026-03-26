@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Search, Plus, MoreVertical, GraduationCap, BarChart3, Mail, Trash2, Edit2 } from "lucide-react";
+import { Users, Search, Plus, MoreVertical, GraduationCap, BarChart3, Mail, Trash2, Edit2, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,23 +11,39 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 
-const allStudents = [
-  { id: "1", name: "Nguyễn Thị Mai", studentId: "HS001", email: "mai.nt@school.edu.vn", class: "12A1 - Toán", avgScore: 9.2, tests: 12, status: "excellent" },
-  { id: "2", name: "Trần Văn Hoàng", studentId: "HS002", email: "hoang.tv@school.edu.vn", class: "12A1 - Toán", avgScore: 8.7, tests: 11, status: "good" },
-  { id: "3", name: "Lê Thị Hương", studentId: "HS003", email: "huong.lt@school.edu.vn", class: "10A5 - Văn", avgScore: 8.1, tests: 10, status: "good" },
-  { id: "4", name: "Phạm Đức Anh", studentId: "HS004", email: "anh.pd@school.edu.vn", class: "12A1 - Toán", avgScore: 7.5, tests: 9, status: "average" },
-  { id: "5", name: "Võ Minh Tuấn", studentId: "HS005", email: "tuan.vm@school.edu.vn", class: "11B2 - Lý", avgScore: 7.0, tests: 8, status: "average" },
-  { id: "6", name: "Đặng Thị Lan", studentId: "HS006", email: "lan.dt@school.edu.vn", class: "10A5 - Văn", avgScore: 6.3, tests: 7, status: "warning" },
-  { id: "7", name: "Bùi Quốc Khánh", studentId: "HS007", email: "khanh.bq@school.edu.vn", class: "IELTS 7.0+", avgScore: 5.8, tests: 5, status: "danger" },
-  { id: "8", name: "Hoàng Thị Yến", studentId: "HS008", email: "yen.ht@school.edu.vn", class: "11B2 - Lý", avgScore: 5.2, tests: 4, status: "danger" },
-  { id: "9", name: "Trịnh Minh Đức", studentId: "HS009", email: "duc.tm@school.edu.vn", class: "12A1 - Toán", avgScore: 8.9, tests: 12, status: "excellent" },
-  { id: "10", name: "Ngô Thị Hồng", studentId: "HS010", email: "hong.nt@school.edu.vn", class: "IELTS 7.0+", avgScore: 7.8, tests: 6, status: "good" },
-];
+interface StudentMetrics {
+  id: string;
+  name: string;
+  studentId: string;
+  email: string;
+  class: string;
+  avgScore: number;
+  tests: number;
+  status: string;
+}
 
 export default function StudentsPage() {
+  const [allStudents, setAllStudents] = useState<StudentMetrics[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const [search, setSearch] = useState("");
   const [filterClass, setFilterClass] = useState("all");
+
+  useEffect(() => {
+    const loadStudents = async () => {
+      try {
+        const data = await apiFetch("/students");
+        setAllStudents(data || []);
+      } catch (err: any) {
+        toast.error("Không thể tải danh sách học sinh: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStudents();
+  }, []);
 
   const filtered = allStudents.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.studentId.toLowerCase().includes(search.toLowerCase());
@@ -54,6 +70,14 @@ export default function StudentsPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -71,9 +95,9 @@ export default function StudentsPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: "Tổng học sinh", value: allStudents.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
-          { label: "Điểm TB toàn trường", value: (allStudents.reduce((a, s) => a + s.avgScore, 0) / allStudents.length).toFixed(1), icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: "Điểm TB toàn trường", value: allStudents.length ? (allStudents.reduce((a, s) => a + s.avgScore, 0) / allStudents.length).toFixed(1) : "0", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
           { label: "HS xuất sắc", value: allStudents.filter(s => s.status === "excellent").length, icon: GraduationCap, color: "text-amber-500", bg: "bg-amber-50" },
-          { label: "Cần hỗ trợ", value: allStudents.filter(s => s.status === "danger").length, icon: Users, color: "text-rose-500", bg: "bg-rose-50" },
+          { label: "Cần hỗ trợ", value: allStudents.filter(s => s.status === "danger" || s.status === "warning").length, icon: Users, color: "text-rose-500", bg: "bg-rose-50" },
         ].map((stat, i) => (
           <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
@@ -151,7 +175,7 @@ export default function StudentsPage() {
                     </td>
                     <td className="py-3.5 text-center">
                       <span className={`inline-flex items-center justify-center w-10 h-7 rounded-md font-bold text-xs ${getScoreColor(student.avgScore)}`}>
-                        {student.avgScore}
+                        {student.avgScore.toFixed(1)}
                       </span>
                     </td>
                     <td className="py-3.5 text-center text-slate-600">{student.tests}</td>
@@ -165,14 +189,8 @@ export default function StudentsPage() {
                           <DropdownMenuItem className="gap-2" onClick={() => toast.info(`Mở hồ sơ ${student.name}`)}>
                             <GraduationCap className="w-4 h-4 text-slate-400" /> Xem hồ sơ
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Mail className="w-4 h-4 text-slate-400" /> Gửi tin nhắn
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2">
-                            <Edit2 className="w-4 h-4 text-slate-400" /> Chỉnh sửa
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2 text-rose-600">
-                            <Trash2 className="w-4 h-4" /> Xóa học sinh
+                          <DropdownMenuItem className="gap-2" onClick={() => apiFetch(`/students/${student.id}`, { method: 'DELETE' }).then(() => setAllStudents(prev => prev.filter(x => x.id !== student.id))).catch(e => toast.error('Lỗi khi xóa'))}>
+                            <Trash2 className="w-4 h-4 text-rose-500" /> <span className="text-rose-600">Xóa học sinh</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -182,7 +200,7 @@ export default function StudentsPage() {
                 {filtered.length === 0 && (
                   <tr>
                     <td colSpan={8} className="py-12 text-center text-slate-400">
-                      Không tìm thấy học sinh nào phù hợp.
+                      Không có học sinh nào.
                     </td>
                   </tr>
                 )}

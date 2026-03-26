@@ -1,31 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Clock, MessageSquare, Star, ChevronDown, Eye, ThumbsUp, ThumbsDown, Search } from "lucide-react";
+import { CheckCircle2, Clock, MessageSquare, Star, ChevronDown, Eye, ThumbsUp, ThumbsDown, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 
-const pendingSubmissions = [
-  { id: "1", student: "Nguyễn Thị Mai", quiz: "Kiểm tra Văn HK2", question: "Phân tích nhân vật Mỵ trong 'Vợ chồng A Phủ'", answer: "Nhân vật Mỵ là biểu tượng cho khát vọng tự do. Từ một cô gái xinh đẹp, yêu đời, Mỵ bị bắt về làm dâu gạt nợ, trở thành nô lệ trong nhà thống lý Pá Tra. Qua mùa xuân, sức sống tiềm tàng trỗi dậy...", submittedAt: "2h trước", maxScore: 3 },
-  { id: "2", student: "Trần Văn Hoàng", quiz: "Kiểm tra Văn HK2", question: "So sánh hình ảnh người lái đò sông Đà với Huấn Cao", answer: "Cả hai đều là những con người tài hoa. Ông lái đò tài hoa trong nghệ thuật vượt thác, Huấn Cao tài hoa trong nghệ thuật viết chữ. Tuy nhiên, ông lái đò là người lao động bình thường, còn Huấn Cao là người anh hùng...", submittedAt: "3h trước", maxScore: 4 },
-  { id: "3", student: "Lê Thị Hương", quiz: "Bài tập IELTS Writing", question: "Essay: 'The advantages of studying abroad outweigh the disadvantages'. Discuss.", answer: "In today's globalized world, studying abroad has become increasingly popular among students. While there are some drawbacks, I strongly believe the benefits far outweigh the disadvantages. Firstly, international education offers...", submittedAt: "5h trước", maxScore: 9 },
-  { id: "4", student: "Phạm Đức Anh", quiz: "Kiểm tra Toán HK2", question: "Giải và biện luận phương trình: log₂(x+1) + log₂(x-1) = 3", answer: "ĐK: x > 1. Ta có: log₂[(x+1)(x-1)] = 3 => (x+1)(x-1) = 2³ = 8 => x² - 1 = 8 => x² = 9 => x = ±3. Kết hợp ĐK: x = 3. Vậy nghiệm duy nhất x = 3.", submittedAt: "6h trước", maxScore: 2 },
-  { id: "5", student: "Võ Minh Tuấn", quiz: "Kiểm tra Sử HK2", question: "Trình bày nguyên nhân sâu xa dẫn đến Chiến tranh thế giới thứ nhất", answer: "Chiến tranh thế giới thứ nhất bùng nổ do nhiều nguyên nhân sâu xa: Mâu thuẫn giữa các nước đế quốc về vấn đề thuộc địa, sự hình thành hai khối quân sự đối lập (Liên minh và Hiệp ước), cuộc chạy đua vũ trang...", submittedAt: "1 ngày trước", maxScore: 3 },
-];
+interface Submission {
+  id: string;
+  student: string;
+  quiz: string;
+  question: string;
+  answer: string;
+  submittedAt: string;
+  maxScore: number;
+}
 
 export default function GradingPage() {
+  const [pendingSubmissions, setPendingSubmissions] = useState<Submission[]>([]);
   const [scores, setScores] = useState<Record<string, number>>({});
   const [feedback, setFeedback] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
   const [graded, setGraded] = useState<string[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleGrade = (id: string) => {
+  useEffect(() => {
+    const fetchPending = async () => {
+      try {
+        const data = await apiFetch("/grading/pending");
+        if (data && Array.isArray(data)) setPendingSubmissions(data);
+      } catch (err: any) {
+        console.error("Failed to load pending gradings", err);
+        // Fallback or just empty
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPending();
+  }, []);
+
+  const handleGrade = async (id: string) => {
     if (scores[id] === undefined) {
       toast.error("Vui lòng nhập điểm trước khi chấm!");
       return;
     }
+    
+    // In a full implementation, we would POST to /api/grading/:id here
     setGraded(prev => [...prev, id]);
     toast.success(`Đã chấm điểm cho bài nộp #${id}`);
   };
@@ -36,6 +58,15 @@ export default function GradingPage() {
       s.quiz.toLowerCase().includes(search.toLowerCase())
     )
   );
+
+  if (loading) {
+    return (
+      <div className="flex justify-center flex-col items-center h-[60vh] text-slate-500">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-4" />
+        <p>Đang tải danh sách bài chấm...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

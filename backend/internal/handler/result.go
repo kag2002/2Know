@@ -42,3 +42,17 @@ func (h *ResultHandler) GetQuizResults(c fiber.Ctx) error {
 
 	return c.JSON(results)
 }
+
+func (h *ResultHandler) GetPendingGradings(c fiber.Ctx) error {
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	gradings, err := h.svc.GetPendingGradings(userId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch pending gradings"})
+	}
+
+	return c.JSON(gradings)
+}

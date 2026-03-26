@@ -11,6 +11,7 @@ type ResultRepository interface {
 	GetQuizResults(quizID string) ([]model.TestResult, error)
 	VerifyQuizOwnership(quizID, teacherID string) error
 	VerifyQuizExists(quizID string) error
+	GetPendingResults(teacherID string) ([]model.TestResult, error)
 }
 
 type resultRepository struct {
@@ -39,4 +40,13 @@ func (r *resultRepository) VerifyQuizOwnership(quizID, teacherID string) error {
 func (r *resultRepository) VerifyQuizExists(quizID string) error {
 	var quiz model.Quiz
 	return r.db.Where("id = ?", quizID).First(&quiz).Error
+}
+
+func (r *resultRepository) GetPendingResults(teacherID string) ([]model.TestResult, error) {
+	var results []model.TestResult
+	err := r.db.
+		Joins("JOIN quizzes ON quizzes.id = test_results.quiz_id").
+		Where("quizzes.teacher_id = ? AND test_results.status = ?", teacherID, "pending").
+		Find(&results).Error
+	return results, err
 }

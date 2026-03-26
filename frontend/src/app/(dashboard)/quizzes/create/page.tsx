@@ -7,7 +7,7 @@ import { ChevronRight, Settings, Users, BookOpen, Flag, CheckCircle, Clock, Awar
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { QuestionBuilder } from "@/components/dashboard/QuestionBuilder";
+import { QuestionBuilder, QuestionPayload } from "@/components/dashboard/QuestionBuilder";
 
 const steps = [
   { id: 1, title: "Cài đặt chung", icon: Settings },
@@ -41,6 +41,9 @@ export default function QuizBuilderWizard() {
     access_type: "public",
   });
 
+  // Lifted Question State
+  const [questions, setQuestions] = useState<QuestionPayload[]>([]);
+
   const updateForm = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
@@ -52,11 +55,30 @@ export default function QuizBuilderWizard() {
       return;
     }
 
+    if (status === "published" && questions.length === 0) {
+      alert("Vui lòng thêm ít nhất một câu hỏi trước khi xuất bản.");
+      setCurrentStep(3);
+      return;
+    }
+
     setLoading(true);
     try {
+      // Transform QuestionPayload to match the Go GORM model
+      const formattedQuestions = questions.map((q, idx) => ({
+        type: q.type === "Trắc nghiệm" ? "multiple_choice" : q.type === "Nhiều đáp án" ? "multiple_answers" : "essay",
+        points: Number(q.points) || 10,
+        content: q.content,
+        order_index: idx,
+        options: q.options.map((opt, optIdx) => ({
+          label: String.fromCharCode(65 + optIdx), // A, B, C, D
+          content: opt.text,
+          is_correct: opt.isCorrect
+        }))
+      }));
+
       await apiFetch("/quizzes", {
         method: "POST",
-        body: JSON.stringify({ ...formData, status })
+        body: JSON.stringify({ ...formData, status, questions: formattedQuestions })
       });
       router.push("/quizzes");
     } catch (err: any) {
@@ -172,23 +194,31 @@ export default function QuizBuilderWizard() {
                     <div className="grid grid-cols-2 gap-4">
                        <div className="space-y-2">
                         <label className="text-sm font-medium">Môn học / Chuyên mục</label>
-                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <select 
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          value={formData.subject}
+                          onChange={(e) => updateForm("subject", e.target.value)}
+                        >
                           <option value="">-- Chọn Môn học --</option>
-                          <option>Toán học</option>
-                          <option>Ngữ văn</option>
-                          <option>Tiếng Anh</option>
-                          <option>Vật lý</option>
-                          <option>Khác</option>
+                          <option value="Toán học">Toán học</option>
+                          <option value="Ngữ văn">Ngữ văn</option>
+                          <option value="Tiếng Anh">Tiếng Anh</option>
+                          <option value="Vật lý">Vật lý</option>
+                          <option value="Khác">Khác</option>
                         </select>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Lớp / Cấp độ</label>
-                        <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                        <select 
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                          value={formData.grade_level}
+                          onChange={(e) => updateForm("grade_level", e.target.value)}
+                        >
                           <option value="">-- Chọn Cấp độ --</option>
-                          <option>Tiểu học</option>
-                          <option>THCS</option>
-                          <option>THPT</option>
-                          <option>Đại học / Tự do</option>
+                          <option value="Tiểu học">Tiểu học</option>
+                          <option value="THCS">THCS</option>
+                          <option value="THPT">THPT</option>
+                          <option value="Đại học / Tự do">Đại học / Tự do</option>
                         </select>
                       </div>
                     </div>
@@ -240,7 +270,7 @@ export default function QuizBuilderWizard() {
               )}
 
               {currentStep === 3 && (
-                <QuestionBuilder />
+                <QuestionBuilder questions={questions} setQuestions={setQuestions} />
               )}
 
               {currentStep === 4 && (
@@ -290,7 +320,13 @@ export default function QuizBuilderWizard() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Thời gian làm bài (Phút)</label>
-                        <input type="number" placeholder="Bỏ trống nếu không giới hạn" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
+                        <input 
+                          type="number" 
+                          placeholder="Bỏ trống nếu không giới hạn" 
+                          value={formData.time_limit_minutes || ""}
+                          onChange={(e) => updateForm("time_limit_minutes", parseInt(e.target.value) || 0)}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
+                        />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Số lần làm lại tối đa</label>
@@ -379,45 +415,44 @@ export default function QuizBuilderWizard() {
                     </div>
                     <h3 className="text-xl font-bold text-slate-900">Mọi thứ đã sẵn sàng!</h3>
                     <p className="text-slate-500 mt-2 max-w-sm text-sm">
-                      Bài kiểm tra của bạn đã được lưu tự động. Xuất bản để gửi tới người tham gia.
+                      Bài kiểm tra của bạn đã được cấu hình. Chọn Xuất bản để cho phép học viên truy cập ngay bài thi.
                     </p>
                   </div>
 
                   {/* QR Code + Share Link */}
                   <div className="border rounded-xl p-6 bg-white space-y-6">
                     <h4 className="font-semibold text-slate-800 text-sm flex items-center gap-2">
-                      <QrCode className="w-4 h-4 text-indigo-500" /> Chia sẻ bài kiểm tra
+                      <QrCode className="w-4 h-4 text-indigo-500" /> Truy cập nhanh
                     </h4>
                     <div className="flex flex-col md:flex-row items-center gap-6">
                       {/* QR Code */}
                       <div className="p-4 bg-white border-2 border-dashed border-indigo-200 rounded-xl flex flex-col items-center shrink-0">
                         <QRCodeSVG
-                          value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/new-quiz-id`}
+                          value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/demo`}
                           size={160}
                           bgColor="#ffffff"
                           fgColor="#1e1b4b"
                           level="M"
                           includeMargin={false}
                         />
-                        <p className="text-xs text-slate-500 mt-3 font-medium">Quét để vào bài thi</p>
+                        <p className="text-xs text-slate-500 mt-3 font-medium">Quét mẫu mã QR</p>
                       </div>
 
                       {/* Share Link + Options */}
                       <div className="flex-1 space-y-4 w-full">
                         <div>
-                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Đường dẫn chia sẻ</label>
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Dự kiến Đường dẫn chia sẻ</label>
                           <div className="flex gap-2">
                             <input
                               readOnly
-                              value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/new-quiz-id`}
+                              value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/[Tự-động-sinh]`}
                               className="flex-1 h-10 px-3 rounded-md border bg-slate-50 text-sm text-slate-700 font-mono"
                             />
                             <Button
                               variant="outline"
                               className="gap-2 shrink-0"
                               onClick={() => {
-                                navigator.clipboard.writeText(`${window.location.origin}/test/new-quiz-id`);
-                                alert("Đã sao chép đường dẫn!");
+                                alert("Đường dẫn này chỉ lấy được sau khi xuất bản!");
                               }}
                             >
                               <LinkIcon className="w-4 h-4" /> Sao chép
@@ -427,11 +462,11 @@ export default function QuizBuilderWizard() {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div className="border rounded-lg p-3 bg-slate-50 flex items-center gap-2">
                             <Users className="w-4 h-4 text-blue-500" />
-                            <span className="text-slate-600">Không cần tài khoản</span>
+                            <span className="text-slate-600">Luồng cấu hình Test Module</span>
                           </div>
                           <div className="border rounded-lg p-3 bg-slate-50 flex items-center gap-2">
-                            <Flag className="w-4 h-4 text-amber-500" />
-                            <span className="text-slate-600">Bật chống gian lận</span>
+                            <BookOpen className="w-4 h-4 text-amber-500" />
+                            <span className="text-slate-600">{questions.length} Câu hỏi sẵn sàng</span>
                           </div>
                         </div>
                       </div>

@@ -62,6 +62,7 @@ func main() {
 	quizRepo := repository.NewQuizRepository(config.DB)
 	questionRepo := repository.NewQuestionRepository(config.DB)
 	resultRepo := repository.NewResultRepository(config.DB)
+	studentRepo := repository.NewStudentRepository(config.DB)
 
 	// Initialize Services
 	authSvc := service.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
@@ -70,6 +71,8 @@ func main() {
 	quizSvc := service.NewQuizService(quizRepo)
 	questionSvc := service.NewQuestionService(questionRepo)
 	resultSvc := service.NewResultService(resultRepo, quizRepo)
+	studentSvc := service.NewStudentService(studentRepo)
+	aiSvc := service.NewAIService()
 
 	// Initialize Handlers
 	authHandler := handler.NewAuthHandler(authSvc)
@@ -78,6 +81,8 @@ func main() {
 	quizHandler := handler.NewQuizHandler(quizSvc)
 	questionHandler := handler.NewQuestionHandler(questionSvc)
 	resultHandler := handler.NewResultHandler(resultSvc)
+	studentHandler := handler.NewStudentHandler(studentSvc)
+	aiHandler := handler.NewAIHandler(aiSvc)
 
 	// Auth routes (public)
 	app.Post("/api/auth/register", authHandler.Register)
@@ -98,6 +103,9 @@ func main() {
 	// Results analytics endpoints (Teacher)
 	api.Get("/quizzes/:quizId/results", resultHandler.GetQuizResults)
 
+	// AI endpoints
+	api.Post("/ai/generate-quiz", aiHandler.GenerateQuiz)
+
 	// Question endpoints
 	api.Get("/quizzes/:quizId/questions", questionHandler.GetQuizQuestions)
 	api.Get("/questions", questionHandler.GetQuestions)
@@ -110,8 +118,17 @@ func main() {
 	api.Get("/classes/:id", classHandler.GetClassByID)
 	api.Post("/classes/:id/students", classHandler.AddStudent)
 
+	// Global Student Directory endpoints
+	api.Get("/students", studentHandler.GetStudents)
+	api.Post("/students", studentHandler.CreateStudent)
+	api.Delete("/students/:id", studentHandler.DeleteStudent)
+
 	// Stats/Dashboard endpoint
 	api.Get("/stats/dashboard", statsHandler.GetDashboardStats)
+	api.Get("/stats/export", statsHandler.ExportCSV)
+
+	// Grading endpoints
+	api.Get("/grading/pending", resultHandler.GetPendingGradings)
 
 	port := os.Getenv("PORT")
 	if port == "" {
