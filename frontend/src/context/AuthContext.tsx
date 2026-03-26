@@ -37,6 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = (token: string, userData: User) => {
     localStorage.setItem("quizlm_token", token);
     localStorage.setItem("quizlm_user", JSON.stringify(userData));
+    // Set cookie so Next.js middleware can detect auth state
+    document.cookie = `quizlm_token=${token}; path=/; max-age=${60 * 60 * 72}; SameSite=Lax`;
     setUser(userData);
     router.push("/overview");
   };
@@ -44,6 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem("quizlm_token");
     localStorage.removeItem("quizlm_user");
+    // Clear the auth cookie
+    document.cookie = "quizlm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     setUser(null);
     router.push("/login");
   };

@@ -45,7 +45,7 @@ export default function LoginPage() {
         <p className="text-slate-500">Đăng nhập để vào trang quản trị 2Know</p>
       </div>
 
-      <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100/50">
+      <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100/50 hover:shadow-md transition-shadow duration-300">
         <form onSubmit={handleLogin} className="space-y-5">
           {error && (
             <div className="p-3 text-sm text-rose-600 border border-rose-200 bg-rose-50 rounded-md">
@@ -61,7 +61,7 @@ export default function LoginPage() {
               type="email" 
               placeholder="name@example.com" 
               required 
-              className="h-11"
+              className="h-11 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(79,70,229,0.1)]"
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={isLoading}
@@ -81,7 +81,7 @@ export default function LoginPage() {
               type="password" 
               autoComplete="current-password"
               required 
-              className="h-11"
+              className="h-11 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(79,70,229,0.1)]"
               value={password}
               onChange={e => setPassword(e.target.value)}
               disabled={isLoading}

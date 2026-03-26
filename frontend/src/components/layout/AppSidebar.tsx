@@ -31,6 +31,7 @@ const sidebarLinks = [
   { icon: Share2, label: "Bộ chia sẻ", href: "/sharing" },
   { icon: Tags, label: "Thẻ", href: "/tags" },
   { icon: StickyNote, label: "Ghi chú", href: "/notes" },
+  { icon: Settings, label: "Cài đặt", href: "/settings" },
 ];
 
 export function AppSidebar() {
@@ -74,10 +75,10 @@ export function AppSidebar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                   isActive 
-                    ? "bg-primary text-primary-foreground" 
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" 
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-0.5"
                 )}
               >
                 <link.icon className="w-5 h-5" />

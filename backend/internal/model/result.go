@@ -23,7 +23,8 @@ type TestResult struct {
 	// JSON payload mapping Question ID to Option ID selected
 	Answers pq.StringArray `gorm:"type:text[]" json:"answers"`
 
-	Status string `gorm:"type:varchar(50);default:'completed'" json:"status"` // completed, abandoned, cheating_flagged
+	Status         string `gorm:"type:varchar(50);default:'completed'" json:"status"` // completed, abandoned, cheating_flagged
+	TabSwitchCount int    `gorm:"default:0" json:"tab_switch_count"`
 
 	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`

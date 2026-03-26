@@ -15,6 +15,14 @@ import (
 // For now, we will handle creating generic questions related to the teacher.
 // We'll update the GORM query to reflect "IsBank" if needed, but for now we'll do standard CRUD.
 
+func GetQuestions(c fiber.Ctx) error {
+	var questions []model.Question
+	if err := config.DB.Preload("Options").Order("created_at desc").Find(&questions).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch questions"})
+	}
+	return c.JSON(questions)
+}
+
 func CreateQuestion(c fiber.Ctx) error {
 	var question model.Question
 	if err := c.Bind().JSON(&question); err != nil {

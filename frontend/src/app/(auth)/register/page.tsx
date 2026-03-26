@@ -29,7 +29,7 @@ export default function RegisterPage() {
       await apiFetch("/auth/register", {
         method: "POST",
         requireAuth: false,
-        body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password }),
+        body: JSON.stringify({ full_name: formData.name, email: formData.email, password: formData.password }),
       });
       // Auto redirect to login
       router.push("/login?registered=success");

@@ -1,143 +1,201 @@
 "use client";
 
+import { use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Users, Target, Activity, Trophy } from "lucide-react";
+import { ArrowLeft, Users, TrendingUp, Award, AlertTriangle, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
-const mockResults = [
-  { id: 1, rank: 1, sbd: "SV0124", name: "Nguyễn Văn An", score: 9.5, correct: 38, time: "25:12", status: "Hoàn thành" },
-  { id: 2, rank: 2, sbd: "SV0128", name: "Lý Tiến Đạt", score: 9.0, correct: 36, time: "30:45", status: "Hoàn thành" },
-  { id: 3, rank: 3, sbd: "SV0125", name: "Trần Thị Bích", score: 8.5, correct: 34, time: "40:22", status: "Hoàn thành" },
-  { id: 4, rank: 4, sbd: "SV0126", name: "Lê Hoàng Phúc", score: 7.0, correct: 28, time: "44:50", status: "Cảnh báo gian lận" },
-  { id: 5, rank: 5, sbd: "SV0127", name: "Phạm Diệu Linh", score: 6.5, correct: 26, time: "45:00", status: "Hết giờ" },
+// Mock data
+const scoreDistribution = [
+  { range: "0-10%", count: 2, color: "#ef4444" },
+  { range: "10-20%", count: 3, color: "#ef4444" },
+  { range: "20-30%", count: 4, color: "#f97316" },
+  { range: "30-40%", count: 6, color: "#f97316" },
+  { range: "40-50%", count: 8, color: "#eab308" },
+  { range: "50-60%", count: 12, color: "#eab308" },
+  { range: "60-70%", count: 15, color: "#22c55e" },
+  { range: "70-80%", count: 18, color: "#22c55e" },
+  { range: "80-90%", count: 10, color: "#10b981" },
+  { range: "90-100%", count: 5, color: "#10b981" },
 ];
 
-export default function ReportDetailPage({ params }: { params: { id: string } }) {
+const questionPerformance = Array.from({ length: 20 }, (_, i) => ({
+  name: `Q${i + 1}`,
+  correct: Math.floor(Math.random() * 60) + 30,
+  incorrect: 0,
+})).map(q => ({ ...q, incorrect: 100 - q.correct }));
+
+const topStudents = [
+  { name: "Nguyễn Thị Mai", score: 9.6, time: "32:15", violations: 0 },
+  { name: "Trần Văn Hoàng", score: 9.2, time: "38:40", violations: 0 },
+  { name: "Lê Thị Hương", score: 8.8, time: "41:05", violations: 1 },
+  { name: "Phạm Đức Anh", score: 8.4, time: "35:22", violations: 0 },
+  { name: "Võ Minh Tuấn", score: 8.0, time: "44:10", violations: 2 },
+];
+
+export default function ReportDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Header */}
       <div className="flex items-center gap-4">
-        <Link href="/reports" className="p-2 border rounded-md hover:bg-slate-50 transition-colors bg-white">
-          <ArrowLeft className="w-5 h-5 text-slate-600" />
+        <Link href="/reports">
+          <Button variant="outline" size="icon" className="h-9 w-9">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
         </Link>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Kiểm tra Toán Học giữa kỳ 2</h1>
-            <span className="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold uppercase">
-              Đã thu bài
-            </span>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            Kiểm tra Toán Học giữa kỳ 2
+          </h1>
+          <p className="text-muted-foreground mt-1">Báo cáo chi tiết • Mã: {id}</p>
+        </div>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Tổng bài nộp", value: "83", icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
+          { label: "Điểm trung bình", value: "7.4", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: "Điểm cao nhất", value: "9.6", icon: Award, color: "text-amber-500", bg: "bg-amber-50" },
+          { label: "Vi phạm tab", value: "12", icon: ShieldAlert, color: "text-rose-500", bg: "bg-rose-50" },
+        ].map((stat, i) => (
+          <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${stat.bg}`}>
+                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase">{stat.label}</p>
+                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Score Distribution */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg">Phân bố điểm số</CardTitle>
+            <p className="text-sm text-muted-foreground">Biểu đồ phân phối điểm của toàn bộ học sinh</p>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={scoreDistribution} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="range" tick={{ fontSize: 11 }} stroke="#94a3b8" />
+                <YAxis tick={{ fontSize: 11 }} stroke="#94a3b8" />
+                <Tooltip
+                  contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "13px" }}
+                  formatter={(value) => [`${value} học sinh`, "Số lượng"]}
+                />
+                <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                  {scoreDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Question Performance */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg">Hiệu suất từng câu hỏi</CardTitle>
+            <p className="text-sm text-muted-foreground">Tỷ lệ % trả lời đúng cho mỗi câu hỏi</p>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={questionPerformance} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                <YAxis tick={{ fontSize: 11 }} stroke="#94a3b8" domain={[0, 100]} />
+                <Tooltip
+                  contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "13px" }}
+                  formatter={(value, name) => [
+                    `${value}%`,
+                    name === "correct" ? "Đúng" : "Sai",
+                  ]}
+                />
+                <Bar dataKey="correct" stackId="a" fill="#22c55e" radius={[0, 0, 0, 0]} name="correct" />
+                <Bar dataKey="incorrect" stackId="a" fill="#fca5a5" radius={[4, 4, 0, 0]} name="incorrect" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Top Students Table */}
+      <Card className="shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">Bảng xếp hạng TOP 5</CardTitle>
+          <p className="text-sm text-muted-foreground">Học sinh có điểm số cao nhất trong bài kiểm tra</p>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b text-left text-slate-500">
+                  <th className="pb-3 font-semibold">#</th>
+                  <th className="pb-3 font-semibold">Họ và Tên</th>
+                  <th className="pb-3 font-semibold text-center">Điểm</th>
+                  <th className="pb-3 font-semibold text-center">Thời gian</th>
+                  <th className="pb-3 font-semibold text-center">Vi phạm</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topStudents.map((s, i) => (
+                  <tr key={i} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
+                    <td className="py-3">
+                      {i < 3 ? (
+                        <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white ${
+                          i === 0 ? "bg-amber-400" : i === 1 ? "bg-slate-400" : "bg-amber-700"
+                        }`}>{i + 1}</span>
+                      ) : (
+                        <span className="text-slate-400 pl-2">{i + 1}</span>
+                      )}
+                    </td>
+                    <td className="py-3 font-medium text-slate-800">{s.name}</td>
+                    <td className="py-3 text-center">
+                      <span className={`font-bold ${s.score >= 8 ? "text-emerald-600" : s.score >= 5 ? "text-amber-600" : "text-rose-600"}`}>
+                        {s.score}
+                      </span>
+                    </td>
+                    <td className="py-3 text-center text-slate-500">{s.time}</td>
+                    <td className="py-3 text-center">
+                      {s.violations > 0 ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-xs font-semibold">
+                          <AlertTriangle className="w-3 h-3" /> {s.violations}
+                        </span>
+                      ) : (
+                        <span className="text-emerald-500 text-xs font-medium">Không</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <p className="text-muted-foreground mt-1 text-sm">
-            45/45 học sinh đã nộp bài • Lớp 12A1
-          </p>
-        </div>
-        <div className="ml-auto">
-          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200">
-            <Download className="w-4 h-4" /> Xuất báo cáo Excel
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="border-none shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Điểm trung bình</CardTitle>
-            <Activity className="w-4 h-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-800">7.8 / 10</div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Điểm cao nhất</CardTitle>
-            <Trophy className="w-4 h-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-800">9.5 <span className="text-xs font-normal text-slate-500">Nguyễn Văn An</span></div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Số lượng nộp bài</CardTitle>
-            <Users className="w-4 h-4 text-indigo-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-800">45 / 45</div>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Tỷ lệ chính xác (TB)</CardTitle>
-            <Target className="w-4 h-4 text-rose-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-800">78%</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b bg-slate-50/50 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-800">Bảng điểm chi tiết</h2>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">Lọc theo điểm</Button>
-            <Button variant="outline" size="sm">Cảnh báo gian lận (1)</Button>
-          </div>
-        </div>
-
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-white hover:bg-white">
-              <TableHead className="w-[80px] text-center font-bold">Xếp hạng</TableHead>
-              <TableHead className="font-semibold text-slate-600">Mã HS</TableHead>
-              <TableHead className="font-semibold text-slate-600">Thí sinh</TableHead>
-              <TableHead className="font-semibold text-slate-600 text-center">Số câu đúng</TableHead>
-              <TableHead className="font-semibold text-slate-600 text-center">Thời gian</TableHead>
-              <TableHead className="font-semibold text-slate-600">Trạng thái</TableHead>
-              <TableHead className="font-semibold text-slate-600 text-right">Tổng điểm</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockResults.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell className="text-center">
-                  <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                    r.rank === 1 ? 'bg-amber-100 text-amber-600' : 
-                    r.rank === 2 ? 'bg-slate-200 text-slate-600' : 
-                    r.rank === 3 ? 'bg-orange-100 text-orange-600' : 'text-slate-400'
-                  }`}>
-                    {r.rank}
-                  </span>
-                </TableCell>
-                <TableCell className="font-medium text-slate-500">{r.sbd}</TableCell>
-                <TableCell className="font-semibold text-slate-800">{r.name}</TableCell>
-                <TableCell className="text-center text-slate-600">{r.correct} / 40</TableCell>
-                <TableCell className="text-center text-slate-600">{r.time}</TableCell>
-                <TableCell>
-                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
-                    r.status === 'Hoàn thành' ? 'bg-emerald-100 text-emerald-700' : 
-                    r.status === 'Hết giờ' ? 'bg-slate-100 text-slate-600' : 'bg-rose-100 text-rose-700'
-                  }`}>
-                    {r.status}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right font-black text-indigo-600 text-lg">
-                  {r.score.toFixed(1)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

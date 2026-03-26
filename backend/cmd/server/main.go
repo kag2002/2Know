@@ -24,8 +24,16 @@ func main() {
 	// Connect to database
 	config.ConnectDB()
 
-	// Auto-migrate models
-	err := config.DB.AutoMigrate(&model.User{})
+	// Auto-migrate all models
+	err := config.DB.AutoMigrate(
+		&model.User{},
+		&model.Quiz{},
+		&model.Question{},
+		&model.Option{},
+		&model.Class{},
+		&model.Student{},
+		&model.TestResult{},
+	)
 	if err != nil {
 		log.Fatalf("Failed to auto-migrate: %v", err)
 	}
@@ -65,6 +73,7 @@ func main() {
 
 	// Question endpoints
 	api.Get("/quizzes/:quizId/questions", handler.GetQuizQuestions)
+	api.Get("/questions", handler.GetQuestions)
 	api.Post("/questions", handler.CreateQuestion)
 	api.Delete("/questions/:id", handler.DeleteQuestion)
 

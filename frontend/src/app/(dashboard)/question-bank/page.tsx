@@ -108,7 +108,18 @@ export default function QuestionBankPage() {
         {/* Data Table */}
         <div className="flex-1 overflow-auto">
           {loading ? (
-             <div className="p-8 text-center text-slate-500">Đang tải câu hỏi...</div>
+            <div className="p-4 space-y-3">
+              {[1,2,3,4,5].map((i) => (
+                <div key={i} className="flex items-center gap-4 p-3 animate-pulse" style={{ animationDelay: `${i * 80}ms` }}>
+                  <div className="w-5 h-5 bg-slate-200 rounded" />
+                  <div className="w-20 h-6 bg-slate-200 rounded-md" />
+                  <div className="flex-1 h-5 bg-slate-200 rounded-md" />
+                  <div className="w-16 h-6 bg-slate-200 rounded-md" />
+                  <div className="w-24 h-5 bg-slate-200 rounded-md" />
+                  <div className="w-8 h-8 bg-slate-200 rounded-md" />
+                </div>
+              ))}
+            </div>
           ) : questions.length === 0 ? (
              <div className="p-12 text-center text-slate-500">Không tìm thấy câu hỏi nào.</div>
           ) : (
