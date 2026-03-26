@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, use } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Camera, 
@@ -16,7 +16,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function OMRScannerPage({ params }: { params: { id: string } }) {
+export default function OMRScannerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
@@ -115,7 +116,7 @@ export default function OMRScannerPage({ params }: { params: { id: string } }) {
       {/* Top Navbar Overlay */}
       <div className="absolute top-0 left-0 right-0 z-20 flex justify-between items-center p-4 bg-gradient-to-b from-black/80 to-transparent">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => router.push(`/quizzes/${params.id}`)}>
+          <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => router.push(`/quizzes/${id}`)}>
             <ArrowLeft className="w-5 h-5 mr-2" /> Quay lại
           </Button>
           <div className="hidden sm:block">
@@ -241,7 +242,7 @@ export default function OMRScannerPage({ params }: { params: { id: string } }) {
                     <Button variant="outline" className="h-12 border-slate-300 text-slate-700 bg-white hover:bg-slate-100 font-semibold" onClick={handleNextBlank}>
                       <Camera className="w-4 h-4 mr-2" /> Chụp phiếu khác
                     </Button>
-                    <Button className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md shadow-emerald-500/20" onClick={() => router.push(`/reports/${params.id}`)}>
+                    <Button className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md shadow-emerald-500/20" onClick={() => router.push(`/reports/${id}`)}>
                       <CheckCircle2 className="w-4 h-4 mr-2" /> Lưu vào Sổ điểm
                     </Button>
                   </div>
