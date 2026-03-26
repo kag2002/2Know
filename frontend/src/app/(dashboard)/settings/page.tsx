@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { User, Palette, Shield, Bell, Save, Loader2, Moon, Sun, Monitor, Check } from "lucide-react";
+import { toast } from "sonner";
 
 const themes = [
   { id: "indigo", label: "Indigo", color: "bg-indigo-600" },
@@ -19,10 +21,10 @@ const themes = [
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("account");
   const [saving, setSaving] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("indigo");
-  const [colorMode, setColorMode] = useState("light");
 
   const tabs = [
     { id: "account", label: "Tài khoản", icon: User },
@@ -33,7 +35,10 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     setSaving(true);
-    setTimeout(() => setSaving(false), 1000);
+    setTimeout(() => {
+      setSaving(false);
+      toast.success("Đã lưu cài đặt thành công!");
+    }, 1000);
   };
 
   return (
@@ -146,15 +151,15 @@ export default function SettingsPage() {
                     ].map((mode) => (
                       <button
                         key={mode.id}
-                        onClick={() => setColorMode(mode.id)}
+                        onClick={() => setTheme(mode.id as "light" | "dark" | "system")}
                         className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${
-                          colorMode === mode.id
+                          theme === mode.id
                             ? "border-indigo-500 bg-indigo-50 shadow-sm"
                             : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                         }`}
                       >
-                        <mode.icon className={`w-6 h-6 ${colorMode === mode.id ? "text-indigo-600" : "text-slate-400"}`} />
-                        <span className={`text-sm font-medium ${colorMode === mode.id ? "text-indigo-700" : "text-slate-600"}`}>
+                        <mode.icon className={`w-6 h-6 ${theme === mode.id ? "text-indigo-600" : "text-slate-400"}`} />
+                        <span className={`text-sm font-medium ${theme === mode.id ? "text-indigo-700" : "text-slate-600"}`}>
                           {mode.label}
                         </span>
                       </button>
