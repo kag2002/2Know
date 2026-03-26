@@ -69,7 +69,7 @@ func main() {
 	classSvc := service.NewClassService(classRepo)
 	quizSvc := service.NewQuizService(quizRepo)
 	questionSvc := service.NewQuestionService(questionRepo)
-	resultSvc := service.NewResultService(resultRepo)
+	resultSvc := service.NewResultService(resultRepo, quizRepo)
 
 	// Initialize Handlers
 	authHandler := handler.NewAuthHandler(authSvc)
@@ -83,7 +83,8 @@ func main() {
 	app.Post("/api/auth/register", authHandler.Register)
 	app.Post("/api/auth/login", authHandler.Login)
 
-	// Public test submission endpoint
+	// Public test routes (Guest)
+	app.Get("/api/test/quiz/:id", quizHandler.GetPublicQuizByID)
 	app.Post("/api/test/submit", resultHandler.SubmitTest)
 
 	// Protected block

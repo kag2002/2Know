@@ -2,29 +2,42 @@
 
 import { useEffect, useState, use } from "react";
 import { Button } from "@/components/ui/button";
-import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, ShieldAlert } from "lucide-react";
+import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, ShieldAlert, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-// Mock data for test taking
-const mockQuestions = Array.from({ length: 40 }, (_, i) => ({
-  id: i + 1,
-  content: `Câu hỏi số ${i + 1}: Tìm đạo hàm của hàm số $y = x^2 - 4x + 3$?`,
-  options: [
-    `y' = 2x - 4`,
-    `y' = 2x + 4`,
-    `y' = x - 4`,
-    `y' = 2x - 3`
-  ]
-}));
+import { apiFetch } from "@/lib/api";
 
 const MAX_TAB_SWITCHES = 3;
+
+interface Option {
+  id: string;
+  label: string;
+  content: string;
+}
+
+interface Question {
+  id: string;
+  content: string;
+  options: Option[];
+}
+
+interface QuizData {
+  id: string;
+  title: string;
+  time_limit_minutes: number;
+  questions: Question[];
+}
 
 export default function TakeTestPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const [timeLeft, setTimeLeft] = useState(45 * 60);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [flagged, setFlagged] = useState<number[]>([]);
+  
+  const [quiz, setQuiz] = useState<QuizData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({}); // QuestionID -> OptionID
+  const [flagged, setFlagged] = useState<string[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
 
   // === PROCTORING STATE ===
@@ -32,14 +45,29 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   const [showWarning, setShowWarning] = useState(false);
   const [timerPaused, setTimerPaused] = useState(false);
 
+  // Initialize Quiz Data
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const data = await apiFetch(`/test/quiz/${id}`, { requireAuth: false });
+        setQuiz(data);
+        setTimeLeft((data.time_limit_minutes || 45) * 60);
+      } catch (err: any) {
+        setError(err.message || "Failed to load test. It may be closed or unavailable.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuiz();
+  }, [id]);
+
   // --- Tab Switch Detection ---
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden) {
+      if (document.hidden && !loading && quiz) {
         setTabSwitchCount(prev => {
           const newCount = prev + 1;
           if (newCount >= MAX_TAB_SWITCHES) {
-            // Auto-submit on 3rd strike
             handleAutoSubmit(newCount);
           }
           return newCount;
@@ -51,7 +79,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []);
+  }, [loading, quiz]);
 
   // --- Copy/Paste Prevention ---
   useEffect(() => {
@@ -71,7 +99,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   // Timer
   useEffect(() => {
-    if (timerPaused) return;
+    if (timerPaused || loading || !quiz) return;
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -83,7 +111,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [timerPaused]);
+  }, [timerPaused, loading, quiz]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -93,26 +121,46 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const currentQ = mockQuestions[currentIdx];
-
-  const toggleFlag = (qid: number) => {
+  const toggleFlag = (qid: string) => {
     setFlagged(prev => prev.includes(qid) ? prev.filter(x => x !== qid) : [...prev, qid]);
   };
 
-  const handleSelect = (qId: number, oIdx: number) => {
-    setAnswers(prev => ({ ...prev, [qId]: oIdx }));
+  const handleSelect = (qId: string, oId: string) => {
+    setAnswers(prev => ({ ...prev, [qId]: oId }));
   };
 
-  const handleAutoSubmit = (switches: number) => {
-    // Store proctoring data for the result page
+  const handleAutoSubmit = async (switches: number) => {
     sessionStorage.setItem("tabSwitchCount", String(switches));
+    await submitPayload(switches);
     router.push(`/test/${id}/result`);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (confirm("Bạn có chắc chắn muốn nộp bài không? Thời gian vẫn còn dư.")) {
       sessionStorage.setItem("tabSwitchCount", String(tabSwitchCount));
+      await submitPayload(tabSwitchCount);
       router.push(`/test/${id}/result`);
+    }
+  };
+
+  const submitPayload = async (switches: number) => {
+    try {
+      const resultObj = await apiFetch("/test/submit", {
+        method: "POST",
+        requireAuth: false,
+        body: JSON.stringify({
+          quiz_id: id,
+          student_name: "Guest Student",
+          student_identifier: "GUEST-" + Math.floor(Math.random() * 10000),
+          time_taken_seconds: ((quiz?.time_limit_minutes || 0) * 60) - timeLeft,
+          answers: Object.values(answers), // Just the option IDs
+          tab_switch_count: switches
+        })
+      });
+      // Save backend computed result into session storage so the result page can render it safely
+      sessionStorage.setItem("quizlm_latest_result", JSON.stringify(resultObj));
+    } catch(err) {
+      console.error("Failed to submit", err);
     }
   };
 
@@ -120,6 +168,36 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
     setShowWarning(false);
     setTimerPaused(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
+  }
+
+  if (error || !quiz) {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center space-y-4">
+        <ShieldAlert className="w-16 h-16 text-rose-500" />
+        <h1 className="text-2xl font-bold">Không thể tải bài thi</h1>
+        <p className="text-slate-500">{error}</p>
+        <Button onClick={() => router.push("/")}>Quay lại trang chủ</Button>
+      </div>
+    );
+  }
+
+  const questions = quiz.questions || [];
+  if (questions.length === 0) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg text-slate-500">Bài thi này chưa có câu hỏi nào.</p>
+      </div>
+    );
+  }
+
+  const currentQ = questions[currentIdx];
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-3.5rem)] relative">
@@ -140,7 +218,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
                 <AlertTriangle className="w-5 h-5" />
                 Lần vi phạm: {tabSwitchCount} / {MAX_TAB_SWITCHES}
               </div>
-              {tabSwitchCount >= MAX_TAB_SWITCHES ? (
+              {tabSwitchCount > MAX_TAB_SWITCHES ? (
                 <p className="text-sm text-rose-600 mt-2 font-medium">
                   Bạn đã hết số lần cảnh báo. Bài thi sẽ được nộp tự động.
                 </p>
@@ -168,7 +246,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         {/* Question Header */}
         <div className="h-16 border-b flex items-center justify-between px-6 bg-slate-50/50">
           <div className="font-semibold text-lg text-slate-800">
-            Câu {currentIdx + 1} <span className="text-slate-400 font-normal text-sm">/ {mockQuestions.length}</span>
+            Câu {currentIdx + 1} <span className="text-slate-400 font-normal text-sm">/ {questions.length}</span>
           </div>
           <div className="flex items-center gap-3">
             {tabSwitchCount > 0 && (
@@ -195,12 +273,12 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
             </h2>
             
             <div className="space-y-4">
-              {currentQ.options.map((opt, idx) => {
-                const isSelected = answers[currentQ.id] === idx;
+              {(currentQ.options || []).map((opt) => {
+                const isSelected = answers[currentQ.id] === opt.id;
                 return (
                   <label 
-                    key={idx} 
-                    onClick={() => handleSelect(currentQ.id, idx)}
+                    key={opt.id} 
+                    onClick={() => handleSelect(currentQ.id, opt.id)}
                     className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
                       isSelected ? 'border-indigo-600 bg-indigo-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-indigo-200'
                     }`}
@@ -211,7 +289,8 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
                       {isSelected && <div className="w-3 h-3 bg-indigo-600 rounded-full" />}
                     </div>
                     <span className={`text-base font-medium ${isSelected ? 'text-indigo-900' : 'text-slate-700'}`}>
-                      {opt}
+                      {opt.label && <span className="font-bold mr-2">{opt.label}.</span>}
+                      {opt.content}
                     </span>
                   </label>
                 );
@@ -232,7 +311,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
             <ChevronLeft className="w-5 h-5" /> Câu trước
           </Button>
           
-          {currentIdx === mockQuestions.length - 1 ? (
+          {currentIdx === questions.length - 1 ? (
             <Button 
               size="lg" 
               className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
@@ -288,7 +367,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         <div className="flex-1 overflow-y-auto p-6">
           <h3 className="font-semibold text-slate-800 mb-4">Danh sách câu hỏi</h3>
           <div className="grid grid-cols-5 gap-2">
-            {mockQuestions.map((q, i) => {
+            {questions.map((q, i) => {
               const isDone = answers[q.id] !== undefined;
               const isFlagged = flagged.includes(q.id);
               const isActive = currentIdx === i;
@@ -320,7 +399,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         </div>
 
         <div className="p-4 bg-white border-t">
-          <Button variant="destructive" className="w-full text-base font-bold shadow-sm" onClick={handleSubmit}>
+          <Button variant="destructive" className="w-full text-base font-bold shadow-sm" onClick={handleSubmit} disabled={Object.keys(answers).length === 0}>
             NỘP BÀI NGAY
           </Button>
         </div>

@@ -61,3 +61,14 @@ func (h *QuizHandler) GetQuizByID(c fiber.Ctx) error {
 
 	return c.JSON(quiz)
 }
+
+func (h *QuizHandler) GetPublicQuizByID(c fiber.Ctx) error {
+	id := c.Params("id")
+
+	quiz, err := h.svc.GetPublicQuizByID(id)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Quiz not found or not published"})
+	}
+
+	return c.JSON(quiz)
+}

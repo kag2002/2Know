@@ -27,8 +27,9 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
 
   if (!response.ok) {
     if (response.status === 401 && typeof window !== 'undefined') {
-      // Force logout on invalid token
+      // Force logout on invalid token and clear server-side SSR cookie to prevent redirect loops
       localStorage.removeItem("quizlm_token");
+      document.cookie = "quizlm_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
       window.location.href = "/login";
     }
     const errorData = await response.json().catch(() => ({}));

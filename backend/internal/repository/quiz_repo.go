@@ -10,6 +10,7 @@ type QuizRepository interface {
 	CreateQuiz(quiz *model.Quiz) error
 	GetQuizzes(teacherID string) ([]model.Quiz, error)
 	GetQuizByID(id, teacherID string) (*model.Quiz, error)
+	GetPublicQuizByID(id string) (*model.Quiz, error)
 }
 
 type quizRepository struct {
@@ -39,6 +40,18 @@ func (r *quizRepository) GetQuizByID(id, teacherID string) (*model.Quiz, error) 
 	var quiz model.Quiz
 	err := r.db.Preload("Questions.Options").
 		Where("id = ? AND teacher_id = ?", id, teacherID).
+		First(&quiz).Error
+	if err != nil {
+		return nil, err
+	}
+	return &quiz, nil
+}
+
+func (r *quizRepository) GetPublicQuizByID(id string) (*model.Quiz, error) {
+	var quiz model.Quiz
+	// Only load published quizzes for guests
+	err := r.db.Preload("Questions.Options").
+		Where("id = ? AND status = 'published'", id).
 		First(&quiz).Error
 	if err != nil {
 		return nil, err
