@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, Settings, Users, BookOpen, Flag, CheckCircle, Clock, Award, Share2 } from "lucide-react";
+import { ChevronRight, Settings, Users, BookOpen, Flag, CheckCircle, Clock, Award, Share2, QrCode, Link as LinkIcon } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { QuestionBuilder } from "@/components/dashboard/QuestionBuilder";
@@ -378,8 +379,63 @@ export default function QuizBuilderWizard() {
                     </div>
                     <h3 className="text-xl font-bold text-slate-900">Mọi thứ đã sẵn sàng!</h3>
                     <p className="text-slate-500 mt-2 max-w-sm text-sm">
-                      Bài kiểm tra của bạn đã được lưu tự động. Bạn có thể xuất bản ngay bây giờ để gửi tới người tham gia.
+                      Bài kiểm tra của bạn đã được lưu tự động. Xuất bản để gửi tới người tham gia.
                     </p>
+                  </div>
+
+                  {/* QR Code + Share Link */}
+                  <div className="border rounded-xl p-6 bg-white space-y-6">
+                    <h4 className="font-semibold text-slate-800 text-sm flex items-center gap-2">
+                      <QrCode className="w-4 h-4 text-indigo-500" /> Chia sẻ bài kiểm tra
+                    </h4>
+                    <div className="flex flex-col md:flex-row items-center gap-6">
+                      {/* QR Code */}
+                      <div className="p-4 bg-white border-2 border-dashed border-indigo-200 rounded-xl flex flex-col items-center shrink-0">
+                        <QRCodeSVG
+                          value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/new-quiz-id`}
+                          size={160}
+                          bgColor="#ffffff"
+                          fgColor="#1e1b4b"
+                          level="M"
+                          includeMargin={false}
+                        />
+                        <p className="text-xs text-slate-500 mt-3 font-medium">Quét để vào bài thi</p>
+                      </div>
+
+                      {/* Share Link + Options */}
+                      <div className="flex-1 space-y-4 w-full">
+                        <div>
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Đường dẫn chia sẻ</label>
+                          <div className="flex gap-2">
+                            <input
+                              readOnly
+                              value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/new-quiz-id`}
+                              className="flex-1 h-10 px-3 rounded-md border bg-slate-50 text-sm text-slate-700 font-mono"
+                            />
+                            <Button
+                              variant="outline"
+                              className="gap-2 shrink-0"
+                              onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/test/new-quiz-id`);
+                                alert("Đã sao chép đường dẫn!");
+                              }}
+                            >
+                              <LinkIcon className="w-4 h-4" /> Sao chép
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="border rounded-lg p-3 bg-slate-50 flex items-center gap-2">
+                            <Users className="w-4 h-4 text-blue-500" />
+                            <span className="text-slate-600">Không cần tài khoản</span>
+                          </div>
+                          <div className="border rounded-lg p-3 bg-slate-50 flex items-center gap-2">
+                            <Flag className="w-4 h-4 text-amber-500" />
+                            <span className="text-slate-600">Bật chống gian lận</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
