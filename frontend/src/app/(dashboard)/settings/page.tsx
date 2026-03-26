@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { User, Palette, Shield, Bell, Save, Loader2, Moon, Sun, Monitor, Check } from "lucide-react";
+import { User, Palette, Shield, Bell, Save, Loader2, Moon, Sun, Monitor, Check, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
 const themes = [
@@ -143,10 +143,11 @@ export default function SettingsPage() {
                 {/* Color Mode */}
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold">Chế độ hiển thị</Label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { id: "light", label: "Sáng", icon: Sun },
                       { id: "dark", label: "Tối", icon: Moon },
+                      { id: "eye-care", label: "Bảo vệ mắt", icon: BookOpen },
                       { id: "system", label: "Hệ thống", icon: Monitor },
                     ].map((mode) => (
                       <button

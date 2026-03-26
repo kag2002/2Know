@@ -45,32 +45,35 @@ function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string
   return <>{display}{suffix}</>;
 }
 
-const statCards = [
-  {
-    value: "56", label: "Bài kiểm tra hoạt động", desc: "Hiện đang mở cho học sinh",
-    icon: Layers, iconColor: "text-indigo-500", badgeColor: "bg-indigo-50 text-indigo-600",
-    badge: "Ổn định", change: null, changeLabel: "Chưa có chênh lệch tuần",
-  },
-  {
-    value: "7", label: "Bài nộp 7 ngày", desc: "Hoàn thành trong tuần qua",
-    icon: CheckSquare, iconColor: "text-rose-500", badgeColor: "bg-rose-50 text-rose-600",
-    badge: "Giảm", change: -91, changeLabel: "-91 so với 7 ngày trước",
-  },
-  {
-    value: "78,1", label: "Điểm trung bình 7 ngày", desc: "Bài làm đủ điều kiện",
-    icon: BarChart, iconColor: "text-emerald-500", badgeColor: "bg-emerald-50 text-emerald-600",
-    badge: "Tăng", change: 5.8, changeLabel: "+5,8 so với 7 ngày trước", suffix: "%",
-  },
-  {
-    value: "135", label: "Hàng chấm", desc: "Câu trả lời thủ công còn chờ",
-    icon: null, iconColor: "text-orange-500", badgeColor: "bg-orange-50 text-orange-600",
-    badge: "Cần theo dõi", change: null, changeLabel: "Chưa có chênh lệch tuần",
-  },
-];
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function OverviewPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
+
+  const statCards = [
+    {
+      value: "56", label: t("overview.stat.active"), desc: t("overview.stat.quizzes"),
+      icon: Layers, iconColor: "text-indigo-500", badgeColor: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400",
+      badge: "Ổn định", change: null, changeLabel: "Chưa có chênh lệch",
+    },
+    {
+      value: "7", label: t("overview.stat.last7days"), desc: t("overview.stat.submissions"),
+      icon: CheckSquare, iconColor: "text-rose-500", badgeColor: "bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400",
+      badge: "Giảm", change: -91, changeLabel: "-91",
+    },
+    {
+      value: "78,1", label: t("overview.stat.avgScore"), desc: t("overview.stat.global"),
+      icon: BarChart, iconColor: "text-emerald-500", badgeColor: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
+      badge: "Tăng", change: 5.8, changeLabel: "+5.8", suffix: "%",
+    },
+    {
+      value: "135", label: t("sidebar.grading"), desc: "Essay queue",
+      icon: null, iconColor: "text-orange-500", badgeColor: "bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
+      badge: "Cần theo dõi", change: null, changeLabel: "Chưa có chênh lệch",
+    },
+  ];
 
   useEffect(() => setMounted(true), []);
 
@@ -87,11 +90,11 @@ export default function OverviewPage() {
               {getGreeting()}
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            {user?.name || "Giáo viên"}
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {t("overview.welcome")}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Đây là nhịp hoạt động trực tiếp của lớp học, hàng chấm và khối lượng AI của bạn.
+            {t("overview.subtitle")}
           </p>
         </div>
         <Button variant="outline" className="gap-2 bg-white">

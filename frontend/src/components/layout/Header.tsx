@@ -1,16 +1,18 @@
 "use client";
 
-import { Bell, Search, PanelLeftClose, ChevronDown, Settings, LogOut, User, Moon, Sun } from "lucide-react";
+import { Bell, Search, PanelLeftClose, ChevronDown, Settings, LogOut, User, Moon, Sun, BookOpen, Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
+import { useTranslation, Language } from "@/context/LanguageContext";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
 export function Header() {
   const { user, logout } = useAuth();
   const { resolvedTheme, setTheme, theme } = useTheme();
+  const { t, language, setLanguage } = useTranslation();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -25,7 +27,9 @@ export function Header() {
   }, []);
 
   const toggleDarkMode = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+    if (resolvedTheme === "light") setTheme("dark");
+    else if (resolvedTheme === "dark") setTheme("eye-care");
+    else setTheme("light");
   };
 
   return (
@@ -39,7 +43,7 @@ export function Header() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input 
             type="search" 
-            placeholder="Tìm kiếm, chạy lệnh hoặc hỏi..." 
+            placeholder={t("header.search")} 
             className="w-full pl-9 bg-muted/50 h-9 transition-all duration-200 focus:bg-background focus:shadow-sm"
           />
         </div>
@@ -52,10 +56,19 @@ export function Header() {
           size="icon"
           className="h-8 w-8"
           onClick={toggleDarkMode}
-          title={resolvedTheme === "dark" ? "Chuyển sang sáng" : "Chuyển sang tối"}
         >
-          {resolvedTheme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
+          {resolvedTheme === "dark" ? <Moon className="h-4 w-4" /> : resolvedTheme === "eye-care" ? <BookOpen className="h-4 w-4 text-amber-600" /> : <Sun className="h-4 w-4 text-amber-400" />}
         </Button>
+
+        <select 
+          value={language} 
+          onChange={(e) => setLanguage(e.target.value as Language)}
+          className="h-8 w-16 md:w-auto rounded-md border border-input bg-background px-2 text-xs focus:ring-0 focus:outline-none focus:border-indigo-500 transition-colors"
+        >
+          <option value="vi">🇻🇳 VI</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="it">🇮🇹 IT</option>
+        </select>
 
         <Button variant="outline" size="icon" className="h-8 w-8 relative">
           <Bell className="h-4 w-4" />

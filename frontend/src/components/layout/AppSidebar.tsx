@@ -19,25 +19,29 @@ import {
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
-const sidebarLinks = [
-  { icon: LayoutDashboard, label: "Tổng quan", href: "/overview" },
-  { icon: FileText, label: "Bài kiểm tra", href: "/quizzes" },
-  { icon: CheckCircle, label: "Hàng chấm", href: "/grading", badge: 135 },
-  { icon: Library, label: "Rubric", href: "/rubrics" },
-  { icon: FileText, label: "Bài kiểm tra giấy", href: "/omr" },
-  { icon: Users, label: "Học sinh", href: "/students" },
-  { icon: GraduationCap, label: "Lớp học", href: "/classes" },
-  { icon: Library, label: "Ngân hàng câu hỏi", href: "/question-bank" },
-  { icon: Share2, label: "Bộ chia sẻ", href: "/sharing" },
-  { icon: Tags, label: "Thẻ", href: "/tags" },
-  { icon: StickyNote, label: "Ghi chú", href: "/notes" },
-  { icon: Settings, label: "Cài đặt", href: "/settings" },
-];
+import { useTranslation } from "@/context/LanguageContext";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
+  
   const [user, setUser] = useState<{full_name?: string; email?: string} | null>(null);
+
+  const sidebarLinks = [
+    { icon: LayoutDashboard, tKey: "sidebar.overview", href: "/overview" },
+    { icon: FileText, tKey: "sidebar.quizzes", href: "/quizzes" },
+    { icon: CheckCircle, tKey: "sidebar.grading", href: "/grading", badge: 135 },
+    { icon: Library, tKey: "sidebar.rubrics", href: "/rubrics" },
+    { icon: FileText, tKey: "sidebar.omr", href: "/omr" },
+    { icon: Users, tKey: "sidebar.students", href: "/students" },
+    { icon: GraduationCap, tKey: "sidebar.classes", href: "/classes" },
+    { icon: Library, tKey: "sidebar.questionBank", href: "/question-bank" },
+    { icon: Share2, tKey: "sidebar.sharing", href: "/sharing" },
+    { icon: Tags, tKey: "sidebar.tags", href: "/tags" },
+    { icon: StickyNote, tKey: "sidebar.notes", href: "/notes" },
+    { icon: Settings, tKey: "sidebar.settings", href: "/settings" },
+  ];
 
   useEffect(() => {
     const stored = localStorage.getItem("quizlm_user");
@@ -82,7 +86,7 @@ export function AppSidebar() {
                 )}
               >
                 <link.icon className="w-5 h-5" />
-                {link.label}
+                {t(link.tKey)}
                 {link.badge && (
                   <span className={cn(
                     "ml-auto text-xs font-semibold px-2 py-0.5 rounded-full",
