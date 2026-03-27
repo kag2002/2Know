@@ -45,6 +45,11 @@ func ConnectDB() {
 		&model.Class{},
 		&model.Student{},
 		&model.TestResult{},
+		&model.Note{},
+		&model.Tag{},
+		&model.Rubric{},
+		&model.ShareLink{},
+		&model.OmrBatch{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
