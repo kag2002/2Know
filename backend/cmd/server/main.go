@@ -37,6 +37,9 @@ func main() {
 		&model.TestResult{},
 		&model.Note{},
 		&model.Tag{},
+		&model.OmrBatch{},
+		&model.Rubric{},
+		&model.ShareLink{},
 	)
 	if err != nil {
 		log.Fatalf("Failed to auto-migrate: %v", err)
@@ -67,6 +70,9 @@ func main() {
 	studentRepo := repository.NewStudentRepository(config.DB)
 	noteRepo := repository.NewNoteRepository(config.DB)
 	tagRepo := repository.NewTagRepository(config.DB)
+	omrRepo := repository.NewOmrBatchRepository(config.DB)
+	rubricRepo := repository.NewRubricRepository(config.DB)
+	shareLinkRepo := repository.NewShareLinkRepository(config.DB)
 
 	// Initialize Services
 	authSvc := service.NewAuthService(userRepo, os.Getenv("JWT_SECRET"))
@@ -79,6 +85,9 @@ func main() {
 	aiSvc := service.NewAIService()
 	noteSvc := service.NewNoteService(noteRepo)
 	tagSvc := service.NewTagService(tagRepo)
+	omrSvc := service.NewOmrBatchService(omrRepo)
+	rubricSvc := service.NewRubricService(rubricRepo)
+	shareLinkSvc := service.NewShareLinkService(shareLinkRepo)
 
 	// Seed Demo Account natively (suppress duplicate log by checking first)
 	if _, _, err := authSvc.Login("demo@2know.edu.vn", "demo123"); err != nil {
@@ -96,6 +105,9 @@ func main() {
 	aiHandler := handler.NewAIHandler(aiSvc)
 	noteHandler := handler.NewNoteHandler(noteSvc)
 	tagHandler := handler.NewTagHandler(tagSvc)
+	omrHandler := handler.NewOmrBatchHandler(omrSvc)
+	rubricHandler := handler.NewRubricHandler(rubricSvc)
+	shareLinkHandler := handler.NewShareLinkHandler(shareLinkSvc)
 
 	// Auth routes (public)
 	app.Post("/api/auth/register", authHandler.Register)
@@ -158,6 +170,21 @@ func main() {
 	api.Get("/users/me", userHandler.GetProfile)
 	api.Patch("/users/me", userHandler.UpdateProfile)
 	api.Patch("/users/me/password", userHandler.ChangePassword)
+
+	// OMR Batch endpoints
+	api.Get("/omr/batches", omrHandler.GetBatches)
+	api.Post("/omr/batches", omrHandler.CreateBatch)
+	api.Delete("/omr/batches/:id", omrHandler.DeleteBatch)
+
+	// Rubric endpoints
+	api.Get("/rubrics", rubricHandler.GetRubrics)
+	api.Post("/rubrics", rubricHandler.CreateRubric)
+	api.Delete("/rubrics/:id", rubricHandler.DeleteRubric)
+
+	// Share Link endpoints
+	api.Get("/shares", shareLinkHandler.GetLinks)
+	api.Post("/shares", shareLinkHandler.CreateLink)
+	api.Delete("/shares/:id", shareLinkHandler.DeleteLink)
 
 	port := os.Getenv("PORT")
 	if port == "" {
