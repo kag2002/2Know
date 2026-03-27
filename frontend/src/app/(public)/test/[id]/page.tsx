@@ -60,7 +60,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
 
   if (loading) {
     return (
-      <div className="flex justify-center flex-col items-center h-[60vh] text-slate-500">
+      <div className="flex justify-center flex-col items-center h-[60vh] text-muted-foreground">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-4" />
         <p>Đang chuẩn bị đề thi...</p>
       </div>
@@ -69,7 +69,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
 
   if (!quiz) {
     return (
-      <div className="text-center py-20 text-slate-500">
+      <div className="text-center py-20 text-muted-foreground">
         {error ? error : "Bài kiểm tra không tồn tại hoặc đã bị khóa."}
       </div>
     );
@@ -77,7 +77,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
 
   return (
     <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6">
-      <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-background rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-border p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
         
         {/* Test Info Header */}
         <div className="text-center space-y-3 pb-8 border-b">
@@ -85,12 +85,12 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-2 animate-pulse"></div>
             Đang mở
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 leading-tight">{quiz.title}</h1>
-          <p className="text-slate-500 text-sm">
+          <h1 className="text-3xl font-bold text-foreground leading-tight">{quiz.title}</h1>
+          <p className="text-muted-foreground text-sm">
             {quiz.subject || "Chưa phân loại"} • {quiz.grade_level || "Tự do"}
           </p>
           {quiz.description && (
-             <p className="mx-auto max-w-lg mt-4 text-sm text-slate-600 italic bg-slate-50 p-4 rounded-xl border border-dashed">
+             <p className="mx-auto max-w-lg mt-4 text-sm text-muted-foreground italic bg-muted p-4 rounded-xl border border-dashed">
                 &quot;{quiz.description}&quot;
              </p>
           )}
@@ -98,31 +98,31 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
 
         {/* Test Parameters */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-colors">
-            <div className="p-3 bg-emerald-100 text-emerald-700 rounded-xl shadow-sm mb-1">
+          <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-muted hover:bg-muted border border-border transition-colors">
+            <div className="p-3 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-xl shadow-sm mb-1">
               <Clock className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-0.5">Thời gian</p>
-              <p className="font-bold text-slate-900 text-lg">{quiz.time_limit_minutes > 0 ? `${quiz.time_limit_minutes} Phút` : "Không giới hạn"}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">Thời gian</p>
+              <p className="font-bold text-foreground text-lg">{quiz.time_limit_minutes > 0 ? `${quiz.time_limit_minutes} Phút` : "Không giới hạn"}</p>
             </div>
           </div>
-          <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-colors">
-            <div className="p-3 bg-blue-100 text-blue-700 rounded-xl shadow-sm mb-1">
+          <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-muted hover:bg-muted border border-border transition-colors">
+            <div className="p-3 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-xl shadow-sm mb-1">
               <HelpCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-0.5">Số lượng</p>
-              <p className="font-bold text-slate-900 text-lg">{quiz.questions.length || 0} Câu hỏi</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">Số lượng</p>
+              <p className="font-bold text-foreground text-lg">{quiz.questions.length || 0} Câu hỏi</p>
             </div>
           </div>
-          <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-colors">
-            <div className="p-3 bg-purple-100 text-purple-700 rounded-xl shadow-sm mb-1">
+          <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-muted hover:bg-muted border border-border transition-colors">
+            <div className="p-3 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 rounded-xl shadow-sm mb-1">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-0.5">Bảo mật</p>
-              <p className="font-bold text-slate-900 text-lg">{(quiz.require_fullscreen || quiz.disable_copy_paste) ? "Chống gian lận" : "Tiêu chuẩn"}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">Bảo mật</p>
+              <p className="font-bold text-foreground text-lg">{(quiz.require_fullscreen || quiz.disable_copy_paste) ? "Chống gian lận" : "Tiêu chuẩn"}</p>
             </div>
           </div>
         </div>
@@ -145,9 +145,9 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
         )}
 
         {/* Entry Form */}
-        <div className="bg-white border shadow-sm p-6 rounded-2xl relative overflow-hidden">
+        <div className="bg-background border shadow-sm p-6 rounded-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-          <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-6">
+          <h3 className="font-bold text-card-foreground flex items-center gap-2 mb-6">
             <User className="w-5 h-5 text-indigo-500" /> Thông tin Thí sinh
           </h3>
           
@@ -159,23 +159,23 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative z-10">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Họ và Tên <span className="text-rose-500">*</span></label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Họ và Tên <span className="text-rose-500">*</span></label>
               <input 
                 type="text" 
                 placeholder="Ví dụ: Nguyễn Văn A"
                 value={studentInfo.name}
                 onChange={e => { setStudentInfo({...studentInfo, name: e.target.value}); setError(""); }}
-                className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium placeholder:font-normal placeholder:text-slate-400" 
+                className="w-full h-11 px-4 rounded-xl border border-border bg-muted text-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium placeholder:font-normal placeholder:text-slate-400" 
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-600 uppercase tracking-widest">Mã định danh (SBD) <span className="text-rose-500">*</span></label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Mã định danh (SBD) <span className="text-rose-500">*</span></label>
               <input 
                 type="text" 
                 placeholder="Nhập MSSV / Mã học sinh"
                 value={studentInfo.sbd}
                 onChange={e => { setStudentInfo({...studentInfo, sbd: e.target.value}); setError(""); }}
-                className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium placeholder:font-normal placeholder:text-slate-400" 
+                className="w-full h-11 px-4 rounded-xl border border-border bg-muted text-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium placeholder:font-normal placeholder:text-slate-400" 
               />
             </div>
           </div>

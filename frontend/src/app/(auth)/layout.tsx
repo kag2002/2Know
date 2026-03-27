@@ -39,7 +39,7 @@ export default function AuthLayout({
           </div>
         </div>
         
-        <div className="relative z-10 text-sm text-slate-500">
+        <div className="relative z-10 text-sm text-muted-foreground">
           © {new Date().getFullYear()} 2Know Clone System. All rights reserved.
         </div>
       </div>

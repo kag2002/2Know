@@ -63,7 +63,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
   if (!classData) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-bold text-slate-800">Không tìm thấy Lớp học</h2>
+        <h2 className="text-xl font-bold text-card-foreground">Không tìm thấy Lớp học</h2>
         <Link href="/classes">
           <Button variant="outline" className="mt-4">Quay lại danh sách</Button>
         </Link>
@@ -83,7 +83,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{name}</h1>
           <p className="text-muted-foreground mt-1">{subject || "Chưa có môn"} • {grade || "Chưa có khối"} • Năm học {school_year || "---"}</p>
         </div>
         <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
@@ -107,7 +107,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase">{stat.label}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 </div>
               </div>
             </CardContent>
@@ -126,7 +126,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               placeholder="Tìm học sinh..."
-              className="pl-9 h-9 w-full rounded-md border bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-colors px-3"
+              className="pl-9 h-9 w-full rounded-md border bg-muted text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-background transition-colors px-3"
             />
           </div>
         </CardHeader>
@@ -134,7 +134,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b text-left text-slate-500">
+                <tr className="border-b text-left text-muted-foreground">
                   <th className="pb-3 font-semibold w-8">#</th>
                   <th className="pb-3 font-semibold">Tên đăng nhập (SBD)</th>
                   <th className="pb-3 font-semibold">Họ và Tên</th>
@@ -146,25 +146,25 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
               </thead>
               <tbody>
                 {students.map((student, i) => (
-                  <tr key={student.id} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
+                  <tr key={student.id} className="border-b last:border-0 hover:bg-muted transition-colors">
                     <td className="py-3.5 text-slate-400">{i + 1}</td>
                     <td className="py-3.5 font-medium text-indigo-600">{student.student_id}</td>
                     <td className="py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold uppercase shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 flex items-center justify-center text-xs font-bold uppercase shrink-0">
                           {student.full_name.split(' ').pop()?.[0] || "?"}
                         </div>
-                        <span className="font-medium text-slate-800">{student.full_name}</span>
+                        <span className="font-medium text-card-foreground">{student.full_name}</span>
                       </div>
                     </td>
-                    <td className="py-3.5 text-slate-500">{student.email || "---"}</td>
+                    <td className="py-3.5 text-muted-foreground">{student.email || "---"}</td>
                     <td className="py-3.5 text-center text-slate-400">---</td>
                     <td className="py-3.5 text-center">
-                       <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-semibold uppercase">Đang học</span>
+                       <span className="px-2 py-0.5 bg-slate-100 text-muted-foreground rounded-full text-[10px] font-semibold uppercase">Đang học</span>
                     </td>
                     <td className="py-3.5">
                       <DropdownMenu>
-                        <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400">
+                        <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted text-slate-400">
                           <MoreVertical className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -178,7 +178,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                 
                 {students.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-500">
+                    <td colSpan={7} className="py-8 text-center text-muted-foreground">
                       Lớp học này chưa có học sinh nào.
                     </td>
                   </tr>

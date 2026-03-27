@@ -111,7 +111,7 @@ export default function OmrPage() {
                     <h3 className="font-semibold text-lg text-foreground">{batch.title}</h3>
                     {batch.status === "completed" && <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Hoàn tất</span>}
                     {batch.status === "scanning" && <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>Đang quét</span>}
-                    {batch.status === "ready" && <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 text-[10px] font-bold uppercase tracking-wider">Chờ quét</span>}
+                    {batch.status === "ready" && <span className="px-2 py-0.5 rounded-full bg-slate-100 text-muted-foreground dark:bg-slate-800 text-[10px] font-bold uppercase tracking-wider">Chờ quét</span>}
                   </div>
                   
                   <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground mt-2">

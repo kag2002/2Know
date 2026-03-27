@@ -70,7 +70,7 @@ export default function ClassesPage() {
           </p>
         </div>
         <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
-          <Button variant="outline" className="gap-2 bg-white dark:bg-card flex-1 sm:flex-none">
+          <Button variant="outline" className="gap-2 bg-background dark:bg-card flex-1 sm:flex-none">
             <Filter className="w-4 h-4" /> Lọc
           </Button>
           <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none" onClick={() => toast.info("Tính năng tạo lớp đang phát triển!")}>

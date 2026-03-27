@@ -92,7 +92,7 @@ export default function QuizBuilderWizard() {
     <div className="max-w-7xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Tạo bài kiểm tra mới</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Tạo bài kiểm tra mới</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Bước {currentStep} / {steps.length}: {steps[currentStep - 1].title}
           </p>
@@ -127,14 +127,14 @@ export default function QuizBuilderWizard() {
                     onClick={() => setCurrentStep(step.id)}
                     className={`w-full flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-md transition-colors ${
                       isActive 
-                        ? "bg-emerald-50 text-emerald-700" 
+                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" 
                         : isPast
-                          ? "text-slate-700 hover:bg-slate-50"
-                          : "text-muted-foreground hover:bg-slate-50"
+                          ? "text-slate-700 hover:bg-muted"
+                          : "text-muted-foreground hover:bg-muted"
                     }`}
                   >
                     <div className={`flex items-center justify-center w-6 h-6 rounded-full border ${
-                      isActive ? "border-emerald-500 bg-white" : isPast ? "bg-emerald-100 border-emerald-200 text-emerald-600" : "border-slate-200"
+                      isActive ? "border-emerald-500 bg-background" : isPast ? "bg-emerald-100 border-emerald-200 text-emerald-600" : "border-border"
                     }`}>
                       {isPast ? (
                         <CheckCircle className="w-4 h-4" />
@@ -152,7 +152,7 @@ export default function QuizBuilderWizard() {
         </Card>
 
         {/* Dynamic Step Content Area */}
-        <Card className="flex-1 h-full overflow-y-auto bg-white">
+        <Card className="flex-1 h-full overflow-y-auto bg-background">
           <CardContent className="p-8">
             <div className="max-w-2xl mx-auto space-y-8">
               <div className="border-b pb-4">
@@ -248,12 +248,12 @@ export default function QuizBuilderWizard() {
                           <label htmlFor="assigned" className="font-medium text-sm">Chỉ định lớp học</label>
                           <p className="text-xs text-muted-foreground mt-1">Giao bài cho một hoặc nhiều lớp cụ thể, chỉ học sinh trong lớp mới xem và làm được.</p>
                         </div>
-                        <div className="bg-white p-4 border rounded-md">
+                        <div className="bg-background p-4 border rounded-md">
                           <div className="flex flex-col gap-2">
-                            <label className="text-xs font-semibold text-slate-500">DANH SÁCH LỚP HỌC CỦA BẠN</label>
+                            <label className="text-xs font-semibold text-muted-foreground">DANH SÁCH LỚP HỌC CỦA BẠN</label>
                             <div className="space-y-2 mt-2 max-h-[150px] overflow-y-auto pr-2">
                               {['Lớp 11A1 - Toán', 'Lớp 11A2 - Toán', 'Đội tuyển HSG Lớp 10'].map(cls => (
-                                <div key={cls} className="flex items-center space-x-2 border p-2.5 rounded-md hover:bg-slate-50 cursor-pointer">
+                                <div key={cls} className="flex items-center space-x-2 border p-2.5 rounded-md hover:bg-muted cursor-pointer">
                                   <input type="checkbox" id={cls} className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
                                   <label htmlFor={cls} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
                                     {cls}
@@ -292,22 +292,22 @@ export default function QuizBuilderWizard() {
                         <div className="border rounded-lg p-4 cursor-pointer border-emerald-500 bg-emerald-50 relative">
                           <CheckCircle className="absolute top-2 right-2 w-4 h-4 text-emerald-600" />
                           <h4 className="font-medium text-sm">Cơ bản (A, B, C, D)</h4>
-                          <p className="text-xs text-slate-500 mt-1">4 đáp án tiêu chuẩn</p>
+                          <p className="text-xs text-muted-foreground mt-1">4 đáp án tiêu chuẩn</p>
                         </div>
-                        <div className="border rounded-lg p-4 cursor-pointer hover:bg-slate-50">
+                        <div className="border rounded-lg p-4 cursor-pointer hover:bg-muted">
                           <h4 className="font-medium text-sm">Đúng/Sai (A, B)</h4>
-                          <p className="text-xs text-slate-500 mt-1">Phân loại Đúng hoặc Sai</p>
+                          <p className="text-xs text-muted-foreground mt-1">Phân loại Đúng hoặc Sai</p>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="mt-6 flex items-center justify-between border p-4 rounded-lg bg-slate-50">
+                    <div className="mt-6 flex items-center justify-between border p-4 rounded-lg bg-muted">
                       <div>
                         <h4 className="text-sm font-medium">Nhận diện SBD tự động</h4>
                         <p className="text-xs text-muted-foreground mt-1">Sử dụng AI để tự động map SBD với danh sách học sinh</p>
                       </div>
                       <div className="w-10 h-5 bg-emerald-500 rounded-full relative cursor-pointer">
-                        <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                        <div className="w-4 h-4 bg-background rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
                       </div>
                     </div>
                   </div>
@@ -350,13 +350,13 @@ export default function QuizBuilderWizard() {
               {currentStep === 6 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="grid gap-6">
-                    <div className="border rounded-lg p-5 flex items-center justify-between bg-slate-50">
+                    <div className="border rounded-lg p-5 flex items-center justify-between bg-muted">
                       <div>
                         <h4 className="font-medium text-sm">Hiển thị kết quả sau khi thi xong</h4>
                         <p className="text-xs text-muted-foreground mt-1">Học sinh sẽ thấy điểm vả giải thích đáp án ngay lập tức</p>
                       </div>
                       <div className="w-10 h-5 bg-emerald-500 rounded-full relative cursor-pointer">
-                        <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                        <div className="w-4 h-4 bg-background rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
                       </div>
                     </div>
 
@@ -366,7 +366,7 @@ export default function QuizBuilderWizard() {
                         <p className="text-xs text-muted-foreground mt-1">Trừ % điểm của câu hỏi nếu học sinh chọn sai đáp án</p>
                       </div>
                       <div className="w-10 h-5 bg-slate-200 rounded-full relative cursor-pointer">
-                        <div className="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
+                        <div className="w-4 h-4 bg-background rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
                       </div>
                     </div>
                   </div>
@@ -382,7 +382,7 @@ export default function QuizBuilderWizard() {
                         <p className="text-xs text-muted-foreground mt-1">Cảnh báo và lưu log nếu thí sinh tự ý thoát tab bài làm ra ngoài</p>
                       </div>
                       <div className="w-10 h-5 bg-emerald-500 rounded-full relative cursor-pointer">
-                        <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                        <div className="w-4 h-4 bg-background rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
                       </div>
                     </div>
                     <div className="border rounded-lg p-5 flex items-center justify-between">
@@ -391,7 +391,7 @@ export default function QuizBuilderWizard() {
                         <p className="text-xs text-muted-foreground mt-1">Vô hiệu hóa chuột phải và tổ hợp phím sao chép văn bản trong lúc làm bài</p>
                       </div>
                       <div className="w-10 h-5 bg-emerald-500 rounded-full relative cursor-pointer">
-                        <div className="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+                        <div className="w-4 h-4 bg-background rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
                       </div>
                     </div>
                     <div className="border rounded-lg p-5 flex items-center justify-between opacity-50 cursor-not-allowed">
@@ -400,7 +400,7 @@ export default function QuizBuilderWizard() {
                         <p className="text-xs text-muted-foreground mt-1">Theo dõi hành vi và phát hiện nhiều khuôn mặt trước camera.</p>
                       </div>
                       <div className="w-10 h-5 bg-slate-200 rounded-full relative">
-                        <div className="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
+                        <div className="w-4 h-4 bg-background rounded-full absolute left-0.5 top-0.5 shadow-sm"></div>
                       </div>
                     </div>
                   </div>
@@ -409,24 +409,24 @@ export default function QuizBuilderWizard() {
 
               {currentStep === 8 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
-                  <div className="flex flex-col items-center justify-center text-center p-8 bg-slate-50 border border-green-200 rounded-xl">
+                  <div className="flex flex-col items-center justify-center text-center p-8 bg-muted border border-green-200 rounded-xl">
                     <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
                       <Share2 className="w-8 h-8 text-emerald-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900">Mọi thứ đã sẵn sàng!</h3>
-                    <p className="text-slate-500 mt-2 max-w-sm text-sm">
+                    <h3 className="text-xl font-bold text-foreground">Mọi thứ đã sẵn sàng!</h3>
+                    <p className="text-muted-foreground mt-2 max-w-sm text-sm">
                       Bài kiểm tra của bạn đã được cấu hình. Chọn Xuất bản để cho phép học viên truy cập ngay bài thi.
                     </p>
                   </div>
 
                   {/* QR Code + Share Link */}
-                  <div className="border rounded-xl p-6 bg-white space-y-6">
-                    <h4 className="font-semibold text-slate-800 text-sm flex items-center gap-2">
+                  <div className="border rounded-xl p-6 bg-background space-y-6">
+                    <h4 className="font-semibold text-card-foreground text-sm flex items-center gap-2">
                       <QrCode className="w-4 h-4 text-indigo-500" /> Truy cập nhanh
                     </h4>
                     <div className="flex flex-col md:flex-row items-center gap-6">
                       {/* QR Code */}
-                      <div className="p-4 bg-white border-2 border-dashed border-indigo-200 rounded-xl flex flex-col items-center shrink-0">
+                      <div className="p-4 bg-background border-2 border-dashed border-indigo-200 rounded-xl flex flex-col items-center shrink-0">
                         <QRCodeSVG
                           value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/demo`}
                           size={160}
@@ -435,18 +435,18 @@ export default function QuizBuilderWizard() {
                           level="M"
                           includeMargin={false}
                         />
-                        <p className="text-xs text-slate-500 mt-3 font-medium">Quét mẫu mã QR</p>
+                        <p className="text-xs text-muted-foreground mt-3 font-medium">Quét mẫu mã QR</p>
                       </div>
 
                       {/* Share Link + Options */}
                       <div className="flex-1 space-y-4 w-full">
                         <div>
-                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Dự kiến Đường dẫn chia sẻ</label>
+                          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">Dự kiến Đường dẫn chia sẻ</label>
                           <div className="flex gap-2">
                             <input
                               readOnly
                               value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/[Tự-động-sinh]`}
-                              className="flex-1 h-10 px-3 rounded-md border bg-slate-50 text-sm text-slate-700 font-mono"
+                              className="flex-1 h-10 px-3 rounded-md border bg-muted text-sm text-slate-700 font-mono"
                             />
                             <Button
                               variant="outline"
@@ -460,13 +460,13 @@ export default function QuizBuilderWizard() {
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-sm">
-                          <div className="border rounded-lg p-3 bg-slate-50 flex items-center gap-2">
+                          <div className="border rounded-lg p-3 bg-muted flex items-center gap-2">
                             <Users className="w-4 h-4 text-blue-500" />
-                            <span className="text-slate-600">Luồng cấu hình Test Module</span>
+                            <span className="text-muted-foreground">Luồng cấu hình Test Module</span>
                           </div>
-                          <div className="border rounded-lg p-3 bg-slate-50 flex items-center gap-2">
+                          <div className="border rounded-lg p-3 bg-muted flex items-center gap-2">
                             <BookOpen className="w-4 h-4 text-amber-500" />
-                            <span className="text-slate-600">{questions.length} Câu hỏi sẵn sàng</span>
+                            <span className="text-muted-foreground">{questions.length} Câu hỏi sẵn sàng</span>
                           </div>
                         </div>
                       </div>

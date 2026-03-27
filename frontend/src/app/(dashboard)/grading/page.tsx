@@ -61,7 +61,7 @@ export default function GradingPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center flex-col items-center h-[60vh] text-slate-500">
+      <div className="flex justify-center flex-col items-center h-[60vh] text-muted-foreground">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-4" />
         <p>Đang tải danh sách bài chấm...</p>
       </div>
@@ -73,11 +73,11 @@ export default function GradingPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Hàng chấm điểm</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Hàng chấm điểm</h1>
           <p className="text-muted-foreground mt-1">Chấm bài tự luận và câu trả lời mở đang chờ duyệt.</p>
         </div>
         <div className="flex gap-2">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 text-amber-700 text-sm font-semibold border border-amber-200">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-sm font-semibold border border-amber-200">
             <Clock className="w-4 h-4" /> {filtered.length} bài chờ chấm
           </span>
         </div>
@@ -99,7 +99,7 @@ export default function GradingPage() {
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase">{stat.label}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 </div>
               </div>
             </CardContent>
@@ -114,7 +114,7 @@ export default function GradingPage() {
           placeholder="Tìm theo tên học sinh hoặc bài kiểm tra..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="pl-9 h-10 w-full rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 px-3"
+          className="pl-9 h-10 w-full rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 px-3"
         />
       </div>
 
@@ -132,12 +132,12 @@ export default function GradingPage() {
                   {sub.student.split(' ').pop()?.[0]}
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-800">{sub.student}</p>
-                  <p className="text-xs text-slate-500">{sub.quiz} • {sub.submittedAt}</p>
+                  <p className="font-semibold text-card-foreground">{sub.student}</p>
+                  <p className="text-xs text-muted-foreground">{sub.quiz} • {sub.submittedAt}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded font-medium">Tối đa: {sub.maxScore} điểm</span>
+                <span className="text-xs bg-slate-100 text-muted-foreground px-2 py-1 rounded font-medium">Tối đa: {sub.maxScore} điểm</span>
                 <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${expanded === sub.id ? 'rotate-180' : ''}`} />
               </div>
             </div>
@@ -153,15 +153,15 @@ export default function GradingPage() {
                   </div>
 
                   {/* Answer */}
-                  <div className="p-4 bg-slate-50 border rounded-lg">
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Câu trả lời của học sinh</p>
+                  <div className="p-4 bg-muted border rounded-lg">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Câu trả lời của học sinh</p>
                     <p className="text-sm text-slate-700 leading-relaxed">{sub.answer}</p>
                   </div>
 
                   {/* Grading Controls */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Điểm số (/{sub.maxScore})</label>
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">Điểm số (/{sub.maxScore})</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="number"
@@ -170,15 +170,15 @@ export default function GradingPage() {
                           step={0.5}
                           value={scores[sub.id] ?? ""}
                           onChange={e => setScores({...scores, [sub.id]: parseFloat(e.target.value)})}
-                          className="h-10 w-24 px-3 rounded-md border bg-white text-sm text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="h-10 w-24 px-3 rounded-md border bg-background text-sm text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500"
                           placeholder="0"
                         />
                         <span className="text-slate-400 text-sm">/ {sub.maxScore}</span>
                         <div className="flex gap-1 ml-2">
-                          <button onClick={() => setScores({...scores, [sub.id]: sub.maxScore})} className="p-1.5 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100" title="Điểm tối đa">
+                          <button onClick={() => setScores({...scores, [sub.id]: sub.maxScore})} className="p-1.5 rounded bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-100" title="Điểm tối đa">
                             <ThumbsUp className="w-4 h-4" />
                           </button>
-                          <button onClick={() => setScores({...scores, [sub.id]: 0})} className="p-1.5 rounded bg-rose-50 text-rose-600 hover:bg-rose-100" title="0 điểm">
+                          <button onClick={() => setScores({...scores, [sub.id]: 0})} className="p-1.5 rounded bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 hover:bg-rose-100" title="0 điểm">
                             <ThumbsDown className="w-4 h-4" />
                           </button>
                         </div>
@@ -186,13 +186,13 @@ export default function GradingPage() {
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Nhận xét (tuỳ chọn)</label>
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">Nhận xét (tuỳ chọn)</label>
                       <input
                         type="text"
                         value={feedback[sub.id] ?? ""}
                         onChange={e => setFeedback({...feedback, [sub.id]: e.target.value})}
                         placeholder="VD: Bài viết tốt, cần bổ sung dẫn chứng..."
-                        className="h-10 w-full px-3 rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="h-10 w-full px-3 rounded-md border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
                   </div>
@@ -216,8 +216,8 @@ export default function GradingPage() {
           <Card className="shadow-sm">
             <CardContent className="py-16 text-center">
               <CheckCircle2 className="w-16 h-16 text-emerald-300 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Không còn bài nào cần chấm! 🎉</h3>
-              <p className="text-slate-500 text-sm">Tất cả câu trả lời tự luận đã được chấm điểm.</p>
+              <h3 className="text-xl font-bold text-card-foreground mb-2">Không còn bài nào cần chấm! 🎉</h3>
+              <p className="text-muted-foreground text-sm">Tất cả câu trả lời tự luận đã được chấm điểm.</p>
             </CardContent>
           </Card>
         )}

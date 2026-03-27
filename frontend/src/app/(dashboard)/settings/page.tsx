@@ -44,7 +44,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Cài đặt</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Cài đặt</h1>
         <p className="text-muted-foreground mt-1">
           Quản lý tài khoản, giao diện và tùy chỉnh cá nhân của bạn.
         </p>
@@ -59,8 +59,8 @@ export default function SettingsPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 activeTab === tab.id
-                  ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 shadow-sm"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -110,7 +110,7 @@ export default function SettingsPage() {
                     <div className="space-y-2">
                       <Label>Gói dịch vụ</Label>
                       <div className="flex items-center gap-2 h-10">
-                        <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">Miễn phí</span>
+                        <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs font-semibold">Miễn phí</span>
                         <Button variant="link" className="text-indigo-600 text-xs p-0 h-auto">Nâng cấp Pro →</Button>
                       </div>
                     </div>
@@ -156,11 +156,11 @@ export default function SettingsPage() {
                         className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 ${
                           theme === mode.id
                             ? "border-indigo-500 bg-indigo-50 shadow-sm"
-                            : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                            : "border-border hover:border-border hover:bg-muted"
                         }`}
                       >
                         <mode.icon className={`w-6 h-6 ${theme === mode.id ? "text-indigo-600" : "text-slate-400"}`} />
-                        <span className={`text-sm font-medium ${theme === mode.id ? "text-indigo-700" : "text-slate-600"}`}>
+                        <span className={`text-sm font-medium ${theme === mode.id ? "text-indigo-700" : "text-muted-foreground"}`}>
                           {mode.label}
                         </span>
                       </button>
@@ -178,14 +178,14 @@ export default function SettingsPage() {
                         onClick={() => setSelectedTheme(theme.id)}
                         className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 ${
                           selectedTheme === theme.id
-                            ? "border-indigo-500 bg-slate-50 shadow-sm"
-                            : "border-transparent hover:border-slate-200"
+                            ? "border-indigo-500 bg-muted shadow-sm"
+                            : "border-transparent hover:border-border"
                         }`}
                       >
                         <div className={`w-8 h-8 rounded-full ${theme.color} shadow-inner flex items-center justify-center`}>
                           {selectedTheme === theme.id && <Check className="w-4 h-4 text-white" />}
                         </div>
-                        <span className="text-[11px] font-medium text-slate-600">{theme.label}</span>
+                        <span className="text-[11px] font-medium text-muted-foreground">{theme.label}</span>
                       </button>
                     ))}
                   </div>
@@ -225,18 +225,18 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-lg bg-slate-50 border">
-                  <h4 className="text-sm font-medium text-slate-800">Phiên đăng nhập</h4>
+                <div className="p-4 rounded-lg bg-muted border">
+                  <h4 className="text-sm font-medium text-card-foreground">Phiên đăng nhập</h4>
                   <p className="text-xs text-muted-foreground mt-1">Bạn đang đăng nhập trên 1 thiết bị</p>
-                  <div className="flex items-center gap-3 mt-3 p-3 bg-white border rounded-md">
+                  <div className="flex items-center gap-3 mt-3 p-3 bg-background border rounded-md">
                     <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
                       <Monitor className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-800">macOS • Chrome</p>
+                      <p className="text-sm font-medium text-card-foreground">macOS • Chrome</p>
                       <p className="text-xs text-muted-foreground">Phiên hiện tại • Hoạt động</p>
                     </div>
-                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-semibold rounded-full">Đang dùng</span>
+                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-semibold rounded-full">Đang dùng</span>
                   </div>
                 </div>
 
@@ -265,13 +265,13 @@ export default function SettingsPage() {
                   { label: "Cảnh báo gian lận", desc: "Thông báo ngay lập tức khi phát hiện hành vi đáng ngờ", on: true },
                   { label: "Nhắc nhở báo cáo đánh giá", desc: "Nhắc bạn xem báo cáo phân tích phổ điểm hàng tuần", on: false },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 rounded-lg border hover:bg-slate-50 transition-colors">
+                  <div key={idx} className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted transition-colors">
                     <div>
-                      <h4 className="text-sm font-medium text-slate-800">{item.label}</h4>
+                      <h4 className="text-sm font-medium text-card-foreground">{item.label}</h4>
                       <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
                     </div>
                     <div className={`w-10 h-5 rounded-full relative cursor-pointer transition-colors ${item.on ? "bg-indigo-500" : "bg-slate-200"}`}>
-                      <div className={`w-4 h-4 bg-white rounded-full absolute top-0.5 shadow-sm transition-all ${item.on ? "right-0.5" : "left-0.5"}`}></div>
+                      <div className={`w-4 h-4 bg-background rounded-full absolute top-0.5 shadow-sm transition-all ${item.on ? "right-0.5" : "left-0.5"}`}></div>
                     </div>
                   </div>
                 ))}

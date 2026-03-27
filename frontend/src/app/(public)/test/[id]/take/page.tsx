@@ -182,7 +182,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
       <div className="flex flex-col h-screen items-center justify-center space-y-4">
         <ShieldAlert className="w-16 h-16 text-rose-500" />
         <h1 className="text-2xl font-bold">Không thể tải bài thi</h1>
-        <p className="text-slate-500">{error}</p>
+        <p className="text-muted-foreground">{error}</p>
         <Button onClick={() => router.push("/")}>Quay lại trang chủ</Button>
       </div>
     );
@@ -192,7 +192,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   if (questions.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p className="text-lg text-slate-500">Bài thi này chưa có câu hỏi nào.</p>
+        <p className="text-lg text-muted-foreground">Bài thi này chưa có câu hỏi nào.</p>
       </div>
     );
   }
@@ -205,12 +205,12 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
       {/* ======= TAB SWITCH WARNING MODAL ======= */}
       {showWarning && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 text-center animate-in zoom-in-95 duration-300">
+          <div className="bg-background rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 text-center animate-in zoom-in-95 duration-300">
             <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-4">
               <ShieldAlert className="w-8 h-8 text-rose-600" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Phát hiện chuyển tab!</h2>
-            <p className="text-slate-500 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-2">Phát hiện chuyển tab!</h2>
+            <p className="text-muted-foreground mb-4">
               Hệ thống đã ghi nhận bạn rời khỏi trang thi. Hành vi này sẽ được báo cáo cho giáo viên.
             </p>
             <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-6">
@@ -241,22 +241,22 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
       )}
 
       {/* Main Question Area */}
-      <div className="flex-1 bg-white flex flex-col relative overflow-hidden">
+      <div className="flex-1 bg-background flex flex-col relative overflow-hidden">
         
         {/* Question Header */}
-        <div className="h-16 border-b flex items-center justify-between px-6 bg-slate-50/50">
-          <div className="font-semibold text-lg text-slate-800">
+        <div className="h-16 border-b flex items-center justify-between px-6 bg-muted/50">
+          <div className="font-semibold text-lg text-card-foreground">
             Câu {currentIdx + 1} <span className="text-slate-400 font-normal text-sm">/ {questions.length}</span>
           </div>
           <div className="flex items-center gap-3">
             {tabSwitchCount > 0 && (
-              <span className="text-xs font-semibold px-2 py-1 rounded-full bg-rose-100 text-rose-600 flex items-center gap-1">
+              <span className="text-xs font-semibold px-2 py-1 rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 flex items-center gap-1">
                 <ShieldAlert className="w-3 h-3" /> {tabSwitchCount} vi phạm
               </span>
             )}
             <Button 
               variant="ghost" 
-              className={`gap-2 ${flagged.includes(currentQ.id) ? 'text-amber-500 bg-amber-50' : 'text-slate-500'}`}
+              className={`gap-2 ${flagged.includes(currentQ.id) ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400' : 'text-muted-foreground'}`}
               onClick={() => toggleFlag(currentQ.id)}
             >
               <Flag className="w-4 h-4" /> 
@@ -268,7 +268,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         {/* Question Content */}
         <div className="flex-1 overflow-y-auto p-6 md:p-12">
           <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-xl md:text-2xl font-medium text-slate-900 leading-relaxed">
+            <h2 className="text-xl md:text-2xl font-medium text-foreground leading-relaxed">
               {currentQ.content}
             </h2>
             
@@ -280,11 +280,11 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
                     key={opt.id} 
                     onClick={() => handleSelect(currentQ.id, opt.id)}
                     className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                      isSelected ? 'border-indigo-600 bg-indigo-50/50 shadow-sm' : 'border-slate-200 bg-white hover:border-indigo-200'
+                      isSelected ? 'border-indigo-600 bg-indigo-50/50 shadow-sm' : 'border-border bg-background hover:border-indigo-200'
                     }`}
                   >
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      isSelected ? 'border-indigo-600' : 'border-slate-300'
+                      isSelected ? 'border-indigo-600' : 'border-border'
                     }`}>
                       {isSelected && <div className="w-3 h-3 bg-indigo-600 rounded-full" />}
                     </div>
@@ -300,7 +300,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         </div>
 
         {/* Question Footer Navigation */}
-        <div className="h-20 border-t flex items-center justify-between px-6 bg-white shrink-0 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)]">
+        <div className="h-20 border-t flex items-center justify-between px-6 bg-background shrink-0 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)]">
           <Button 
             variant="outline" 
             size="lg" 
@@ -332,14 +332,14 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
       </div>
 
       {/* Right Sidebar - Status Map */}
-      <div className="w-full md:w-80 bg-slate-50 border-l flex flex-col shrink-0">
+      <div className="w-full md:w-80 bg-muted border-l flex flex-col shrink-0">
         
         {/* Timer Box */}
-        <div className="p-6 border-b bg-white flex flex-col items-center justify-center">
-          <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+        <div className="p-6 border-b bg-background flex flex-col items-center justify-center">
+          <div className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
             <Clock className="w-4 h-4" /> Thời gian còn lại
           </div>
-          <div className={`text-4xl font-black font-mono tracking-tight ${timeLeft < 300 ? 'text-rose-600 animate-pulse' : 'text-slate-800'}`}>
+          <div className={`text-4xl font-black font-mono tracking-tight ${timeLeft < 300 ? 'text-rose-600 animate-pulse' : 'text-card-foreground'}`}>
             {formatTime(timeLeft)}
           </div>
           {timerPaused && (
@@ -348,34 +348,34 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         </div>
 
         {/* Info summary */}
-        <div className="px-6 py-4 grid grid-cols-3 gap-4 text-center border-b text-sm bg-white">
+        <div className="px-6 py-4 grid grid-cols-3 gap-4 text-center border-b text-sm bg-background">
           <div>
             <div className="font-bold text-lg text-emerald-600">{Object.keys(answers).length}</div>
-            <div className="text-slate-500 text-xs">Đã làm</div>
+            <div className="text-muted-foreground text-xs">Đã làm</div>
           </div>
           <div>
             <div className="font-bold text-lg text-amber-500">{flagged.length}</div>
-            <div className="text-slate-500 text-xs">Phân vân</div>
+            <div className="text-muted-foreground text-xs">Phân vân</div>
           </div>
           <div>
             <div className={`font-bold text-lg ${tabSwitchCount > 0 ? 'text-rose-500' : 'text-slate-400'}`}>{tabSwitchCount}</div>
-            <div className="text-slate-500 text-xs">Vi phạm</div>
+            <div className="text-muted-foreground text-xs">Vi phạm</div>
           </div>
         </div>
 
         {/* Question Palette */}
         <div className="flex-1 overflow-y-auto p-6">
-          <h3 className="font-semibold text-slate-800 mb-4">Danh sách câu hỏi</h3>
+          <h3 className="font-semibold text-card-foreground mb-4">Danh sách câu hỏi</h3>
           <div className="grid grid-cols-5 gap-2">
             {questions.map((q, i) => {
               const isDone = answers[q.id] !== undefined;
               const isFlagged = flagged.includes(q.id);
               const isActive = currentIdx === i;
               
-              let btnClass = "border-slate-200 text-slate-500 hover:border-slate-300 bg-white";
+              let btnClass = "border-border text-muted-foreground hover:border-border bg-background";
               if (isActive) btnClass = "border-indigo-600 bg-indigo-600 text-white ring-2 ring-indigo-200 ring-offset-1";
               else if (isFlagged && isDone) btnClass = "border-amber-500 bg-amber-500 text-white";
-              else if (isFlagged) btnClass = "border-amber-500 text-amber-600 bg-amber-50";
+              else if (isFlagged) btnClass = "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400";
               else if (isDone) btnClass = "border-emerald-500 bg-emerald-500 text-white";
 
               return (
@@ -390,15 +390,15 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
             })}
           </div>
           
-          <div className="mt-8 space-y-2 text-xs text-slate-500">
+          <div className="mt-8 space-y-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-emerald-500"></div> Đã trả lời</div>
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-amber-500"></div> Đang phân vân (cắm cờ)</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-white"></div> Chưa trả lời</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-background"></div> Chưa trả lời</div>
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-rose-500"></div> Vi phạm tab</div>
           </div>
         </div>
 
-        <div className="p-4 bg-white border-t">
+        <div className="p-4 bg-background border-t">
           <Button variant="destructive" className="w-full text-base font-bold shadow-sm" onClick={handleSubmit} disabled={Object.keys(answers).length === 0}>
             NỘP BÀI NGAY
           </Button>

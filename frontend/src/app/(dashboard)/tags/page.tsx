@@ -32,7 +32,7 @@ export default function TagsPage() {
 
   const addTag = async () => {
     if (!newTag.trim()) return;
-    const colors = ["bg-indigo-100 text-indigo-700", "bg-emerald-100 text-emerald-700", "bg-violet-100 text-violet-700", "bg-amber-100 text-amber-700", "bg-rose-100 text-rose-700"];
+    const colors = ["bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400", "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400", "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"];
     const color = colors[Math.floor(Math.random() * colors.length)];
     
     try {

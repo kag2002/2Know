@@ -15,25 +15,25 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden">
+    <div className="min-h-screen bg-muted font-sans selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden">
       
       {/* Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md shadow-sm border-b pb-4 pt-4' : 'bg-transparent pt-6 pb-6'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-background/80 backdrop-blur-md shadow-sm border-b pb-4 pt-4' : 'bg-transparent pt-6 pb-6'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${scrolled ? 'bg-indigo-600' : 'bg-slate-900'}`}>
               <span className="text-white text-xl font-black">2</span>
             </div>
-            <span className={`text-xl font-bold tracking-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-slate-900'}`}>Know</span>
+            <span className={`text-xl font-bold tracking-tight transition-colors ${scrolled ? 'text-foreground' : 'text-foreground'}`}>Know</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600">
+          <div className="hidden md:flex items-center gap-8 font-medium text-sm text-muted-foreground">
             <Link href="#features" className="hover:text-indigo-600 transition-colors">Tính năng</Link>
             <Link href="#solution" className="hover:text-indigo-600 transition-colors">Giải pháp</Link>
             <Link href="#pricing" className="hover:text-indigo-600 transition-colors">Bảng giá</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <Button variant="ghost" className="font-semibold px-4 hover:bg-slate-100/50">Đăng nhập</Button>
+              <Button variant="ghost" className="font-semibold px-4 hover:bg-muted/50">Đăng nhập</Button>
             </Link>
             <Link href="/register">
               <Button className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 rounded-full px-6 font-semibold">
@@ -53,16 +53,16 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-indigo-100 text-indigo-700 font-medium text-sm shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-background border border-indigo-100 text-indigo-700 font-medium text-sm shadow-sm">
               <SparkleIcon className="w-4 h-4" /> Nền tảng đánh giá giáo dục thế hệ mới
             </div>
-            <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 leading-[1.1]">
+            <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.1]">
               Tổ chức thi trực tuyến<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
                 nhanh gọn & tối ưu
               </span>
             </h1>
-            <p className="text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               2Know/2Know cung cấp giải pháp toàn diện cho Giáo viên và Nhà trường trong việc ra đề, giám sát thi online và chấm điểm tự động tích hợp bảng phân tích dữ liệu chuyên nghiệp.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -72,7 +72,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="/login">
-                <Button size="lg" variant="outline" className="h-14 px-8 text-base font-bold rounded-full border-2 bg-white/50 backdrop-blur-sm w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="h-14 px-8 text-base font-bold rounded-full border-2 bg-background/50 backdrop-blur-sm w-full sm:w-auto">
                   Vào Trang Quản Trị
                 </Button>
               </Link>
@@ -81,7 +81,7 @@ export default function LandingPage() {
 
           {/* Dashboard Preview Mockup */}
           <div className="mt-16 lg:mt-24 relative max-w-5xl mx-auto animate-in fade-in zoom-in-95 duration-1000 delay-200 fill-mode-both">
-            <div className="rounded-2xl border bg-white shadow-2xl overflow-hidden ring-1 ring-slate-900/5">
+            <div className="rounded-2xl border bg-background shadow-2xl overflow-hidden ring-1 ring-slate-900/5">
               <div className="h-8 bg-slate-100 border-b flex items-center px-4 gap-2">
                 <div className="flex gap-1.5">
                   <div className="w-3 h-3 rounded-full bg-rose-400"></div>
@@ -92,11 +92,11 @@ export default function LandingPage() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/20 to-transparent z-10"></div>
                 {/* Fake App Content for Visual */}
-                <div className="h-[400px] bg-slate-50 flex">
-                  <div className="w-64 bg-white border-r p-4 space-y-4">
+                <div className="h-[400px] bg-muted flex">
+                  <div className="w-64 bg-background border-r p-4 space-y-4">
                     <div className="h-8 w-24 bg-slate-200 rounded animate-pulse"></div>
                     <div className="space-y-2 pt-4">
-                      {[1,2,3,4].map(i => <div key={i} className="h-10 border border-slate-100 bg-slate-50 rounded-md"></div>)}
+                      {[1,2,3,4].map(i => <div key={i} className="h-10 border border-border bg-muted rounded-md"></div>)}
                     </div>
                   </div>
                   <div className="flex-1 p-8 space-y-6">
@@ -105,7 +105,7 @@ export default function LandingPage() {
                       <div className="h-10 w-32 bg-indigo-200 rounded animate-pulse"></div>
                     </div>
                     <div className="grid grid-cols-3 gap-6">
-                      {[1,2,3].map(i => <div key={i} className="h-32 bg-white border rounded-xl shadow-sm"></div>)}
+                      {[1,2,3].map(i => <div key={i} className="h-32 bg-background border rounded-xl shadow-sm"></div>)}
                     </div>
                   </div>
                 </div>
@@ -113,12 +113,12 @@ export default function LandingPage() {
             </div>
             
             {/* Decorator cards floating */}
-            <div className="hidden lg:flex absolute -left-12 top-32 bg-white p-4 rounded-xl shadow-xl border animate-bounce-slow">
+            <div className="hidden lg:flex absolute -left-12 top-32 bg-background p-4 rounded-xl shadow-xl border animate-bounce-slow">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><CheckCircle2 className="w-6 h-6" /></div>
+                <div className="p-2 bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-lg"><CheckCircle2 className="w-6 h-6" /></div>
                 <div>
-                  <p className="font-bold text-sm text-slate-800">Chấm điểm tự động</p>
-                  <p className="text-xs text-slate-500">Mất 0.1s thay vì 3 giờ</p>
+                  <p className="font-bold text-sm text-card-foreground">Chấm điểm tự động</p>
+                  <p className="text-xs text-muted-foreground">Mất 0.1s thay vì 3 giờ</p>
                 </div>
               </div>
             </div>
@@ -127,11 +127,11 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-white">
+      <section id="features" className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">Tính năng vượt trội của nền tảng</h2>
-            <p className="text-slate-600 text-lg">Mọi thứ bạn cần để tổ chức kỳ thi đều được thiết kế tối ưu, gọn nhẹ và bảo mật nhất.</p>
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Tính năng vượt trội của nền tảng</h2>
+            <p className="text-muted-foreground text-lg">Mọi thứ bạn cần để tổ chức kỳ thi đều được thiết kế tối ưu, gọn nhẹ và bảo mật nhất.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -171,23 +171,23 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-slate-50">
+      <section id="pricing" className="py-24 bg-muted">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">Bảng giá đơn giản, minh bạch</h2>
-            <p className="text-slate-600 text-lg">Bắt đầu miễn phí. Nâng cấp khi bạn cần mở rộng quy mô.</p>
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Bảng giá đơn giản, minh bạch</h2>
+            <p className="text-muted-foreground text-lg">Bắt đầu miễn phí. Nâng cấp khi bạn cần mở rộng quy mô.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-lg transition-all">
-              <h3 className="text-lg font-bold text-slate-800">Miễn phí</h3>
-              <p className="text-slate-500 text-sm mt-1">Dành cho giáo viên cá nhân</p>
+            <div className="bg-background rounded-2xl border border-border p-8 hover:shadow-lg transition-all">
+              <h3 className="text-lg font-bold text-card-foreground">Miễn phí</h3>
+              <p className="text-muted-foreground text-sm mt-1">Dành cho giáo viên cá nhân</p>
               <div className="my-6">
-                <span className="text-4xl font-black text-slate-900">0đ</span>
-                <span className="text-slate-500 text-sm">/tháng</span>
+                <span className="text-4xl font-black text-foreground">0đ</span>
+                <span className="text-muted-foreground text-sm">/tháng</span>
               </div>
-              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+              <ul className="space-y-3 text-sm text-muted-foreground mb-8">
                 {["5 bài kiểm tra/tháng", "50 học sinh", "Chấm tự động trắc nghiệm", "Báo cáo cơ bản"].map(f => (
                   <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />{f}</li>
                 ))}
@@ -198,15 +198,15 @@ export default function LandingPage() {
             </div>
 
             {/* Pro — Highlighted */}
-            <div className="bg-white rounded-2xl border-2 border-indigo-500 p-8 shadow-xl relative">
+            <div className="bg-background rounded-2xl border-2 border-indigo-500 p-8 shadow-xl relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">Phổ biến nhất</div>
-              <h3 className="text-lg font-bold text-slate-800">Pro</h3>
-              <p className="text-slate-500 text-sm mt-1">Dành cho tổ bộ môn & trường nhỏ</p>
+              <h3 className="text-lg font-bold text-card-foreground">Pro</h3>
+              <p className="text-muted-foreground text-sm mt-1">Dành cho tổ bộ môn & trường nhỏ</p>
               <div className="my-6">
                 <span className="text-4xl font-black text-indigo-600">199K</span>
-                <span className="text-slate-500 text-sm">/tháng</span>
+                <span className="text-muted-foreground text-sm">/tháng</span>
               </div>
-              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+              <ul className="space-y-3 text-sm text-muted-foreground mb-8">
                 {["Không giới hạn bài kiểm tra", "500 học sinh", "Chấm điểm OMR (AI)", "Chống gian lận nâng cao", "Thống kê phổ điểm", "Hỗ trợ ưu tiên"].map(f => (
                   <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-indigo-500 shrink-0" />{f}</li>
                 ))}
@@ -217,13 +217,13 @@ export default function LandingPage() {
             </div>
 
             {/* Enterprise */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 hover:shadow-lg transition-all">
-              <h3 className="text-lg font-bold text-slate-800">Enterprise</h3>
-              <p className="text-slate-500 text-sm mt-1">Dành cho trường học & sở GD</p>
+            <div className="bg-background rounded-2xl border border-border p-8 hover:shadow-lg transition-all">
+              <h3 className="text-lg font-bold text-card-foreground">Enterprise</h3>
+              <p className="text-muted-foreground text-sm mt-1">Dành cho trường học & sở GD</p>
               <div className="my-6">
-                <span className="text-4xl font-black text-slate-900">Liên hệ</span>
+                <span className="text-4xl font-black text-foreground">Liên hệ</span>
               </div>
-              <ul className="space-y-3 text-sm text-slate-600 mb-8">
+              <ul className="space-y-3 text-sm text-muted-foreground mb-8">
                 {["Mọi tính năng Pro", "Không giới hạn học sinh", "AI tạo đề tự động", "Tích hợp LMS/API", "SLA 99.9%", "Quản lý đa chi nhánh"].map(f => (
                   <li key={f} className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />{f}</li>
                 ))}
@@ -242,12 +242,12 @@ export default function LandingPage() {
           <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">Hơn 12,000 giáo viên đã tin tưởng 2Know để tổ chức hàng triệu bài thi. Tham gia ngay hôm nay.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/register">
-              <Button size="lg" className="h-14 px-10 text-base font-bold rounded-full bg-white text-indigo-700 hover:bg-indigo-50 shadow-xl w-full sm:w-auto">
+              <Button size="lg" className="h-14 px-10 text-base font-bold rounded-full bg-background text-indigo-700 hover:bg-indigo-50 shadow-xl w-full sm:w-auto">
                 Đăng ký miễn phí <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="h-14 px-10 text-base font-bold rounded-full border-2 border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="h-14 px-10 text-base font-bold rounded-full border-2 border-white/30 text-white hover:bg-background/10 w-full sm:w-auto">
                 Dùng thử Demo
               </Button>
             </Link>
@@ -299,12 +299,12 @@ export default function LandingPage() {
 
 function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
   return (
-    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-8 hover:shadow-lg hover:border-indigo-100 transition-all group">
-      <div className="w-12 h-12 rounded-xl bg-white border shadow-sm flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+    <div className="bg-muted border border-border rounded-2xl p-8 hover:shadow-lg hover:border-indigo-100 transition-all group">
+      <div className="w-12 h-12 rounded-xl bg-background border shadow-sm flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all">
         {icon}
       </div>
-      <h3 className="text-xl font-bold text-slate-800 mb-3">{title}</h3>
-      <p className="text-slate-600 leading-relaxed text-sm">{desc}</p>
+      <h3 className="text-xl font-bold text-card-foreground mb-3">{title}</h3>
+      <p className="text-muted-foreground leading-relaxed text-sm">{desc}</p>
     </div>
   );
 }

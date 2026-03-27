@@ -66,7 +66,7 @@ export default function RegisterPage() {
       {/* Benefits List */}
       <div className="grid grid-cols-2 gap-2">
         {benefits.map((b, i) => (
-          <div key={i} className="flex items-center gap-2 text-sm text-slate-600 bg-emerald-50/50 border border-emerald-100 rounded-lg px-3 py-2">
+          <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground bg-emerald-50/50 border border-emerald-100 rounded-lg px-3 py-2">
             <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span className="text-xs font-medium">{b}</span>
           </div>
@@ -139,7 +139,7 @@ export default function RegisterPage() {
                 onChange={e => setFormData({...formData, password: e.target.value})}
                 disabled={isLoading}
               />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-muted-foreground">
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -168,7 +168,7 @@ export default function RegisterPage() {
             {isLoading ? "Đang tạo tài khoản..." : "Tạo tài khoản miễn phí"}
           </Button>
 
-          <div className="text-xs text-center text-slate-500 mt-4 leading-relaxed">
+          <div className="text-xs text-center text-muted-foreground mt-4 leading-relaxed">
             Bằng cách đăng ký, bạn đồng ý với{" "}
             <a href="#" className="underline text-indigo-600 hover:text-indigo-500">Điều khoản</a> và{" "}
             <a href="#" className="underline text-indigo-600 hover:text-indigo-500">Bảo mật</a> của 2Know.
@@ -176,7 +176,7 @@ export default function RegisterPage() {
         </form>
       </div>
 
-      <div className="text-center text-sm text-slate-500">
+      <div className="text-center text-sm text-muted-foreground">
         Đã có tài khoản?{" "}
         <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
           Đăng nhập

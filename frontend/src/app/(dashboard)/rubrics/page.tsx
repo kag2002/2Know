@@ -136,7 +136,7 @@ export default function RubricsPage() {
                 {rubric.active ? (
                   <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold uppercase ml-auto">Đang áp dụng</span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 text-[10px] font-bold uppercase ml-auto">Bản nháp</span>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-muted-foreground dark:bg-slate-800 text-[10px] font-bold uppercase ml-auto">Bản nháp</span>
                 )}
               </div>
               
@@ -144,20 +144,20 @@ export default function RubricsPage() {
               <div className="mt-4 pt-4 border-t flex flex-wrap gap-2">
                 {rubric.subject === "Tiếng Anh" ? (
                   <>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Ngữ pháp (25%)</span>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Từ vựng (25%)</span>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Mạch lạc (25%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Ngữ pháp (25%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Từ vựng (25%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Mạch lạc (25%)</span>
                   </>
                 ) : rubric.subject === "Ngữ văn" ? (
                   <>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Hiểu đề (30%)</span>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Dẫn chứng (40%)</span>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Diễn đạt (30%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Hiểu đề (30%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Dẫn chứng (40%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Diễn đạt (30%)</span>
                   </>
                 ) : (
                   <>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Đáp án đúng (50%)</span>
-                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-slate-600 dark:text-slate-300 border">Lập luận logic (50%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Đáp án đúng (50%)</span>
+                    <span className="px-2 py-1 bg-muted/50 rounded text-xs font-medium text-muted-foreground dark:text-slate-300 border">Lập luận logic (50%)</span>
                   </>
                 )}
               </div>

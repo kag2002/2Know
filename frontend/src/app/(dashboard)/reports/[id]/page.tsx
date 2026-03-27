@@ -57,7 +57,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Kiểm tra Toán Học giữa kỳ 2
           </h1>
           <p className="text-muted-foreground mt-1">Báo cáo chi tiết • Mã: {id}</p>
@@ -80,7 +80,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase">{stat.label}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 </div>
               </div>
             </CardContent>
@@ -153,7 +153,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b text-left text-slate-500">
+                <tr className="border-b text-left text-muted-foreground">
                   <th className="pb-3 font-semibold">#</th>
                   <th className="pb-3 font-semibold">Họ và Tên</th>
                   <th className="pb-3 font-semibold text-center">Điểm</th>
@@ -163,7 +163,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
               </thead>
               <tbody>
                 {topStudents.map((s, i) => (
-                  <tr key={i} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
+                  <tr key={i} className="border-b last:border-0 hover:bg-muted transition-colors">
                     <td className="py-3">
                       {i < 3 ? (
                         <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white ${
@@ -173,16 +173,16 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
                         <span className="text-slate-400 pl-2">{i + 1}</span>
                       )}
                     </td>
-                    <td className="py-3 font-medium text-slate-800">{s.name}</td>
+                    <td className="py-3 font-medium text-card-foreground">{s.name}</td>
                     <td className="py-3 text-center">
                       <span className={`font-bold ${s.score >= 8 ? "text-emerald-600" : s.score >= 5 ? "text-amber-600" : "text-rose-600"}`}>
                         {s.score}
                       </span>
                     </td>
-                    <td className="py-3 text-center text-slate-500">{s.time}</td>
+                    <td className="py-3 text-center text-muted-foreground">{s.time}</td>
                     <td className="py-3 text-center">
                       {s.violations > 0 ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-xs font-semibold">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 text-xs font-semibold">
                           <AlertTriangle className="w-3 h-3" /> {s.violations}
                         </span>
                       ) : (

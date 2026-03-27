@@ -90,14 +90,14 @@ export default function OverviewPage() {
               {getGreeting()}
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-white">
             {t("overview.welcome")}
           </h1>
           <p className="text-muted-foreground mt-1">
             {t("overview.subtitle")}
           </p>
         </div>
-        <Button variant="outline" className="gap-2 bg-white">
+        <Button variant="outline" className="gap-2 bg-background">
           <Settings2 className="w-4 h-4" /> {t("overview.reload")}
         </Button>
       </div>
@@ -106,7 +106,7 @@ export default function OverviewPage() {
         {statCards.map((card, i) => (
           <Card 
             key={i} 
-            className={`shadow-sm border-slate-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${
+            className={`shadow-sm border-border hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${
               mounted ? "animate-in fade-in slide-in-from-bottom-4" : "opacity-0"
             }`}
             style={{ animationDelay: `${i * 100}ms`, animationFillMode: "both", animationDuration: "500ms" }}
@@ -116,7 +116,7 @@ export default function OverviewPage() {
               <span className="text-xs text-muted-foreground">{timeStr}</span>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-slate-800">
+              <div className="text-4xl font-bold text-card-foreground">
                 <AnimatedNumber value={card.value} suffix={card.suffix || ""} />
                 {card.suffix || ""}
               </div>
@@ -130,7 +130,7 @@ export default function OverviewPage() {
                 {card.changeLabel}
               </p>
               <div className="mt-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   {card.icon ? (
                     <card.icon className={`w-4 h-4 ${card.iconColor}`} />
                   ) : (
@@ -148,7 +148,7 @@ export default function OverviewPage() {
       
       {/* Activity Feed and Charts */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className={`col-span-4 shadow-sm border-slate-200 ${mounted ? "animate-in fade-in duration-500" : "opacity-0"}`} style={{ animationDelay: "500ms", animationFillMode: "both" }}>
+        <Card className={`col-span-4 shadow-sm border-border ${mounted ? "animate-in fade-in duration-500" : "opacity-0"}`} style={{ animationDelay: "500ms", animationFillMode: "both" }}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -167,12 +167,12 @@ export default function OverviewPage() {
           <CardContent>
             <div className="space-y-3">
               {[
-                { name: "Lê Uy Đức", action: t("overview.stream.action1"), time: "17:36", status: t("overview.stream.status1"), statusColor: "text-pink-500 bg-pink-50" },
-                { name: "Nguyễn Thị Mai", action: t("overview.stream.action2"), time: "16:20", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50" },
-                { name: "Trần Văn Hoàng", action: t("overview.stream.action3"), time: "15:45", status: t("overview.stream.status3"), statusColor: "text-amber-600 bg-amber-50" },
-                { name: t("overview.stream.name4"), action: t("overview.stream.action4"), time: "14:10", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50" },
+                { name: "Lê Uy Đức", action: t("overview.stream.action1"), time: "17:36", status: t("overview.stream.status1"), statusColor: "text-pink-500 bg-pink-50 dark:bg-pink-900/30 dark:text-pink-400" },
+                { name: "Nguyễn Thị Mai", action: t("overview.stream.action2"), time: "16:20", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" },
+                { name: "Trần Văn Hoàng", action: t("overview.stream.action3"), time: "15:45", status: t("overview.stream.status3"), statusColor: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" },
+                { name: t("overview.stream.name4"), action: t("overview.stream.action4"), time: "14:10", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" },
               ].map((item, i) => (
-                <div key={i} className="flex flex-col p-3 rounded-lg border text-sm hover:bg-slate-50/80 transition-colors cursor-pointer group">
+                <div key={i} className="flex flex-col p-3 rounded-lg border text-sm hover:bg-muted/80 transition-colors cursor-pointer group">
                   <div className="flex justify-between items-start mb-1">
                     <span className="font-medium group-hover:text-indigo-600 transition-colors">
                       <strong>{item.name}</strong> {item.action}
@@ -188,7 +188,7 @@ export default function OverviewPage() {
           </CardContent>
         </Card>
         
-        <Card className={`col-span-3 shadow-sm border-slate-200 ${mounted ? "animate-in fade-in duration-500" : "opacity-0"}`} style={{ animationDelay: "600ms", animationFillMode: "both" }}>
+        <Card className={`col-span-3 shadow-sm border-border ${mounted ? "animate-in fade-in duration-500" : "opacity-0"}`} style={{ animationDelay: "600ms", animationFillMode: "both" }}>
            <CardHeader>
             <div className="flex items-center justify-between">
               <div>

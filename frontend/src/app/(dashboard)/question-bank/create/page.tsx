@@ -56,18 +56,18 @@ export default function CreateQuestionPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       <div className="flex items-center gap-4">
-        <Link href="/question-bank" className="p-2 border rounded-md hover:bg-slate-50 transition-colors">
-          <ArrowLeft className="w-5 h-5 text-slate-600" />
+        <Link href="/question-bank" className="p-2 border rounded-md hover:bg-muted transition-colors">
+          <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Thêm câu hỏi mới</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Thêm câu hỏi mới</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Tạo câu hỏi và lưu vào ngân hàng dữ liệu để tái sử dụng.
           </p>
         </div>
         <div className="ml-auto flex gap-3">
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="bg-white gap-2" disabled>
+            <Button variant="outline" className="bg-background gap-2" disabled>
               Lưu nháp
             </Button>
             <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 shadow-sm font-semibold" onClick={handleSave} disabled={isSaving}>
@@ -77,7 +77,7 @@ export default function CreateQuestionPage() {
         </div>
       </div>
 
-      <div className="space-y-6 bg-white p-6 border rounded-xl shadow-sm">
+      <div className="space-y-6 bg-background p-6 border rounded-xl shadow-sm">
         <div className="grid grid-cols-3 gap-6">
           <div className="col-span-1 space-y-2">
             <label className="text-sm font-medium">Loại câu hỏi</label>
@@ -108,7 +108,7 @@ export default function CreateQuestionPage() {
           <label className="text-sm font-medium">Nội dung câu hỏi <span className="text-rose-500">*</span></label>
           <div className="border rounded-md">
             {/* Fake Rich Text Toolbar */}
-            <div className="flex items-center gap-2 p-2 border-b bg-slate-50 rounded-t-md">
+            <div className="flex items-center gap-2 p-2 border-b bg-muted rounded-t-md">
               <Button variant="ghost" size="sm" className="h-8 px-2 font-bold">B</Button>
               <Button variant="ghost" size="sm" className="h-8 px-2 italic">I</Button>
               <Button variant="ghost" size="sm" className="h-8 px-2 underline">U</Button>
@@ -133,7 +133,7 @@ export default function CreateQuestionPage() {
 
           <div className="space-y-3">
             {options.map((opt, i) => (
-              <div key={opt.id} className={`flex items-start gap-3 p-3 border rounded-lg transition-colors ${opt.isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-white'}`}>
+              <div key={opt.id} className={`flex items-start gap-3 p-3 border rounded-lg transition-colors ${opt.isCorrect ? 'bg-emerald-50 border-emerald-200' : 'bg-background'}`}>
                 <div className="pt-2">
                   <input
                     type="radio"
@@ -152,7 +152,7 @@ export default function CreateQuestionPage() {
                       newOpts[i].text = e.target.value;
                       setOptions(newOpts);
                     }}
-                    className={`bg-white ${opt.isCorrect ? 'border-emerald-300' : ''}`}
+                    className={`bg-background ${opt.isCorrect ? 'border-emerald-300' : ''}`}
                   />
                 </div>
                 <Button variant="ghost" size="icon" className="text-slate-400 hover:text-rose-500 mt-0.5">
@@ -162,7 +162,7 @@ export default function CreateQuestionPage() {
             ))}
           </div>
 
-          <Button variant="outline" className="w-full border-dashed gap-2 text-slate-500 mt-2">
+          <Button variant="outline" className="w-full border-dashed gap-2 text-muted-foreground mt-2">
             <Plus className="w-4 h-4" /> Thêm đáp án khác
           </Button>
         </div>
@@ -170,7 +170,7 @@ export default function CreateQuestionPage() {
         <div className="space-y-2 pt-4 border-t">
           <label className="text-sm font-medium">Giải thích đáp án (Tùy chọn)</label>
           <textarea 
-            className="flex min-h-[80px] w-full rounded-md border border-input bg-slate-50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500"
+            className="flex min-h-[80px] w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500"
             placeholder="Giải thích tại sao đáp án lại đúng để học sinh có thể tham khảo sau khi thi xong..."
           ></textarea>
         </div>

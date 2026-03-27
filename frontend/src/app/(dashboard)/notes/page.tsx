@@ -184,7 +184,7 @@ function NoteCard({ note, onDelete, onTogglePin }: { note: typeof initialNotes[0
           </p>
         </div>
         <DropdownMenu>
-          <DropdownMenuTrigger className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-white/50 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+          <DropdownMenuTrigger className="h-7 w-7 flex items-center justify-center rounded-full hover:bg-background/50 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
             <MoreVertical className="w-4 h-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

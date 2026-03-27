@@ -118,14 +118,14 @@ export function AppSidebar() {
         <div
           className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-pink-100 text-pink-700 flex items-center justify-center font-semibold uppercase">
+          <div className="w-8 h-8 rounded-full bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400 flex items-center justify-center font-semibold uppercase">
             {user?.full_name ? user.full_name[0] : "U"}
           </div>
           <div className="flex flex-col flex-1 overflow-hidden">
             <span className="text-sm font-medium leading-none truncate">{user?.full_name || "User"}</span>
             <span className="text-xs text-muted-foreground mt-1 truncate">{user?.email}</span>
           </div>
-          <button onClick={handleLogout} className="p-1 hover:bg-slate-200 rounded text-slate-500 transition-colors">
+          <button onClick={handleLogout} className="p-1 hover:bg-accent rounded text-muted-foreground transition-colors">
             <LogOut className="w-4 h-4" />
           </button>
         </div>

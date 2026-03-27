@@ -125,7 +125,7 @@ function LoginForm() {
                 onChange={e => setPassword(e.target.value)}
                 disabled={isLoading}
               />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-muted-foreground">
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -151,7 +151,7 @@ function LoginForm() {
         </div>
       </div>
 
-      <div className="text-center text-sm text-slate-500">
+      <div className="text-center text-sm text-muted-foreground">
         Chưa có tài khoản?{" "}
         <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
           Đăng ký miễn phí
