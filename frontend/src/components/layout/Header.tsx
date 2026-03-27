@@ -86,7 +86,7 @@ export function Header() {
             </div>
             <div className="hidden md:flex flex-col items-start">
               <span className="text-sm font-medium leading-none">{user?.name || "User"}</span>
-              <span className="text-[10px] text-muted-foreground mt-0.5">Giáo viên</span>
+              <span className="text-[10px] text-muted-foreground mt-0.5">{t("header.teacher")}</span>
             </div>
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground hidden md:block transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`} />
           </button>
@@ -103,7 +103,7 @@ export function Header() {
                 onClick={() => setShowDropdown(false)}
               >
                 <Settings className="w-4 h-4" />
-                Cài đặt
+                {t("sidebar.settings")}
               </Link>
               <Link
                 href="/settings"
@@ -111,7 +111,7 @@ export function Header() {
                 onClick={() => setShowDropdown(false)}
               >
                 <User className="w-4 h-4" />
-                Hồ sơ cá nhân
+                {t("header.profile")}
               </Link>
               <div className="border-t mt-1 pt-1">
                 <button
@@ -119,7 +119,7 @@ export function Header() {
                   className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  Đăng xuất
+                  {t("header.logout")}
                 </button>
               </div>
             </div>

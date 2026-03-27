@@ -104,14 +104,14 @@ export function AppSidebar() {
       <div className="p-4 border-t mt-auto">
         <div className="mb-4 space-y-2">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Hạn ngạch AI</span>
+            <span>{t("sidebar.aiQuota")}</span>
             <span className="font-semibold">100%</span>
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div className="h-full bg-pink-500 w-full rounded-full"></div>
           </div>
           <div className="text-xs text-muted-foreground flex items-center gap-1">
-            <span className="text-pink-500 line-through">⚡ Không giới hạn</span>
+            <span className="text-pink-500 line-through">⚡ {t("sidebar.unlimited")}</span>
           </div>
         </div>
 

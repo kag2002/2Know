@@ -32,6 +32,11 @@ func ConnectDB() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	// Ensure uuid-ossp extension exists before migrating tables
+	if err := db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`).Error; err != nil {
+		log.Fatal("Failed to create extension uuid-ossp:", err)
+	}
+
 	err = db.AutoMigrate(
 		&model.User{},
 		&model.Quiz{},

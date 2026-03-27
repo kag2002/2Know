@@ -26,7 +26,7 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
   });
 
   if (!response.ok) {
-    if (response.status === 401 && typeof window !== 'undefined') {
+    if (response.status === 401 && requireAuth && typeof window !== 'undefined') {
       // Force logout on invalid token and clear server-side SSR cookie to prevent redirect loops
       localStorage.removeItem("2know_token");
       document.cookie = "2know_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";

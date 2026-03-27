@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v3"
 
 	"backend/internal/service"
@@ -31,6 +33,8 @@ func (h *AuthHandler) Register(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
+	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
+
 	user, err := h.svc.Register(req.Email, req.Password, req.FullName)
 	if err != nil {
 		if err == service.ErrUserExists {
@@ -54,6 +58,8 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
+
+	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
 
 	user, token, err := h.svc.Login(req.Email, req.Password)
 	if err != nil {

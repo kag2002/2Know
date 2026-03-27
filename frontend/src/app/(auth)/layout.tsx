@@ -45,11 +45,11 @@ export default function AuthLayout({
       </div>
 
       {/* Right side - Form/Action */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 relative">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-background relative">
         {/* Mobile Header */}
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white">Q</div>
-          <span className="font-bold text-slate-900 tracking-tight">2Know</span>
+          <span className="font-bold text-foreground tracking-tight">2Know</span>
         </div>
         
         <div className="w-full max-w-md">

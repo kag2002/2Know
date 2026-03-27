@@ -56,22 +56,22 @@ export default function OverviewPage() {
     {
       value: "56", label: t("overview.stat.active"), desc: t("overview.stat.quizzes"),
       icon: Layers, iconColor: "text-indigo-500", badgeColor: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400",
-      badge: "Ổn định", change: null, changeLabel: "Chưa có chênh lệch",
+      badge: t("overview.badge.stable"), change: null, changeLabel: t("overview.badge.noChange"),
     },
     {
       value: "7", label: t("overview.stat.last7days"), desc: t("overview.stat.submissions"),
       icon: CheckSquare, iconColor: "text-rose-500", badgeColor: "bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400",
-      badge: "Giảm", change: -91, changeLabel: "-91",
+      badge: t("overview.badge.decreased"), change: -91, changeLabel: "-91",
     },
     {
       value: "78,1", label: t("overview.stat.avgScore"), desc: t("overview.stat.global"),
       icon: BarChart, iconColor: "text-emerald-500", badgeColor: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
-      badge: "Tăng", change: 5.8, changeLabel: "+5.8", suffix: "%",
+      badge: t("overview.badge.increased"), change: 5.8, changeLabel: "+5.8", suffix: "%",
     },
     {
-      value: "135", label: t("sidebar.grading"), desc: "Essay queue",
+      value: "135", label: t("sidebar.grading"), desc: t("overview.badge.essayQueue"),
       icon: null, iconColor: "text-orange-500", badgeColor: "bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
-      badge: "Cần theo dõi", change: null, changeLabel: "Chưa có chênh lệch",
+      badge: t("overview.badge.needsAttention"), change: null, changeLabel: t("overview.badge.noChange"),
     },
   ];
 
@@ -98,7 +98,7 @@ export default function OverviewPage() {
           </p>
         </div>
         <Button variant="outline" className="gap-2 bg-white">
-          <Settings2 className="w-4 h-4" /> Tải lại dữ liệu
+          <Settings2 className="w-4 h-4" /> {t("overview.reload")}
         </Button>
       </div>
 
@@ -152,25 +152,25 @@ export default function OverviewPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Dòng hoạt động</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Các bài hoàn thành gần đây, sự kiện bảo mật, phiên điểm danh đã đóng và cập nhật job AI.</p>
+                <CardTitle>{t("overview.activityStream")}</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">{t("overview.activityDesc")}</p>
               </div>
               <Button variant="outline" size="sm" className="gap-2 text-emerald-600 outline-emerald-200 bg-emerald-50">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                Trực tiếp
+                {t("overview.live")}
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {[
-                { name: "Lê Uy Đức", action: "đã hoàn thành minh chứng bài tập với 0%", time: "17:36", status: "Mở", statusColor: "text-pink-500 bg-pink-50" },
-                { name: "Nguyễn Thị Mai", action: "đã nộp bài kiểm tra Toán giữa kỳ", time: "16:20", status: "Hoàn thành", statusColor: "text-emerald-600 bg-emerald-50" },
-                { name: "Trần Văn Hoàng", action: "bị cảnh báo chuyển tab lần 2", time: "15:45", status: "Cảnh báo", statusColor: "text-amber-600 bg-amber-50" },
-                { name: "AI Generator", action: "đã tạo 15 câu hỏi trắc nghiệm mới", time: "14:10", status: "Hoàn thành", statusColor: "text-emerald-600 bg-emerald-50" },
+                { name: "Lê Uy Đức", action: t("overview.stream.action1"), time: "17:36", status: t("overview.stream.status1"), statusColor: "text-pink-500 bg-pink-50" },
+                { name: "Nguyễn Thị Mai", action: t("overview.stream.action2"), time: "16:20", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50" },
+                { name: "Trần Văn Hoàng", action: t("overview.stream.action3"), time: "15:45", status: t("overview.stream.status3"), statusColor: "text-amber-600 bg-amber-50" },
+                { name: t("overview.stream.name4"), action: t("overview.stream.action4"), time: "14:10", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50" },
               ].map((item, i) => (
                 <div key={i} className="flex flex-col p-3 rounded-lg border text-sm hover:bg-slate-50/80 transition-colors cursor-pointer group">
                   <div className="flex justify-between items-start mb-1">
@@ -192,8 +192,8 @@ export default function OverviewPage() {
            <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Phân bố điểm học sinh</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Phân bổ điểm trung bình theo toàn bộ chuyên mục</p>
+                <CardTitle>{t("overview.scoreDistribution")}</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">{t("overview.scoreDesc")}</p>
               </div>
             </div>
           </CardHeader>
@@ -202,15 +202,15 @@ export default function OverviewPage() {
               <div className="w-48 h-48 rounded-full border-[16px] border-emerald-400 border-t-amber-400 border-r-rose-500 border-b-blue-400 flex items-center justify-center relative shadow-inner">
                 <div className="text-center">
                   <div className="text-3xl font-bold">108</div>
-                  <div className="text-xs text-muted-foreground">Có điểm</div>
+                  <div className="text-xs text-muted-foreground">{t("overview.graded")}</div>
                 </div>
               </div>
               <div className="flex gap-4 mt-6">
                 {[
-                  { label: "Giỏi", color: "bg-emerald-400", pct: "42%" },
-                  { label: "Khá", color: "bg-blue-400", pct: "28%" },
-                  { label: "TB", color: "bg-amber-400", pct: "20%" },
-                  { label: "Yếu", color: "bg-rose-500", pct: "10%" },
+                  { label: t("overview.excellent"), color: "bg-emerald-400", pct: "42%" },
+                  { label: t("overview.good"), color: "bg-blue-400", pct: "28%" },
+                  { label: t("overview.average"), color: "bg-amber-400", pct: "20%" },
+                  { label: t("overview.poor"), color: "bg-rose-500", pct: "10%" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-1.5 text-xs">
                     <div className={`w-2.5 h-2.5 rounded-full ${item.color}`}></div>

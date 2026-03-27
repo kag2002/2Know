@@ -80,6 +80,11 @@ func main() {
 	noteSvc := service.NewNoteService(noteRepo)
 	tagSvc := service.NewTagService(tagRepo)
 
+	// Seed Demo Account natively (suppress duplicate log by checking first)
+	if _, _, err := authSvc.Login("demo@2know.edu.vn", "demo123"); err != nil {
+		authSvc.Register("demo@2know.edu.vn", "demo123", "Giáo viên Demo")
+	}
+
 	// Initialize Handlers
 	authHandler := handler.NewAuthHandler(authSvc)
 	statsHandler := handler.NewStatsHandler(statsSvc)
