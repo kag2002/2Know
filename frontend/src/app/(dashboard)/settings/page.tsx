@@ -23,12 +23,12 @@ const themes = [
 
 export default function SettingsPage() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("account");
   const [saving, setSaving] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("indigo");
-  const [fullName, setFullName] = useState(user?.full_name || "");
+  const [fullName, setFullName] = useState(user?.name || "");
 
   const tabs = [
     { id: "account", label: "account", icon: User },
@@ -44,6 +44,7 @@ export default function SettingsPage() {
         method: "PATCH",
         body: JSON.stringify({ full_name: fullName }),
       });
+      updateUser({ name: fullName });
       toast.success(t("settings.account.save") + " ✓");
     } catch (err: any) {
       toast.error("Lỗi: " + err.message);
@@ -106,7 +107,7 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>{t("settings.account.fullName")}</Label>
-                      <Input defaultValue={user?.name || ""} className="h-10" />
+                      <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="h-10" />
                     </div>
                     <div className="space-y-2">
                       <Label>{t("settings.account.email")}</Label>
