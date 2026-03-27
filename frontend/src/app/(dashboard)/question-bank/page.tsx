@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+import { useTranslation } from "@/context/LanguageContext";
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -30,6 +31,7 @@ interface Question {
 }
 
 export default function QuestionBankPage() {
+  const { t } = useTranslation();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,19 +57,19 @@ export default function QuestionBankPage() {
       {/* Sidebar Filters */}
       <div className="w-64 shrink-0 flex flex-col gap-6 hidden md:flex h-full">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Ngân hàng</h1>
-          <p className="text-sm text-muted-foreground mt-1">Quản lý kho câu hỏi dùng chung</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("questionBank.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("questionBank.subtitle")}</p>
         </div>
 
         <Link href="/question-bank/create">
           <Button className="w-full justify-start gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm">
-            <Plus className="w-4 h-4" /> Soạn câu hỏi mới
+            <Plus className="w-4 h-4" /> {t("questionBank.addNew")}
           </Button>
         </Link>
         
         {/* Navigations/Folders */}
         <div className="space-y-1 overflow-y-auto flex-1 pr-2">
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-2">Thư mục môn học</div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-2">{t("questionBank.folders")}</div>
           {['Toán Đại Số 12', 'Hình Học Không Gian', 'Vật Lý Nâng Cao', 'Tiếng Anh B1'].map(folder => (
             <button key={folder} className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors text-left">
               <FolderCode className="w-4 h-4 text-slate-400" />
@@ -75,7 +77,7 @@ export default function QuestionBankPage() {
             </button>
           ))}
           
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-6 mb-3 px-2">Bộ lọc theo Nhãn (Tags)</div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-6 mb-3 px-2">{t("questionBank.tagFilter")}</div>
           <div className="flex flex-wrap gap-2 px-2">
             {['#kho', '#trung-binh', '#de', '#thi-thu', '#chuong1'].map(tag => (
               <span key={tag} className="inline-flex items-center px-2 py-1 bg-slate-100 hover:bg-accent text-muted-foreground text-[11px] font-semibold rounded-md cursor-pointer transition-colors">
@@ -94,13 +96,13 @@ export default function QuestionBankPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input 
               type="text"
-              placeholder="Tìm kiếm nội dung câu hỏi..." 
+              placeholder={t("questionBank.searchPlaceholder")} 
               className="w-full pl-9 h-10 border border-input rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" className="gap-2 bg-background">
-              <Filter className="w-4 h-4" /> Lọc
+              <Filter className="w-4 h-4" /> {t("filter")}
             </Button>
           </div>
         </div>
@@ -121,7 +123,7 @@ export default function QuestionBankPage() {
               ))}
             </div>
           ) : questions.length === 0 ? (
-             <div className="p-12 text-center text-muted-foreground">Không tìm thấy câu hỏi nào.</div>
+             <div className="p-12 text-center text-muted-foreground">{t("questionBank.noResults")}</div>
           ) : (
             <Table>
               <TableHeader className="bg-background sticky top-0 z-10 shadow-sm">
@@ -129,10 +131,10 @@ export default function QuestionBankPage() {
                   <TableHead className="w-[50px] text-center">
                     <input type="checkbox" className="rounded border-border" />
                   </TableHead>
-                  <TableHead className="w-[100px] font-semibold">Loại</TableHead>
-                  <TableHead className="font-semibold">Nội dung câu hỏi</TableHead>
-                  <TableHead className="font-semibold w-[150px]">Độ khó</TableHead>
-                  <TableHead className="font-semibold w-[120px]">Thư mục</TableHead>
+                  <TableHead className="w-[100px] font-semibold">{t("questionBank.type")}</TableHead>
+                  <TableHead className="font-semibold">{t("questionBank.content")}</TableHead>
+                  <TableHead className="font-semibold w-[150px]">{t("questionBank.difficulty")}</TableHead>
+                  <TableHead className="font-semibold w-[120px]">{t("questionBank.folder")}</TableHead>
                   <TableHead className="text-right w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -162,7 +164,7 @@ export default function QuestionBankPage() {
                         {q.difficulty}
                       </span>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">{q.folder || "Chưa phân loại"}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{q.folder || t("questionBank.uncategorized")}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger className="h-8 w-8 p-0 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground">
@@ -170,9 +172,9 @@ export default function QuestionBankPage() {
                           <MoreHorizontal className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                          <DropdownMenuItem>Tạo bản sao</DropdownMenuItem>
-                          <DropdownMenuItem className="text-rose-600">Xóa vĩnh viễn</DropdownMenuItem>
+                          <DropdownMenuItem>{t("edit")}</DropdownMenuItem>
+                          <DropdownMenuItem>{t("questionBank.clone")}</DropdownMenuItem>
+                          <DropdownMenuItem className="text-rose-600">{t("questionBank.deletePermanent")}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -185,7 +187,7 @@ export default function QuestionBankPage() {
         
         {/* Pagination Footer */}
         <div className="p-3 border-t bg-muted/50 flex items-center justify-between text-xs text-muted-foreground">
-          <div>Hiển thị <span className="font-medium text-foreground">{questions.length}</span> câu hỏi</div>
+          <div>{t("questionBank.showing")} <span className="font-medium text-foreground">{questions.length}</span> {t("questionBank.questions")}</div>
         </div>
       </div>
     </div>
