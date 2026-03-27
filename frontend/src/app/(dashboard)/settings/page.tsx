@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { User, Palette, Shield, Bell, Save, Loader2, Moon, Sun, Monitor, Check, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 import { useTranslation } from "@/context/LanguageContext";
 
 const themes = [
@@ -27,6 +28,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("account");
   const [saving, setSaving] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("indigo");
+  const [fullName, setFullName] = useState(user?.full_name || "");
 
   const tabs = [
     { id: "account", label: "account", icon: User },
@@ -35,12 +37,19 @@ export default function SettingsPage() {
     { id: "notifications", label: "notifications", icon: Bell },
   ];
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
-    setTimeout(() => {
+    try {
+      await apiFetch("/users/me", {
+        method: "PATCH",
+        body: JSON.stringify({ full_name: fullName }),
+      });
+      toast.success(t("settings.account.save") + " ✓");
+    } catch (err: any) {
+      toast.error("Lỗi: " + err.message);
+    } finally {
       setSaving(false);
-      toast.info("Tính năng lưu sẽ hoạt động sau khi kết nối API Profile.");
-    }, 500);
+    }
   };
 
   return (

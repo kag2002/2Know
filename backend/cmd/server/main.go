@@ -153,6 +153,12 @@ func main() {
 	// Grading endpoints
 	api.Get("/grading/pending", resultHandler.GetPendingGradings)
 
+	// User Profile endpoints
+	userHandler := handler.NewUserHandler(userRepo)
+	api.Get("/users/me", userHandler.GetProfile)
+	api.Patch("/users/me", userHandler.UpdateProfile)
+	api.Patch("/users/me/password", userHandler.ChangePassword)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
