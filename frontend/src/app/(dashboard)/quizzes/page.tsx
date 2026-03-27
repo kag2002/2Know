@@ -13,6 +13,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface Quiz {
   id: string;
@@ -27,6 +36,9 @@ export default function QuizzesPage() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
 
   useEffect(() => {
     loadQuizzes();
@@ -50,6 +62,27 @@ export default function QuizzesPage() {
       case 'draft': return <span className="px-2 py-1 bg-slate-100 text-muted-foreground rounded-md text-xs font-medium">{t("quizzes.statusDraft")}</span>;
       case 'closed': return <span className="px-2 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-md text-xs font-medium">{t("quizzes.statusClosed")}</span>;
       default: return null;
+    }
+  };
+
+  const handleEditQuiz = async () => {
+    if (!editingQuiz || !editingQuiz.title || !editingQuiz.subject) {
+      toast.warning("Vui lòng nhập tên và môn học bài kiểm tra!");
+      return;
+    }
+    try {
+      await apiFetch(`/quizzes/${editingQuiz.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          title: editingQuiz.title,
+          subject: editingQuiz.subject
+        })
+      });
+      toast.success("Cập nhật bài kiểm tra thành công!");
+      setIsEditDialogOpen(false);
+      loadQuizzes();
+    } catch {
+      toast.error("Lỗi cập nhật bài kiểm tra");
     }
   };
 
@@ -138,7 +171,7 @@ export default function QuizzesPage() {
                     </Button>
                   )}
                   {quiz.status === 'draft' && (
-                    <Button variant="outline" size="sm" className="gap-2 text-muted-foreground w-full sm:w-auto">
+                    <Button variant="outline" size="sm" className="gap-2 text-muted-foreground w-full sm:w-auto" onClick={() => window.location.href = `/quizzes/create?edit=${quiz.id}`}>
                       <Edit2 className="w-4 h-4" /> {t("quizzes.continueDraft")}
                     </Button>
                   )}
@@ -149,6 +182,9 @@ export default function QuizzesPage() {
                       <MoreHorizontal className="w-4 h-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem className="gap-2" onClick={() => { setEditingQuiz(quiz); setIsEditDialogOpen(true); }}>
+                        <Edit2 className="w-4 h-4 text-slate-400"/> Cài đặt bài kiểm tra
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="gap-2" onClick={async () => {
                         try {
                           await apiFetch('/quizzes', { method: 'POST', body: JSON.stringify({ title: quiz.title + ' (Copy)', subject: quiz.subject, status: 'draft' }) });
@@ -173,6 +209,40 @@ export default function QuizzesPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Quiz Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Cài đặt bài kiểm tra</DialogTitle>
+            <DialogDescription>Thay đổi thông tin cơ bản của bài kiểm tra.</DialogDescription>
+          </DialogHeader>
+          {editingQuiz && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-q-title">Tên bài kiểm tra</Label>
+                <Input 
+                  id="edit-q-title" 
+                  value={editingQuiz.title} 
+                  onChange={(e) => setEditingQuiz({...editingQuiz, title: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-q-subject">Môn học</Label>
+                <Input 
+                  id="edit-q-subject" 
+                  value={editingQuiz.subject} 
+                  onChange={(e) => setEditingQuiz({...editingQuiz, subject: e.target.value})} 
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditQuiz} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

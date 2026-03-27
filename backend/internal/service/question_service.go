@@ -9,6 +9,7 @@ type QuestionService interface {
 	GetQuestions() ([]model.Question, error)
 	CreateQuestion(teacherID string, question *model.Question) error
 	GetQuizQuestions(teacherID, quizID string) ([]model.Question, error)
+	UpdateQuestion(teacherID, questionID string, params map[string]interface{}) error
 	DeleteQuestion(teacherID, questionID string) error
 }
 
@@ -47,9 +48,26 @@ func (s *questionService) DeleteQuestion(teacherID, questionID string) error {
 		return err
 	}
 
-	if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
-		return err
+	if question.QuizID != "" {
+		if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
+			return err
+		}
 	}
 
 	return s.repo.DeleteQuestion(question)
+}
+
+func (s *questionService) UpdateQuestion(teacherID, questionID string, params map[string]interface{}) error {
+	question, err := s.repo.GetQuestionByID(questionID)
+	if err != nil {
+		return err
+	}
+
+	if question.QuizID != "" {
+		if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
+			return err
+		}
+	}
+
+	return s.repo.UpdateQuestion(questionID, params)
 }

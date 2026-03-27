@@ -124,6 +124,7 @@ func main() {
 	api.Get("/quizzes", quizHandler.GetQuizzes)
 	api.Post("/quizzes", quizHandler.CreateQuiz)
 	api.Get("/quizzes/:id", quizHandler.GetQuizByID)
+	api.Patch("/quizzes/:id", quizHandler.UpdateQuiz)
 	api.Delete("/quizzes/:id", quizHandler.DeleteQuiz)
 
 	// Results analytics endpoints (Teacher)
@@ -136,6 +137,7 @@ func main() {
 	api.Get("/quizzes/:quizId/questions", questionHandler.GetQuizQuestions)
 	api.Get("/questions", questionHandler.GetQuestions)
 	api.Post("/questions", questionHandler.CreateQuestion)
+	api.Patch("/questions/:id", questionHandler.UpdateQuestion)
 	api.Delete("/questions/:id", questionHandler.DeleteQuestion)
 
 	// Class & Student endpoints
@@ -157,6 +159,7 @@ func main() {
 	api.Post("/notes", noteHandler.CreateNote)
 	api.Delete("/notes/:id", noteHandler.DeleteNote)
 	api.Patch("/notes/:id/pin", noteHandler.TogglePin)
+	api.Patch("/notes/:id", noteHandler.UpdateNote)
 
 	api.Get("/tags", tagHandler.GetTags)
 	api.Post("/tags", tagHandler.CreateTag)

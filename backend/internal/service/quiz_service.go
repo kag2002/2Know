@@ -10,6 +10,7 @@ type QuizService interface {
 	GetQuizzes(teacherID string) ([]model.Quiz, error)
 	GetQuizByID(id, teacherID string) (*model.Quiz, error)
 	GetPublicQuizByID(id string) (*model.Quiz, error)
+	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
 	DeleteQuiz(id, teacherID string) error
 }
 
@@ -52,4 +53,8 @@ func (s *quizService) GetPublicQuizByID(id string) (*model.Quiz, error) {
 
 func (s *quizService) DeleteQuiz(id, teacherID string) error {
 	return s.repo.DeleteQuiz(id, teacherID)
+}
+
+func (s *quizService) UpdateQuiz(id string, teacherID string, params map[string]interface{}) error {
+	return s.repo.UpdateQuiz(id, teacherID, params)
 }

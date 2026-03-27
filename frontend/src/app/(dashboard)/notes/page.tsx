@@ -11,6 +11,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiFetch } from "@/lib/api";
 import { useTranslation } from "@/context/LanguageContext";
 
@@ -24,6 +33,9 @@ export default function NotesPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingNote, setEditingNote] = useState<any>(null);
 
   const loadNotes = async () => {
     try {
@@ -83,6 +95,28 @@ export default function NotesPage() {
       toast.success(t("notes.pinSuccess"));
     } catch (err) {
       toast.error("Lỗi ghim ghi chú.");
+    }
+  };
+
+  const handleUpdateNote = async () => {
+    if (!editingNote || !editingNote.title.trim() || !editingNote.content.trim()) {
+      toast.error(t("notes.required"));
+      return;
+    }
+    try {
+      await apiFetch(`/notes/${editingNote.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          title: editingNote.title,
+          content: editingNote.content
+        })
+      });
+      setNotes(notes.map(n => n.id === editingNote.id ? { ...n, title: editingNote.title, content: editingNote.content } : n));
+      setIsEditing(false);
+      setEditingNote(null);
+      toast.success("Cập nhật ghi chú thành công!");
+    } catch (err) {
+      toast.error("Lỗi cập nhật ghi chú.");
     }
   };
 
@@ -153,7 +187,7 @@ export default function NotesPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pinned.map(note => (
-              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} t={t} />
+              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} onEdit={(n) => { setEditingNote(n); setIsEditing(true); }} t={t} />
             ))}
           </div>
         </>
@@ -166,16 +200,51 @@ export default function NotesPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {unpinned.map(note => (
-              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} t={t} />
+              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} onEdit={(n) => { setEditingNote(n); setIsEditing(true); }} t={t} />
             ))}
           </div>
         </>
       )}
+
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa ghi chú</DialogTitle>
+            <DialogDescription>Cập nhật nội dung ghi chú cá nhân của bạn.</DialogDescription>
+          </DialogHeader>
+          {editingNote && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-note-title">Tiêu đề</Label>
+                <input 
+                  id="edit-note-title"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" 
+                  value={editingNote.title}
+                  onChange={(e) => setEditingNote({...editingNote, title: e.target.value})}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-note-content">Nội dung</Label>
+                <textarea 
+                  id="edit-note-content"
+                  className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={editingNote.content}
+                  onChange={(e) => setEditingNote({...editingNote, content: e.target.value})}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditing(false)}>{t("notes.cancel") || "Hủy"}</Button>
+            <Button onClick={handleUpdateNote} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("notes.save") || "Lưu"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function NoteCard({ note, onDelete, onTogglePin, t }: { note: any; onDelete: (id: string) => void; onTogglePin: (id: string) => void; t: any }) {
+function NoteCard({ note, onDelete, onTogglePin, onEdit, t }: { note: any; onDelete: (id: string) => void; onTogglePin: (id: string) => void; onEdit: (note: any) => void; t: any }) {
   return (
     <Card className={`shadow-sm hover:shadow-md transition-all border ${note.color} group`}>
       <CardHeader className="flex flex-row items-start justify-between pb-2">
@@ -192,6 +261,9 @@ function NoteCard({ note, onDelete, onTogglePin, t }: { note: any; onDelete: (id
           <DropdownMenuContent align="end">
             <DropdownMenuItem className="gap-2" onClick={() => onTogglePin(note.id)}>
               <Pin className="w-4 h-4" /> {note.pinned ? t("notes.unpin") : t("notes.pin")}
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-2" onClick={() => onEdit(note)}>
+              <Edit2 className="w-4 h-4" /> Chỉnh sửa
             </DropdownMenuItem>
             <DropdownMenuItem className="gap-2 text-destructive" onClick={() => onDelete(note.id)}>
               <Trash2 className="w-4 h-4" /> {t("notes.delete")}

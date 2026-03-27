@@ -11,6 +11,7 @@ type QuestionRepository interface {
 	GetQuizQuestions(quizID string) ([]model.Question, error)
 	GetQuestionByID(id string) (*model.Question, error)
 	CreateQuestion(question *model.Question) error
+	UpdateQuestion(id string, params map[string]interface{}) error
 	DeleteQuestion(question *model.Question) error
 	VerifyQuizOwnership(quizID, teacherID string) error
 }
@@ -50,6 +51,10 @@ func (r *questionRepository) CreateQuestion(question *model.Question) error {
 
 func (r *questionRepository) DeleteQuestion(question *model.Question) error {
 	return r.db.Delete(question).Error
+}
+
+func (r *questionRepository) UpdateQuestion(id string, params map[string]interface{}) error {
+	return r.db.Model(&model.Question{}).Where("id = ?", id).Updates(params).Error
 }
 
 func (r *questionRepository) VerifyQuizOwnership(quizID, teacherID string) error {

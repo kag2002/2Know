@@ -66,3 +66,22 @@ func (h *QuestionHandler) DeleteQuestion(c fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusNoContent)
 }
+
+func (h *QuestionHandler) UpdateQuestion(c fiber.Ctx) error {
+	questionId := c.Params("id")
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	var params map[string]interface{}
+	if err := c.Bind().JSON(&params); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := h.svc.UpdateQuestion(userId, questionId, params); err != nil {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Failed to update question or unauthorized"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Question updated successfully"})
+}

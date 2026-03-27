@@ -21,6 +21,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface Question {
   id: string;
@@ -36,6 +46,9 @@ export default function QuestionBankPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+
   useEffect(() => {
     loadQuestions();
   }, []);
@@ -49,6 +62,28 @@ export default function QuestionBankPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditQuestion = async () => {
+    if (!editingQuestion || !editingQuestion.content) {
+      toast.warning("Nội dung câu hỏi không được để trống!");
+      return;
+    }
+    try {
+      await apiFetch(`/questions/${editingQuestion.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          content: editingQuestion.content,
+          difficulty: editingQuestion.difficulty,
+          folder: editingQuestion.folder
+        })
+      });
+      toast.success("Cập nhật câu hỏi thành công!");
+      setIsEditDialogOpen(false);
+      loadQuestions();
+    } catch {
+      toast.error("Lỗi khi cập nhật câu hỏi");
     }
   };
 
@@ -173,7 +208,7 @@ export default function QuestionBankPage() {
                           <MoreHorizontal className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => window.location.href = '/question-bank/create'}>{t("edit")}</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => { setEditingQuestion(q); setIsEditDialogOpen(true); }}>{t("edit")}</DropdownMenuItem>
                           <DropdownMenuItem onClick={async () => {
                             try {
                               await apiFetch('/questions', { method: 'POST', body: JSON.stringify({ content: q.content + ' (Copy)', type: q.type, quiz_id: q.id }) });
@@ -204,6 +239,55 @@ export default function QuestionBankPage() {
           <div>{t("questionBank.showing")} <span className="font-medium text-foreground">{questions.length}</span> {t("questionBank.questions")}</div>
         </div>
       </div>
+
+      {/* Edit Question Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa câu hỏi</DialogTitle>
+            <DialogDescription>Chỉnh sửa nội dung và phân loại của câu hỏi trong ngân hàng.</DialogDescription>
+          </DialogHeader>
+          {editingQuestion && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-q-content">Nội dung câu hỏi</Label>
+                <textarea 
+                  id="edit-q-content" 
+                  value={editingQuestion.content} 
+                  onChange={(e) => setEditingQuestion({...editingQuestion, content: e.target.value})} 
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-q-difficulty">Độ khó</Label>
+                <select 
+                  id="edit-q-difficulty" 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={editingQuestion.difficulty} 
+                  onChange={(e) => setEditingQuestion({...editingQuestion, difficulty: e.target.value})}
+                >
+                  <option value="Dễ">Dễ</option>
+                  <option value="Trung bình">Trung bình</option>
+                  <option value="Khó">Khó</option>
+                </select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-q-folder">Thư mục / Chuyên đề</Label>
+                <Input 
+                  id="edit-q-folder" 
+                  value={editingQuestion.folder || ''} 
+                  onChange={(e) => setEditingQuestion({...editingQuestion, folder: e.target.value})} 
+                  placeholder="VD: Toán học cơ bản"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditQuestion} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

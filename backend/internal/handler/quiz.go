@@ -79,8 +79,30 @@ func (h *QuizHandler) DeleteQuiz(c fiber.Ctx) error {
 	if userId == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
+
 	if err := h.svc.DeleteQuiz(id, userId); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete quiz"})
 	}
-	return c.JSON(fiber.Map{"message": "Quiz deleted"})
+
+	return c.JSON(fiber.Map{"message": "Quiz successfully deleted"})
+}
+
+func (h *QuizHandler) UpdateQuiz(c fiber.Ctx) error {
+	id := c.Params("id")
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	var params map[string]interface{}
+	if err := c.Bind().JSON(&params); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := h.svc.UpdateQuiz(id, userId, params); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update quiz"})
+	}
+
+	// Just return success message, the frontend reloads the list anyway
+	return c.JSON(fiber.Map{"message": "Quiz updated successfully"})
 }

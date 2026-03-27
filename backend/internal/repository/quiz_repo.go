@@ -11,6 +11,7 @@ type QuizRepository interface {
 	GetQuizzes(teacherID string) ([]model.Quiz, error)
 	GetQuizByID(id, teacherID string) (*model.Quiz, error)
 	GetPublicQuizByID(id string) (*model.Quiz, error)
+	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
 	DeleteQuiz(id, teacherID string) error
 }
 
@@ -62,4 +63,8 @@ func (r *quizRepository) GetPublicQuizByID(id string) (*model.Quiz, error) {
 
 func (r *quizRepository) DeleteQuiz(id, teacherID string) error {
 	return r.db.Where("id = ? AND teacher_id = ?", id, teacherID).Delete(&model.Quiz{}).Error
+}
+
+func (r *quizRepository) UpdateQuiz(id string, teacherID string, params map[string]interface{}) error {
+	return r.db.Model(&model.Quiz{}).Where("id = ? AND teacher_id = ?", id, teacherID).Updates(params).Error
 }

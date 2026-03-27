@@ -10,6 +10,7 @@ type NoteRepository interface {
 	GetNotes(userID string) ([]model.Note, error)
 	CreateNote(note *model.Note) error
 	UpdateNote(note *model.Note) error
+	UpdateNoteContent(id, userID string, params map[string]interface{}) error
 	DeleteNote(id, userID string) error
 	GetNoteByID(id, userID string) (*model.Note, error)
 }
@@ -34,6 +35,10 @@ func (r *noteRepository) CreateNote(note *model.Note) error {
 
 func (r *noteRepository) UpdateNote(note *model.Note) error {
 	return r.db.Save(note).Error
+}
+
+func (r *noteRepository) UpdateNoteContent(id, userID string, params map[string]interface{}) error {
+	return r.db.Model(&model.Note{}).Where("id = ? AND user_id = ?", id, userID).Updates(params).Error
 }
 
 func (r *noteRepository) DeleteNote(id, userID string) error {

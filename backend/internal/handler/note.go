@@ -63,6 +63,26 @@ func (h *NoteHandler) DeleteNote(c fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
+func (h *NoteHandler) UpdateNote(c fiber.Ctx) error {
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	id := c.Params("id")
+	
+	var params map[string]interface{}
+	if err := c.Bind().JSON(&params); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := h.svc.UpdateNoteContent(id, userId, params); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update note"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Note updated successfully"})
+}
+
 func (h *NoteHandler) TogglePin(c fiber.Ctx) error {
 	userId := getUserIdFromToken(c)
 	if userId == "" {
