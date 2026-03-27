@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useTranslation } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -31,7 +33,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (searchParams.get("registered") === "success") {
-      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      toast.success(t("auth.registerSuccess"));
     }
   }, [searchParams]);
 
@@ -47,10 +49,10 @@ function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
       login(data.token, data.user);
-      toast.success("Đăng nhập thành công!");
+      toast.success(t("auth.loginSuccess"));
     } catch (err: any) {
       setError(err.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
-      toast.error("Đăng nhập thất bại!");
+      toast.error(t("auth.loginError"));
     } finally {
       setIsLoading(false);
     }

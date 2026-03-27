@@ -75,7 +75,7 @@ export default function RubricsPage() {
           criteria_count: 3
         })
       });
-      toast.success("Đã tạo Rubric mới!");
+      toast.success(t("rubrics.createSuccess"));
       loadRubrics();
     } catch {
       toast.error("Lỗi tạo Rubric");
@@ -117,7 +117,7 @@ export default function RubricsPage() {
             <p className="text-xs font-medium text-muted-foreground uppercase mt-1">{t("rubrics.usageCount")}</p>
           </CardContent>
         </Card>
-        <Card className="shadow-sm border-dashed bg-muted/30 flex items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => toast.success("Đã mở thư viện mẫu!")}>
+        <Card className="shadow-sm border-dashed bg-muted/30 flex items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => toast.success(t("rubrics.exploreLibrarySuccess"))}>
           <CardContent className="pt-6 flex flex-col items-center justify-center text-center">
             <div className="p-3 bg-card rounded-full shadow-sm mb-2"><Plus className="w-4 h-4 text-indigo-500" /></div>
             <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{t("rubrics.exploreLibrary")}</p>

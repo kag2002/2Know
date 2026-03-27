@@ -10,7 +10,7 @@ export type Language = "vi" | "en" | "it";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const dictionaries: Record<Language, Record<string, string>> = {
@@ -22,7 +22,15 @@ const dictionaries: Record<Language, Record<string, string>> = {
 const LanguageContext = createContext<LanguageContextType>({
   language: "vi",
   setLanguage: () => {},
-  t: (key) => key,
+  t: (key, params) => {
+    let str = key;
+    if (params) {
+      Object.keys(params).forEach(k => {
+        str = str.replace(new RegExp(`{{${k}}}`, 'g'), String(params[k]));
+      });
+    }
+    return str;
+  },
 });
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -40,9 +48,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("2know-lang", lang);
   };
 
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const dict = dictionaries[language];
-    return dict[key] || dictionaries["vi"][key] || key;
+    let str = dict[key] || dictionaries["vi"][key] || key;
+    if (params) {
+      Object.keys(params).forEach(k => {
+        str = str.replace(new RegExp(`{{${k}}}`, 'g'), String(params[k]));
+      });
+    }
+    return str;
   };
 
   return (

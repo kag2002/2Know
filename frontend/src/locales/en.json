@@ -427,5 +427,36 @@
   "common.filter": "Filter",
   "common.edit": "Edit",
   "common.delete": "Delete",
-  "common.loading": "Loading data..."
+  "common.loading": "Loading data...",
+
+  "auth.registerSuccess": "Registration successful! Please log in.",
+  "auth.loginSuccess": "Login successful!",
+  "auth.loginError": "Login failed!",
+
+  "rubrics.createSuccess": "Rubric created!",
+  "rubrics.exploreLibrarySuccess": "Library opened!",
+  "omr.createSuccess": "Grading batch created!",
+
+  "classDetail.deleteStudentSuccess": "Student removed",
+  "classDetail.confirmDeleteStudent": "Are you sure you want to remove this student from the class?",
+  "classDetail.deleteStudentError": "Failed to remove student",
+
+  "quizCreate.alertNoLink": "This link is only available after publishing!",
+
+  "quizGenerate.promptRequired": "Please enter a topic to generate questions.",
+  "quizGenerate.alertInvalidFormat": "Error: Invalid question format received from AI.",
+  "quizGenerate.alertNetworkError": "AI connection error: ",
+  "quizGenerate.alertAddSuccess": "Added {{count}} questions to Bank!",
+
+  "questionBank.alertContentRequired": "Please enter question content!",
+  "questionBank.alertSaveSuccess": "Question saved successfully!",
+  "questionBank.alertSaveError": "Error saving question: ",
+
+  "studentProfile.notFound": "Student profile not found.",
+  "studentProfile.title": "Student Profile",
+  "studentProfile.studentId": "Student ID",
+  "studentProfile.personalInfo": "Personal Information",
+  "studentProfile.notUpdated": "Not updated",
+  "studentProfile.studyHistory": "Study History",
+  "studentProfile.loadingHistory": "Loading student history..."
 }

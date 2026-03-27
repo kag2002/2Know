@@ -72,7 +72,7 @@ export default function OmrPage() {
           template: "Mẫu 50 câu (A4)"
         })
       });
-      toast.success("Đã tạo đợt chấm mới!");
+      toast.success(t("omr.createSuccess"));
       loadBatches();
     } catch {
       toast.error("Lỗi tạo đợt chấm");

@@ -23,6 +23,7 @@ const steps = [
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "@/context/LanguageContext";
+import { toast } from "sonner";
 
 export default function QuizBuilderWizard() {
   const { t } = useTranslation();
@@ -453,8 +454,9 @@ export default function QuizBuilderWizard() {
                             <Button
                               variant="outline"
                               className="gap-2 shrink-0"
-                              onClick={() => {
-                                alert("Đường dẫn này chỉ lấy được sau khi xuất bản!");
+                              onClick={(e) => {
+                                e.preventDefault();
+                                toast.info(t("quizCreate.alertNoLink"));
                               }}
                             >
                               <LinkIcon className="w-4 h-4" /> Sao chép

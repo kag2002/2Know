@@ -18,16 +18,19 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function AIGeneratorPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedQuestions, setGeneratedQuestions] = useState<any[]>([]);
   const [generationSteps, setGenerationSteps] = useState<string[]>([]);
   
   const generateQuiz = async () => {
-    if (!prompt.trim()) return alert("Vui lòng nhập chủ đề bạn muốn tạo câu hỏi.");
+    if (!prompt.trim()) return toast.warning(t("quizGenerate.promptRequired"));
     
     setIsGenerating(true);
     setGeneratedQuestions([]);
@@ -60,17 +63,17 @@ export default function AIGeneratorPage() {
             }));
             setGeneratedQuestions(formatted);
         } else {
-            alert("Lỗi: Không nhận được định dạng câu hỏi hợp lệ từ AI.");
+            toast.error(t("quizGenerate.alertInvalidFormat"));
         }
     } catch (err: any) {
-        alert("Lỗi khi kết nối tới AI: " + (err.message || "Unknown error"));
+        toast.error(t("quizGenerate.alertNetworkError") + (err.message || "Unknown error"));
     } finally {
         setIsGenerating(false);
     }
   };
 
   const handleSaveToBank = () => {
-    alert("Đã thêm " + generatedQuestions.length + " câu hỏi vào Ngân Hàng!");
+    toast.success(t("quizGenerate.alertAddSuccess", { count: generatedQuestions.length }));
     router.push("/question-bank");
   };
 

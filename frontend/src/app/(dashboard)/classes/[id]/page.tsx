@@ -173,12 +173,12 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => window.location.href = `/students/${student.id}`}>{t("classDetail.viewProfile")}</DropdownMenuItem>
                           <DropdownMenuItem className="text-rose-600" onClick={async () => {
-                            if (!confirm("Bạn có chắc muốn xóa học sinh này khỏi lớp?")) return;
+                            if (!confirm(t("classDetail.confirmDeleteStudent"))) return;
                             try {
                               await apiFetch(`/students/${student.id}`, { method: 'DELETE' });
                               setClassData({ ...classData, students: classData.students.filter(s => s.id !== student.id) });
-                              toast.success("Đã xóa học sinh");
-                            } catch { toast.error("Lỗi xóa học sinh") }
+                              toast.success(t("classDetail.deleteStudentSuccess"));
+                            } catch { toast.error(t("classDetail.deleteStudentError")) }
                           }}>{t("classDetail.removeFromClass")}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

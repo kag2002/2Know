@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
+import { useTranslation } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +16,7 @@ import Link from "next/link";
 
 export default function CreateQuestionPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [qType, setQType] = useState("multiple_choice");
   const [content, setContent] = useState("");
   const [options, setOptions] = useState([
@@ -31,7 +34,7 @@ export default function CreateQuestionPage() {
   };
 
   const handleSave = async () => {
-    if (!content.trim()) return alert("Vui lòng nhập nội dung câu hỏi!");
+    if (!content.trim()) return toast.warning(t("questionBank.alertContentRequired"));
     setIsSaving(true);
     try {
       await apiFetch("/questions", {
@@ -44,10 +47,10 @@ export default function CreateQuestionPage() {
           options: options.map(o => ({ content: o.text, is_correct: o.isCorrect }))
         })
       });
-      alert("Đã lưu câu hỏi thành công!");
+      toast.success(t("questionBank.alertSaveSuccess"));
       router.push("/question-bank");
     } catch (err: any) {
-      alert("Lỗi khi lưu câu hỏi: " + err.message);
+      toast.error(t("questionBank.alertSaveError") + err.message);
     } finally {
       setIsSaving(false);
     }

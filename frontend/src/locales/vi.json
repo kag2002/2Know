@@ -427,5 +427,36 @@
   "common.filter": "Lọc",
   "common.edit": "Chỉnh sửa",
   "common.delete": "Xóa",
-  "common.loading": "Đang tải dữ liệu..."
+  "common.loading": "Đang tải dữ liệu...",
+
+  "auth.registerSuccess": "Đăng ký thành công! Vui lòng đăng nhập.",
+  "auth.loginSuccess": "Đăng nhập thành công!",
+  "auth.loginError": "Đăng nhập thất bại!",
+
+  "rubrics.createSuccess": "Đã tạo Rubric mới!",
+  "rubrics.exploreLibrarySuccess": "Đã mở thư viện mẫu!",
+  "omr.createSuccess": "Đã tạo đợt chấm mới!",
+
+  "classDetail.deleteStudentSuccess": "Đã xóa học sinh",
+  "classDetail.confirmDeleteStudent": "Bạn có chắc muốn xóa học sinh này khỏi lớp?",
+  "classDetail.deleteStudentError": "Lỗi xóa học sinh",
+
+  "quizCreate.alertNoLink": "Đường dẫn này chỉ lấy được sau khi xuất bản!",
+
+  "quizGenerate.promptRequired": "Vui lòng nhập chủ đề bạn muốn tạo câu hỏi.",
+  "quizGenerate.alertInvalidFormat": "Lỗi: Không nhận được định dạng câu hỏi hợp lệ từ AI.",
+  "quizGenerate.alertNetworkError": "Lỗi khi kết nối tới AI: ",
+  "quizGenerate.alertAddSuccess": "Đã thêm {{count}} câu hỏi vào Ngân Hàng!",
+
+  "questionBank.alertContentRequired": "Vui lòng nhập nội dung câu hỏi!",
+  "questionBank.alertSaveSuccess": "Đã lưu câu hỏi thành công!",
+  "questionBank.alertSaveError": "Lỗi khi lưu câu hỏi: ",
+
+  "studentProfile.notFound": "Không tìm thấy hồ sơ học sinh.",
+  "studentProfile.title": "Hồ sơ học sinh",
+  "studentProfile.studentId": "Mã HS",
+  "studentProfile.personalInfo": "Thông tin cá nhân",
+  "studentProfile.notUpdated": "Chưa cập nhật",
+  "studentProfile.studyHistory": "Lịch sử học tập",
+  "studentProfile.loadingHistory": "Đang tải lịch sử thi của học sinh..."
 }
