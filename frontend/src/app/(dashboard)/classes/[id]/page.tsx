@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Users, BarChart3, Mail, Search, MoreVertical, TrendingUp, Award, Loader2 } from "lucide-react";
+import { ArrowLeft, Users, BarChart3, Mail, Search, MoreVertical, TrendingUp, Award, Loader2, Plus } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import {
@@ -12,6 +12,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/context/LanguageContext";
 import { toast } from "sonner";
 
@@ -39,6 +49,15 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
   const [classData, setClassData] = useState<ClassData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Invite Student State
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [newStudent, setNewStudent] = useState({ full_name: "", email: "", student_id: "" });
+  const [isInviting, setIsInviting] = useState(false);
+
+  // Edit Class State
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingClass, setEditingClass] = useState<any>(null);
+
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -54,6 +73,56 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
     };
     fetchClassData();
   }, [id]);
+
+  const handleInviteStudent = async () => {
+    if (!newStudent.full_name || !newStudent.student_id) {
+      toast.warning(t("students.alertNameEmail"));
+      return;
+    }
+    setIsInviting(true);
+    try {
+      const created = await apiFetch("/students", {
+        method: "POST",
+        body: JSON.stringify({
+          full_name: newStudent.full_name,
+          email: newStudent.email,
+          student_id: newStudent.student_id,
+          class_id: id
+        })
+      });
+      if (classData) setClassData({ ...classData, students: [created, ...classData.students] });
+      setIsInviteDialogOpen(false);
+      setNewStudent({ full_name: "", email: "", student_id: "" });
+      toast.success(t("classDetail.inviteSuccess") || "Đã thêm học sinh vào lớp");
+    } catch {
+      toast.error(t("classDetail.inviteError") || "Lỗi khi thêm học sinh");
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const handleEditClass = async () => {
+    if (!editingClass || !editingClass.name) {
+      toast.warning("Tên lớp không được để trống!");
+      return;
+    }
+    try {
+      await apiFetch(`/classes/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: editingClass.name,
+          grade: editingClass.grade,
+          subject: editingClass.subject,
+          school_year: editingClass.school_year
+        })
+      });
+      setClassData({ ...classData, ...editingClass });
+      setIsEditDialogOpen(false);
+      toast.success(t("classes.updateSuccess"));
+    } catch {
+      toast.error(t("classes.updateError"));
+    }
+  };
 
   if (loading) {
     return (
@@ -89,8 +158,14 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
           <h1 className="text-3xl font-bold tracking-tight text-foreground">{name}</h1>
           <p className="text-muted-foreground mt-1">{subject || t("classDetail.noSubject")} • {grade || t("classDetail.noGrade")} • {t("classDetail.schoolYear")} {school_year || "---"}</p>
         </div>
-        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
-          <Mail className="w-4 h-4" /> {t("classDetail.invite")}
+        <Button variant="outline" className="gap-2 bg-background" onClick={() => {
+          setEditingClass({ name, subject, grade, school_year });
+          setIsEditDialogOpen(true);
+        }}>
+          Chỉnh sửa thông tin
+        </Button>
+        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => setIsInviteDialogOpen(true)}>
+          <Plus className="w-4 h-4" /> Thêm học sinh
         </Button>
       </div>
 
@@ -198,6 +273,94 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         </CardContent>
       </Card>
+
+      {/* Invite Student Dialog */}
+      <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Thêm học sinh mới</DialogTitle>
+            <DialogDescription>Học sinh sẽ được thêm trực tiếp vào danh sách lớp {classData.name}.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="sbd">Mã học sinh (SBD) <span className="text-rose-500">*</span></Label>
+              <Input 
+                id="sbd" 
+                placeholder="VD: HS001" 
+                value={newStudent.student_id} 
+                onChange={(e) => setNewStudent({...newStudent, student_id: e.target.value})} 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="fullname">Họ và Tên <span className="text-rose-500">*</span></Label>
+              <Input 
+                id="fullname" 
+                placeholder="VD: Nguyễn Văn A" 
+                value={newStudent.full_name} 
+                onChange={(e) => setNewStudent({...newStudent, full_name: e.target.value})} 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email liên hệ (Tùy chọn)</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="VD: hs001@school.edu.vn" 
+                value={newStudent.email} 
+                onChange={(e) => setNewStudent({...newStudent, email: e.target.value})} 
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleInviteStudent} disabled={isInviting} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {isInviting ? "Đang thêm..." : "Xác nhận thêm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Class Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{t("classes.editInfo")}</DialogTitle>
+            <DialogDescription>{t("classes.createDesc")}</DialogDescription>
+          </DialogHeader>
+          {editingClass && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-name">Tên lớp học <span className="text-rose-500">*</span></Label>
+                <Input 
+                  id="edit-name" 
+                  value={editingClass.name} 
+                  onChange={(e) => setEditingClass({...editingClass, name: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-grade">Khối / Năm học</Label>
+                <Input 
+                  id="edit-grade" 
+                  value={editingClass.grade} 
+                  onChange={(e) => setEditingClass({...editingClass, grade: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject">Môn học phụ trách</Label>
+                <Input 
+                  id="edit-subject" 
+                  value={editingClass.subject} 
+                  onChange={(e) => setEditingClass({...editingClass, subject: e.target.value})} 
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
