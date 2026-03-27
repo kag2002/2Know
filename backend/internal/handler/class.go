@@ -83,3 +83,16 @@ func (h *ClassHandler) AddStudent(c fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(student)
 }
+
+// DELETE Class
+func (h *ClassHandler) DeleteClass(c fiber.Ctx) error {
+	id := c.Params("id")
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+	if err := h.svc.DeleteClass(id, userId); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete class"})
+	}
+	return c.JSON(fiber.Map{"message": "Class deleted"})
+}

@@ -408,6 +408,22 @@
   "quizCreate.alertNoQuestions": "Vui lòng thêm ít nhất một câu hỏi trước khi xuất bản.",
   "quizCreate.saveError": "Lỗi lưu bài kiểm tra: ",
 
+  "quizzes.duplicateSuccess": "Đã nhân bản đề thi!",
+  "quizzes.duplicateError": "Lỗi nhân bản đề thi.",
+  "quizzes.confirmDelete": "Bạn có chắc muốn xóa đề thi này?",
+  "quizzes.deleteSuccess": "Đã xóa đề thi!",
+  "quizzes.deleteError": "Lỗi xóa đề thi.",
+
+  "classes.confirmDelete": "Bạn có chắc muốn xóa lớp này?",
+  "classes.deleteSuccess": "Đã xóa lớp!",
+  "classes.deleteError": "Lỗi xóa lớp.",
+
+  "questionBank.cloneSuccess": "Đã nhân bản câu hỏi!",
+  "questionBank.cloneError": "Lỗi nhân bản câu hỏi.",
+  "questionBank.confirmDelete": "Bạn có chắc muốn xóa câu hỏi này?",
+  "questionBank.deleteSuccess": "Đã xóa câu hỏi!",
+  "questionBank.deleteError": "Lỗi xóa câu hỏi.",
+
   "common.filter": "Lọc",
   "common.edit": "Chỉnh sửa",
   "common.delete": "Xóa",

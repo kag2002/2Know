@@ -12,6 +12,7 @@ type ClassRepository interface {
 	GetClassByID(id, teacherID string) (*model.Class, error)
 	VerifyOwnership(id, teacherID string) error
 	CreateStudent(student *model.Student) error
+	DeleteClass(id, teacherID string) error
 }
 
 type classRepository struct {
@@ -53,4 +54,8 @@ func (r *classRepository) VerifyOwnership(id, teacherID string) error {
 
 func (r *classRepository) CreateStudent(student *model.Student) error {
 	return r.db.Create(student).Error
+}
+
+func (r *classRepository) DeleteClass(id, teacherID string) error {
+	return r.db.Where("id = ? AND teacher_id = ?", id, teacherID).Delete(&model.Class{}).Error
 }

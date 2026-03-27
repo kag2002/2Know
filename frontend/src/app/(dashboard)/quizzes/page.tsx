@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, MoreHorizontal, Clock, Users, Play, Copy, Edit2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
 import {
   DropdownMenu,
@@ -148,9 +149,22 @@ export default function QuizzesPage() {
                       <MoreHorizontal className="w-4 h-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem className="gap-2"><Copy className="w-4 h-4 text-slate-400"/> {t("quizzes.duplicate")}</DropdownMenuItem>
-                      <DropdownMenuItem className="gap-2"><Users className="w-4 h-4 text-slate-400"/> {t("quizzes.assignClass")}</DropdownMenuItem>
-                      <DropdownMenuItem className="gap-2 text-rose-600 focus:text-rose-600"><Trash2 className="w-4 h-4"/> {t("quizzes.deleteQuiz")}</DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2" onClick={async () => {
+                        try {
+                          await apiFetch('/quizzes', { method: 'POST', body: JSON.stringify({ title: quiz.title + ' (Copy)', subject: quiz.subject, status: 'draft' }) });
+                          loadQuizzes();
+                          toast.success(t("quizzes.duplicateSuccess"));
+                        } catch { toast.error(t("quizzes.duplicateError")); }
+                      }}><Copy className="w-4 h-4 text-slate-400"/> {t("quizzes.duplicate")}</DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2" onClick={() => window.location.href = '/classes'}><Users className="w-4 h-4 text-slate-400"/> {t("quizzes.assignClass")}</DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2 text-rose-600 focus:text-rose-600" onClick={async () => {
+                        if (!confirm(t("quizzes.confirmDelete"))) return;
+                        try {
+                          await apiFetch(`/quizzes/${quiz.id}`, { method: 'DELETE' });
+                          setQuizzes(prev => prev.filter(q => q.id !== quiz.id));
+                          toast.success(t("quizzes.deleteSuccess"));
+                        } catch { toast.error(t("quizzes.deleteError")); }
+                      }}><Trash2 className="w-4 h-4"/> {t("quizzes.deleteQuiz")}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

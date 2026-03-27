@@ -10,6 +10,7 @@ type QuizService interface {
 	GetQuizzes(teacherID string) ([]model.Quiz, error)
 	GetQuizByID(id, teacherID string) (*model.Quiz, error)
 	GetPublicQuizByID(id string) (*model.Quiz, error)
+	DeleteQuiz(id, teacherID string) error
 }
 
 type quizService struct {
@@ -47,4 +48,8 @@ func (s *quizService) GetPublicQuizByID(id string) (*model.Quiz, error) {
 	}
 
 	return quiz, nil
+}
+
+func (s *quizService) DeleteQuiz(id, teacherID string) error {
+	return s.repo.DeleteQuiz(id, teacherID)
 }

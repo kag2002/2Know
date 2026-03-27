@@ -130,9 +130,16 @@ export default function ClassesPage() {
                       <MoreVertical className="w-4 h-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>{t("classes.editInfo")}</DropdownMenuItem>
-                      <DropdownMenuItem>{t("classes.benchmarkReport")}</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">{t("classes.archiveClass")}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => window.location.href = `/classes/${cls.id}`}>{t("classes.editInfo")}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => toast.info(t("classes.benchmarkReport"))}>{t("classes.benchmarkReport")}</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive" onClick={async () => {
+                        if (!confirm(t("classes.confirmDelete"))) return;
+                        try {
+                          await apiFetch(`/classes/${cls.id}`, { method: 'DELETE' });
+                          setClasses(prev => prev.filter(c => c.id !== cls.id));
+                          toast.success(t("classes.deleteSuccess"));
+                        } catch { toast.error(t("classes.deleteError")); }
+                      }}>{t("classes.archiveClass")}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

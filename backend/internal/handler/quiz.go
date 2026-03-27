@@ -72,3 +72,15 @@ func (h *QuizHandler) GetPublicQuizByID(c fiber.Ctx) error {
 
 	return c.JSON(quiz)
 }
+
+func (h *QuizHandler) DeleteQuiz(c fiber.Ctx) error {
+	id := c.Params("id")
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+	if err := h.svc.DeleteQuiz(id, userId); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete quiz"})
+	}
+	return c.JSON(fiber.Map{"message": "Quiz deleted"})
+}

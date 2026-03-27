@@ -10,6 +10,7 @@ type ClassService interface {
 	GetClasses(teacherID string) ([]model.Class, error)
 	GetClassByID(id, teacherID string) (*model.Class, error)
 	AddStudent(classID, teacherID string, student *model.Student) error
+	DeleteClass(id, teacherID string) error
 }
 
 type classService struct {
@@ -40,4 +41,8 @@ func (s *classService) AddStudent(classID, teacherID string, student *model.Stud
 	}
 	student.ClassID = classID
 	return s.repo.CreateStudent(student)
+}
+
+func (s *classService) DeleteClass(id, teacherID string) error {
+	return s.repo.DeleteClass(id, teacherID)
 }

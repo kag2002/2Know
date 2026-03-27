@@ -408,6 +408,22 @@
   "quizCreate.alertNoQuestions": "Please add at least one question before publishing.",
   "quizCreate.saveError": "Error saving assessment: ",
 
+  "quizzes.duplicateSuccess": "Quiz duplicated!",
+  "quizzes.duplicateError": "Failed to duplicate quiz.",
+  "quizzes.confirmDelete": "Are you sure you want to delete this quiz?",
+  "quizzes.deleteSuccess": "Quiz deleted!",
+  "quizzes.deleteError": "Failed to delete quiz.",
+
+  "classes.confirmDelete": "Are you sure you want to delete this class?",
+  "classes.deleteSuccess": "Class deleted!",
+  "classes.deleteError": "Failed to delete class.",
+
+  "questionBank.cloneSuccess": "Question cloned!",
+  "questionBank.cloneError": "Failed to clone question.",
+  "questionBank.confirmDelete": "Are you sure you want to delete this question?",
+  "questionBank.deleteSuccess": "Question deleted!",
+  "questionBank.deleteError": "Failed to delete question.",
+
   "common.filter": "Filter",
   "common.edit": "Edit",
   "common.delete": "Delete",

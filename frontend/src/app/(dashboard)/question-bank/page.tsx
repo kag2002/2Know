@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, MoreHorizontal, FolderCode, Tags } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -172,9 +173,22 @@ export default function QuestionBankPage() {
                           <MoreHorizontal className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>{t("edit")}</DropdownMenuItem>
-                          <DropdownMenuItem>{t("questionBank.clone")}</DropdownMenuItem>
-                          <DropdownMenuItem className="text-rose-600">{t("questionBank.deletePermanent")}</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.location.href = '/question-bank/create'}>{t("edit")}</DropdownMenuItem>
+                          <DropdownMenuItem onClick={async () => {
+                            try {
+                              await apiFetch('/questions', { method: 'POST', body: JSON.stringify({ content: q.content + ' (Copy)', type: q.type, quiz_id: q.id }) });
+                              loadQuestions();
+                              toast.success(t("questionBank.cloneSuccess"));
+                            } catch { toast.error(t("questionBank.cloneError")); }
+                          }}>{t("questionBank.clone")}</DropdownMenuItem>
+                          <DropdownMenuItem className="text-rose-600" onClick={async () => {
+                            if (!confirm(t("questionBank.confirmDelete"))) return;
+                            try {
+                              await apiFetch(`/questions/${q.id}`, { method: 'DELETE' });
+                              setQuestions(prev => prev.filter(x => x.id !== q.id));
+                              toast.success(t("questionBank.deleteSuccess"));
+                            } catch { toast.error(t("questionBank.deleteError")); }
+                          }}>{t("questionBank.deletePermanent")}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
