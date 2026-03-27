@@ -8,6 +8,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import {
+import { useTranslation } from "@/context/LanguageContext";
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -25,6 +26,7 @@ interface ClassItem {
 }
 
 export default function ClassesPage() {
+  const { t } = useTranslation();
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -75,9 +77,9 @@ export default function ClassesPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">Quản lý lớp học</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("classes.title")}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Tổ chức học sinh theo lớp, dễ dàng giao bài tập và theo dõi tiến độ học tập.
+            {t("classes.subtitle")}
           </p>
         </div>
         <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
@@ -85,7 +87,7 @@ export default function ClassesPage() {
             <Filter className="w-4 h-4" /> Lọc
           </Button>
           <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none" onClick={handleCreateClass}>
-            <Plus className="w-4 h-4" /> Tạo lớp mới
+            <Plus className="w-4 h-4" /> {t("classes.createNew")}
           </Button>
         </div>
       </div>
@@ -94,7 +96,7 @@ export default function ClassesPage() {
         <div className="relative flex-1 w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Tìm kiếm tên lớp học..." 
+            placeholder={t("classes.searchPlaceholder")} 
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-10 h-10 bg-muted/50 border-transparent focus:bg-background transition-colors"
@@ -103,7 +105,7 @@ export default function ClassesPage() {
         <div className="hidden sm:block h-6 w-px bg-border"></div>
         <div className="flex gap-6 text-sm">
           <div className="flex flex-col">
-            <span className="text-muted-foreground text-xs uppercase font-semibold">Tổng số lớp</span>
+            <span className="text-muted-foreground text-xs uppercase font-semibold">{t("classes.totalClasses")}</span>
             <span className="font-bold text-lg">{classes.length}</span>
           </div>
           <div className="flex flex-col">
@@ -128,9 +130,9 @@ export default function ClassesPage() {
                       <MoreVertical className="w-4 h-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Chỉnh sửa thông tin</DropdownMenuItem>
-                      <DropdownMenuItem>Báo cáo điểm chuẩn</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">Lưu trữ lớp</DropdownMenuItem>
+                      <DropdownMenuItem>{t("classes.editInfo")}</DropdownMenuItem>
+                      <DropdownMenuItem>{t("classes.benchmarkReport")}</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive">{t("classes.archiveClass")}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -182,8 +184,8 @@ export default function ClassesPage() {
             <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-transform">
               <Plus className="w-6 h-6 text-indigo-500" />
             </div>
-            <h3 className="font-semibold">Tạo Lớp học mới</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-[200px] text-center">Tạo phòng học kín và quản lý tiến trình học tập</p>
+            <h3 className="font-semibold">{t("classes.createNewCard")}</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-[200px] text-center">{t("classes.createNewCardDesc")}</p>
           </div>
         </div>
       )}

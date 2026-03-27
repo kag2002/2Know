@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
+import { useTranslation } from "@/context/LanguageContext";
 
 interface StudentMetrics {
   id: string;
@@ -25,6 +26,7 @@ interface StudentMetrics {
 }
 
 export default function StudentsPage() {
+  const { t } = useTranslation();
   const [allStudents, setAllStudents] = useState<StudentMetrics[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -61,11 +63,11 @@ export default function StudentsPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "excellent": return <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-[10px] font-semibold">Xuất sắc</span>;
-      case "good": return <span className="px-2 py-0.5 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-[10px] font-semibold">Tốt</span>;
-      case "average": return <span className="px-2 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-[10px] font-semibold">Trung bình</span>;
-      case "warning": return <span className="px-2 py-0.5 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 rounded-full text-[10px] font-semibold">Cần chú ý</span>;
-      case "danger": return <span className="px-2 py-0.5 bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-full text-[10px] font-semibold">Yếu</span>;
+      case "excellent": return <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full text-[10px] font-semibold">{t("students.statusExcellent")}</span>;
+      case "good": return <span className="px-2 py-0.5 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-[10px] font-semibold">{t("students.statusGood")}</span>;
+      case "average": return <span className="px-2 py-0.5 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-[10px] font-semibold">{t("students.statusAverage")}</span>;
+      case "warning": return <span className="px-2 py-0.5 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 rounded-full text-[10px] font-semibold">{t("students.statusWarning")}</span>;
+      case "danger": return <span className="px-2 py-0.5 bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-full text-[10px] font-semibold">{t("students.statusDanger")}</span>;
       default: return null;
     }
   };
@@ -100,21 +102,21 @@ export default function StudentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Quản lý Học sinh</h1>
-          <p className="text-muted-foreground mt-1">Tổng hợp hồ sơ, điểm số và phân loại năng lực học tập của toàn bộ học sinh.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("students.title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("students.subtitle")}</p>
         </div>
         <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={handleAddStudent}>
-          <Plus className="w-4 h-4" /> Thêm học sinh
+          <Plus className="w-4 h-4" /> {t("students.addNew")}
         </Button>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Tổng học sinh", value: allStudents.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
-          { label: "Điểm TB toàn trường", value: allStudents.length ? (allStudents.reduce((a, s) => a + s.avgScore, 0) / allStudents.length).toFixed(1) : "0", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
-          { label: "HS xuất sắc", value: allStudents.filter(s => s.status === "excellent").length, icon: GraduationCap, color: "text-amber-500", bg: "bg-amber-50" },
-          { label: "Cần hỗ trợ", value: allStudents.filter(s => s.status === "danger" || s.status === "warning").length, icon: Users, color: "text-rose-500", bg: "bg-rose-50" },
+          { label: t("students.total"), value: allStudents.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
+          { label: t("students.avgSchoolScore"), value: allStudents.length ? (allStudents.reduce((a, s) => a + s.avgScore, 0) / allStudents.length).toFixed(1) : "0", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: t("students.excellentCount"), value: allStudents.filter(s => s.status === "excellent").length, icon: GraduationCap, color: "text-amber-500", bg: "bg-amber-50" },
+          { label: t("students.needSupport"), value: allStudents.filter(s => s.status === "danger" || s.status === "warning").length, icon: Users, color: "text-rose-500", bg: "bg-rose-50" },
         ].map((stat, i) => (
           <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">

@@ -15,8 +15,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function OMRScannerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = useTranslation();
   const { id } = use(params);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -118,12 +120,12 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
       <div className="absolute top-0 left-0 right-0 z-20 flex justify-between items-center p-4 bg-gradient-to-b from-black/80 to-transparent">
         <div className="flex items-center gap-3">
           <Button variant="ghost" className="text-white hover:bg-background/20" onClick={() => router.push(`/quizzes/${id}`)}>
-            <ArrowLeft className="w-5 h-5 mr-2" /> Quay lại
+            <ArrowLeft className="w-5 h-5 mr-2" /> {t("back")}
           </Button>
           <div className="hidden sm:block">
-            <h1 className="font-semibold text-lg">Hệ thống chấm thi OMR AI</h1>
+            <h1 className="font-semibold text-lg">{t("scan.title")}</h1>
             <p className="text-xs text-emerald-400 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sẵn sàng phân tích
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> {t("scan.ready")}
             </p>
           </div>
         </div>
@@ -146,11 +148,11 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
         {cameraError ? (
           <div className="text-center p-6 bg-slate-900 rounded-xl border border-slate-800 max-w-sm">
             <Camera className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-white mb-2">Lỗi Camera</h3>
+            <h3 className="text-lg font-medium text-white mb-2">{t("scan.cameraError")}</h3>
             <p className="text-sm text-slate-400 mb-6">{cameraError}</p>
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">Tải ảnh lên</Button>
-              <Button onClick={startCamera} className="bg-indigo-600 hover:bg-indigo-700 text-white">Thử lại</Button>
+              <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">{t("scan.uploadImage")}</Button>
+              <Button onClick={startCamera} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("scan.retry")}</Button>
             </div>
           </div>
         ) : (
@@ -182,14 +184,14 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <Zap className="w-12 h-12 text-indigo-400 mb-4 animate-pulse" />
                       <div className="text-xl font-bold text-white tracking-widest">{scanProgress}%</div>
-                      <div className="text-indigo-200 text-sm mt-2 font-medium">Đang dùng AI trích xuất dữ liệu...</div>
+                      <div className="text-indigo-200 text-sm mt-2 font-medium">{t("scan.processing")}</div>
                     </div>
                   )}
                 </div>
                 
                 {/* Instruction Text */}
                 <div className="absolute bottom-32 bg-black/60 px-6 py-3 rounded-full backdrop-blur-md">
-                  <p className="text-sm font-medium tracking-wide">Căn lề phiếu trắc nghiệm vào khung viền xanh</p>
+                  <p className="text-sm font-medium tracking-wide">{t("scan.alignPrompt")}</p>
                 </div>
               </div>
             )}
@@ -202,9 +204,9 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
                   <div className="bg-emerald-50 border-b border-emerald-100 p-6 text-center relative overflow-hidden">
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
                     <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-3" />
-                    <h2 className="text-2xl font-bold text-card-foreground">Chấm điểm thành công!</h2>
+                    <h2 className="text-2xl font-bold text-card-foreground">{t("scan.success")}</h2>
                     {scanResult?.isDemo && (
-                      <span className="inline-block mt-2 px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold rounded-full">⚠️ CHẾ ĐỘ DEMO</span>
+                      <span className="inline-block mt-2 px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold rounded-full">⚠️ {t("scan.demoMode")}</span>
                     )}
                     <p className="text-emerald-700 text-sm mt-1 font-medium">OMR AI phân tích hoàn tất với độ chính xác {(scanResult.confidence * 100).toFixed(1)}%</p>
                   </div>
@@ -213,17 +215,17 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
                   <div className="p-6 grid grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div>
-                        <p className="text-sm text-muted-foreground font-medium mb-1">Số Báo Danh (SBD)</p>
+                        <p className="text-sm text-muted-foreground font-medium mb-1">{t("scan.studentId")}</p>
                         <p className="text-2xl font-bold font-mono tracking-wider">{scanResult.student_id}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground font-medium mb-1">Số câu đúng</p>
+                        <p className="text-sm text-muted-foreground font-medium mb-1">{t("scan.correctCount")}</p>
                         <p className="text-xl font-semibold text-indigo-600">{scanResult.total_correct} <span className="text-base text-slate-400 font-normal">/ {scanResult.total_questions}</span></p>
                       </div>
                     </div>
 
                     <div className="flex flex-col items-center justify-center bg-muted rounded-xl border border-border p-4">
-                      <p className="text-sm text-muted-foreground font-medium mb-2 uppercase tracking-wider">Tổng điểm</p>
+                      <p className="text-sm text-muted-foreground font-medium mb-2 uppercase tracking-wider">{t("scan.totalScore")}</p>
                       <div className="text-5xl font-black text-emerald-600 tracking-tighter">
                         {scanResult.score}
                       </div>
@@ -232,11 +234,11 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
 
                   {/* Captured Highlight Image */}
                   <div className="px-6 pb-4">
-                    <p className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Ảnh Cắt Bằng AI (Crop)</p>
+                    <p className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">{t("scan.capturedImage")}</p>
                     <div className="h-24 bg-slate-100 rounded-lg overflow-hidden relative border border-border">
                       <img src={scanResult.capturedImage} className="w-full h-full object-cover" alt="Captured Sheet" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-2">
-                        <span className="text-xs text-white font-medium bg-black/40 px-2 py-1 rounded backdrop-blur-sm">Khớp 100% tọa độ Form</span>
+                        <span className="text-xs text-white font-medium bg-black/40 px-2 py-1 rounded backdrop-blur-sm">{t("scan.formMatch")}</span>
                       </div>
                     </div>
                   </div>
@@ -244,10 +246,10 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
                   {/* Bottom Actions */}
                   <div className="p-4 bg-muted grid grid-cols-2 gap-3 border-t">
                     <Button variant="outline" className="h-12 border-border text-slate-700 bg-background hover:bg-muted font-semibold" onClick={handleNextBlank}>
-                      <Camera className="w-4 h-4 mr-2" /> Chụp phiếu khác
+                      <Camera className="w-4 h-4 mr-2" /> {t("scan.nextSheet")}
                     </Button>
                     <Button className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-md shadow-emerald-500/20" onClick={() => router.push(`/reports/${id}`)}>
-                      <CheckCircle2 className="w-4 h-4 mr-2" /> Lưu vào Sổ điểm
+                      <CheckCircle2 className="w-4 h-4 mr-2" /> {t("scan.saveGradebook")}
                     </Button>
                   </div>
                 </div>
@@ -267,9 +269,9 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
               disabled={isScanning || !!cameraError}
             >
               {isScanning ? (
-                <><Loader2 className="w-6 h-6 mr-3 animate-spin"/> Đang phân tích...</>
+                <><Loader2 className="w-6 h-6 mr-3 animate-spin"/> {t("scan.scanning")}</>
               ) : (
-                <><ScanLine className="w-6 h-6 mr-3" /> CHẤM ĐIỂM NGAY</>
+                <><ScanLine className="w-6 h-6 mr-3" /> {t("scan.scanNow")}</>
               )}
             </Button>
           </div>
