@@ -29,6 +29,7 @@ export interface OmrBatch {
   id: string;
   title: string;
   template: string;
+  quiz_id: string;
   sheets_scanned: number;
   total_sheets: number;
   status: string;
@@ -39,18 +40,37 @@ export default function OmrPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newBatch, setNewBatch] = useState({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)" });
+  const [newBatch, setNewBatch] = useState({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)", quiz_id: "" });
   
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingBatch, setEditingBatch] = useState<OmrBatch | null>(null);
 
   const [batches, setBatches] = useState<OmrBatch[]>([]);
+  const [quizzes, setQuizzes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadBatches();
+    loadData();
   }, []);
 
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [batchesData, quizzesData] = await Promise.all([
+        apiFetch("/omr/batches"),
+        apiFetch("/quizzes")
+      ]);
+      setBatches(batchesData || []);
+      // Only let them select published quizzes conceptually, but here we list all
+      setQuizzes(quizzesData || []);
+    } catch (err) {
+      toast.error("Không thể tải dữ liệu OMR");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // legacy loadBatches for refresh
   const loadBatches = async () => {
     try {
       setLoading(true);
@@ -91,7 +111,7 @@ export default function OmrPage() {
       });
       toast.success(t("omr.createSuccess"));
       setIsDialogOpen(false);
-      setNewBatch({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)" });
+      setNewBatch({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)", quiz_id: "" });
       loadBatches();
     } catch {
       toast.error("Lỗi tạo đợt chấm");
@@ -108,7 +128,8 @@ export default function OmrPage() {
         method: 'PATCH',
         body: JSON.stringify({
           title: editingBatch.title,
-          template: editingBatch.template
+          template: editingBatch.template,
+          quiz_id: editingBatch.quiz_id
         })
       });
       toast.success("Cập nhật đợt quét OMR thành công!");
@@ -162,6 +183,20 @@ export default function OmrPage() {
                   >
                     <option value="Mẫu 50 câu (A4)">Mẫu 50 câu (A4)</option>
                     <option value="Mẫu 40 câu (Tự luận)">Mẫu kết hợp 40 MCQ + Tự luận</option>
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="b_quiz">Bài kiểm tra (Đáp án gốc)</Label>
+                  <select 
+                    id="b_quiz" 
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={newBatch.quiz_id} 
+                    onChange={(e) => setNewBatch({...newBatch, quiz_id: e.target.value})}
+                  >
+                    <option value="">-- Chọn bài kiểm tra --</option>
+                    {quizzes.filter(q => q.status === 'published').map(q => (
+                      <option key={q.id} value={q.id}>{q.title}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -272,8 +307,8 @@ export default function OmrPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Link href={`/quizzes/${batch.id}/scan`}>
-                      <Button variant={batch.status === "completed" ? "outline" : "default"} className={batch.status !== "completed" ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm" : "bg-card"}>
+                    <Link href={batch.quiz_id ? `/quizzes/${batch.quiz_id}/scan` : "#"}>
+                      <Button variant={batch.status === "completed" ? "outline" : "default"} className={batch.status !== "completed" ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm" : "bg-card"} disabled={!batch.quiz_id}>
                         {batch.status === "completed" ? "Xem kết quả" : "Quét tiếp"}
                       </Button>
                     </Link>
@@ -329,6 +364,20 @@ export default function OmrPage() {
                 >
                   <option value="Mẫu 50 câu (A4)">Mẫu 50 câu (A4)</option>
                   <option value="Mẫu 40 câu (Tự luận)">Mẫu kết hợp 40 MCQ + Tự luận</option>
+                </select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-b-quiz">Bài kiểm tra (Đáp án gốc)</Label>
+                <select 
+                  id="edit-b-quiz" 
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={editingBatch.quiz_id || ""} 
+                  onChange={(e) => setEditingBatch({...editingBatch, quiz_id: e.target.value})}
+                >
+                  <option value="">-- Chọn bài kiểm tra --</option>
+                  {quizzes.filter(q => q.status === 'published').map(q => (
+                    <option key={q.id} value={q.id}>{q.title}</option>
+                  ))}
                 </select>
               </div>
             </div>

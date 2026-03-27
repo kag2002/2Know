@@ -42,4 +42,8 @@ type Quiz struct {
 
 	// Relationships
 	Questions []Question `gorm:"foreignKey:QuizID" json:"questions,omitempty"`
+
+	// Contextual Stats (Not stored directly in DB)
+	Submissions int64   `gorm:"-" json:"submissions"`
+	AvgScore    float64 `gorm:"-" json:"avg_score"`
 }

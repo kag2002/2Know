@@ -10,6 +10,7 @@ import (
 type OmrBatch struct {
 	ID            string    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()" json:"id"`
 	UserID        string    `gorm:"type:uuid;not null;index" json:"-"`
+	QuizID        string    `gorm:"type:uuid" json:"quiz_id"` // Link to the Answer Key
 	Title         string    `gorm:"type:varchar(255);not null" json:"title"`
 	Template      string    `gorm:"type:varchar(100);default:'Mẫu 50 câu (A4)'" json:"template"`
 	SheetsScanned int       `gorm:"default:0" json:"sheets_scanned"`

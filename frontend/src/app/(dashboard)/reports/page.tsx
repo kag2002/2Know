@@ -21,6 +21,8 @@ interface Quiz {
   title: string;
   status: string;
   created_at: string;
+  submissions: number;
+  avg_score: number;
 }
 
 export default function ReportsPage() {
@@ -163,12 +165,12 @@ export default function ReportsPage() {
                 </div>
 
                 <div className="flex gap-8 sm:gap-12 text-center shrink-0">
-                  <div className="flex flex-col opacity-50">
-                    <span className="text-xl font-bold text-card-foreground">---</span>
+                  <div className="flex flex-col">
+                    <span className="text-xl font-bold text-card-foreground">{quiz.submissions || 0}</span>
                     <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t("reports.submissions")}</span>
                   </div>
-                  <div className="flex flex-col opacity-50">
-                    <span className="text-xl font-bold text-emerald-600">---</span>
+                  <div className="flex flex-col">
+                    <span className="text-xl font-bold text-emerald-600">{quiz.avg_score ? quiz.avg_score.toFixed(1) : "0.0"}</span>
                     <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{t("reports.avgScore")}</span>
                   </div>
                 </div>

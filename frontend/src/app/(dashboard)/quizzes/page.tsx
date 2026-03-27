@@ -166,7 +166,7 @@ export default function QuizzesPage() {
                 {/* Actions */}
                 <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto sm:justify-end">
                   {quiz.status === 'published' && (
-                    <Button variant="outline" size="sm" className="gap-2 text-indigo-600 border-indigo-200 bg-indigo-50 hover:bg-indigo-100 w-full sm:w-auto">
+                    <Button variant="outline" size="sm" className="gap-2 text-indigo-600 border-indigo-200 bg-indigo-50 hover:bg-indigo-100 w-full sm:w-auto" onClick={() => window.open(`/test/${quiz.id}`, '_blank')}>
                       <Play className="w-4 h-4" /> {t("quizzes.startExam")}
                     </Button>
                   )}
