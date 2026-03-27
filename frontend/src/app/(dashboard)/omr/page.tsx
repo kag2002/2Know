@@ -205,7 +205,7 @@ export default function OmrPage() {
                         <MoreHorizontal className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="gap-2"><Printer className="w-4 h-4"/> In bảng điểm</DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2" onClick={() => window.open('/reports', '_blank')}><Printer className="w-4 h-4"/> In bảng điểm</DropdownMenuItem>
                         <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive" onClick={() => handleDelete(batch.id)}><Trash2 className="w-4 h-4"/> Xóa đợt quét</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "@/context/LanguageContext";
+import { toast } from "sonner";
 
 interface Student {
   id: string;
@@ -170,8 +171,15 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                           <MoreVertical className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>{t("classDetail.viewProfile")}</DropdownMenuItem>
-                          <DropdownMenuItem className="text-rose-600">{t("classDetail.removeFromClass")}</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => window.location.href = `/students/${student.id}`}>{t("classDetail.viewProfile")}</DropdownMenuItem>
+                          <DropdownMenuItem className="text-rose-600" onClick={async () => {
+                            if (!confirm("Bạn có chắc muốn xóa học sinh này khỏi lớp?")) return;
+                            try {
+                              await apiFetch(`/students/${student.id}`, { method: 'DELETE' });
+                              setClassData({ ...classData, students: classData.students.filter(s => s.id !== student.id) });
+                              toast.success("Đã xóa học sinh");
+                            } catch { toast.error("Lỗi xóa học sinh") }
+                          }}>{t("classDetail.removeFromClass")}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>

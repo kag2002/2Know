@@ -153,7 +153,7 @@ export default function NotesPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pinned.map(note => (
-              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} />
+              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} t={t} />
             ))}
           </div>
         </>
@@ -166,7 +166,7 @@ export default function NotesPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {unpinned.map(note => (
-              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} />
+              <NoteCard key={note.id} note={note} onDelete={deleteNote} onTogglePin={togglePin} t={t} />
             ))}
           </div>
         </>
@@ -175,7 +175,7 @@ export default function NotesPage() {
   );
 }
 
-function NoteCard({ note, onDelete, onTogglePin }: { note: typeof initialNotes[0]; onDelete: (id: string) => void; onTogglePin: (id: string) => void }) {
+function NoteCard({ note, onDelete, onTogglePin, t }: { note: any; onDelete: (id: string) => void; onTogglePin: (id: string) => void; t: any }) {
   return (
     <Card className={`shadow-sm hover:shadow-md transition-all border ${note.color} group`}>
       <CardHeader className="flex flex-row items-start justify-between pb-2">
@@ -192,9 +192,6 @@ function NoteCard({ note, onDelete, onTogglePin }: { note: typeof initialNotes[0
           <DropdownMenuContent align="end">
             <DropdownMenuItem className="gap-2" onClick={() => onTogglePin(note.id)}>
               <Pin className="w-4 h-4" /> {note.pinned ? t("notes.unpin") : t("notes.pin")}
-            </DropdownMenuItem>
-            <DropdownMenuItem className="gap-2">
-              <Edit2 className="w-4 h-4" /> {t("notes.edit")}
             </DropdownMenuItem>
             <DropdownMenuItem className="gap-2 text-destructive" onClick={() => onDelete(note.id)}>
               <Trash2 className="w-4 h-4" /> {t("notes.delete")}

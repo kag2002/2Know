@@ -164,8 +164,17 @@ export default function RubricsPage() {
                     <MoreHorizontal className="w-4 h-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="gap-2"><Edit2 className="w-4 h-4"/> {t("rubrics.editCriteria")}</DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2"><Copy className="w-4 h-4"/> {t("rubrics.duplicate")}</DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2" onClick={() => toast.info("Tính năng chỉnh sửa Rubric đang phát triển")}><Edit2 className="w-4 h-4"/> {t("rubrics.editCriteria")}</DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2" onClick={async () => {
+                      try {
+                        await apiFetch("/rubrics", {
+                          method: 'POST',
+                          body: JSON.stringify({ title: rubric.title + " (Copy)", subject: rubric.subject, target: rubric.target, criteria_count: rubric.criteria_count })
+                        });
+                        loadRubrics();
+                        toast.success(t("rubrics.cloneSuccess") || "Đã nhân bản Rubric");
+                      } catch { toast.error("Lỗi nhân bản Rubric") }
+                    }}><Copy className="w-4 h-4"/> {t("rubrics.duplicate")}</DropdownMenuItem>
                     <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive" onClick={() => handleDelete(rubric.id)}><Trash2 className="w-4 h-4"/> Xóa</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
