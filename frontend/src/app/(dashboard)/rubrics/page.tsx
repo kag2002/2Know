@@ -41,6 +41,9 @@ export default function RubricsPage() {
   const [rubrics, setRubrics] = useState<RubricData[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newRubric, setNewRubric] = useState({ title: "", subject: "", target: "", criteria_count: 3 });
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingRubric, setEditingRubric] = useState<RubricData | null>(null);
 
@@ -77,17 +80,19 @@ export default function RubricsPage() {
   };
 
   const handleCreate = async () => {
+    if (!newRubric.title || !newRubric.subject) {
+      toast.warning("Vui lòng điền tên và môn học!");
+      return;
+    }
+    
     try {
       await apiFetch("/rubrics", {
         method: 'POST',
-        body: JSON.stringify({
-          title: `Tiêu chí chấm tự luận ${new Date().toLocaleString('vi-VN')}`,
-          subject: "Ngữ văn",
-          target: "Chung",
-          criteria_count: 3
-        })
+        body: JSON.stringify(newRubric)
       });
       toast.success(t("rubrics.createSuccess"));
+      setIsCreateDialogOpen(false);
+      setNewRubric({ title: "", subject: "", target: "", criteria_count: 3 });
       loadRubrics();
     } catch {
       toast.error("Lỗi tạo Rubric");
@@ -123,10 +128,52 @@ export default function RubricsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("rubrics.title")}</h1>
           <p className="text-muted-foreground mt-1 text-sm">{t("rubrics.subtitle")}</p>
         </div>
-        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading} onClick={handleCreate}>
+        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading} onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="w-4 h-4" /> {t("rubrics.createNew")}
         </Button>
       </div>
+
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Tạo Rubric mới</DialogTitle>
+            <DialogDescription>Nhập thông tin cho bộ tiêu chí chấm điểm.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="c_title">Tên Rubric</Label>
+              <Input 
+                id="c_title" 
+                placeholder="VD: Tiêu chí chấm văn tự luận"
+                value={newRubric.title} 
+                onChange={(e) => setNewRubric({...newRubric, title: e.target.value})} 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="c_subject">Môn học</Label>
+              <Input 
+                id="c_subject" 
+                placeholder="VD: Ngữ văn, Lịch sử..."
+                value={newRubric.subject} 
+                onChange={(e) => setNewRubric({...newRubric, subject: e.target.value})} 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="c_target">Đối tượng</Label>
+              <Input 
+                id="c_target" 
+                placeholder="VD: Lớp 10 Chung"
+                value={newRubric.target} 
+                onChange={(e) => setNewRubric({...newRubric, target: e.target.value})} 
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, MoreHorizontal, Clock, Users, Play, Copy, Edit2, Trash2 } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Clock, Users, Play, Copy, Edit2, Trash2, Share2 } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
+
 interface Quiz {
   id: string;
   title: string;
@@ -38,7 +39,10 @@ export default function QuizzesPage() {
   const [error, setError] = useState("");
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+  const [editingQuiz, setEditingQuiz] = useState<any>(null);
+
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [shareConfig, setShareConfig] = useState({ title: "", type: "public", quiz_id: "" });
 
   useEffect(() => {
     loadQuizzes();
@@ -81,8 +85,25 @@ export default function QuizzesPage() {
       toast.success("Cập nhật bài kiểm tra thành công!");
       setIsEditDialogOpen(false);
       loadQuizzes();
-    } catch {
-      toast.error("Lỗi cập nhật bài kiểm tra");
+    } catch { toast.error(t("quizzes.editError") || "Lỗi cập nhật bài kiểm tra"); }
+  };
+
+  const handleCreateShare = async () => {
+    if (!shareConfig.title) {
+      toast.warning("Vui lòng nhập tên chiến dịch chia sẻ!");
+      return;
+    }
+    try {
+      await apiFetch("/shares", {
+        method: "POST",
+        body: JSON.stringify(shareConfig)
+      });
+      toast.success("Tạo link chia sẻ thành công!");
+      setIsShareDialogOpen(false);
+      // Optional: Redirect them to Sharing page or encourage them to view it
+      setTimeout(() => window.location.href = '/sharing', 1000);
+    } catch (err: any) {
+      toast.error("Lỗi khi tạo chia sẻ: " + err.message);
     }
   };
 
@@ -185,6 +206,12 @@ export default function QuizzesPage() {
                       <DropdownMenuItem className="gap-2" onClick={() => { setEditingQuiz(quiz); setIsEditDialogOpen(true); }}>
                         <Edit2 className="w-4 h-4 text-slate-400"/> Cài đặt bài kiểm tra
                       </DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2" onClick={() => { 
+                        setShareConfig({ quiz_id: quiz.id, title: `Chia sẻ: ${quiz.title}`, type: "public" });
+                        setIsShareDialogOpen(true);
+                      }}>
+                        <Share2 className="w-4 h-4 text-slate-400"/> Chia sẻ bài test
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="gap-2" onClick={async () => {
                         try {
                           await apiFetch('/quizzes', { method: 'POST', body: JSON.stringify({ title: quiz.title + ' (Copy)', subject: quiz.subject, status: 'draft' }) });
@@ -240,6 +267,42 @@ export default function QuizzesPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
             <Button onClick={handleEditQuiz} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Dialog */}
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Tạo link chia sẻ bài test</DialogTitle>
+            <DialogDescription>Chia sẻ bài kiểm tra này cho học sinh hoặc lớp học.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="s_title">Tên chiến dịch chia sẻ</Label>
+              <Input 
+                id="s_title" 
+                value={shareConfig.title} 
+                onChange={(e) => setShareConfig({...shareConfig, title: e.target.value})} 
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="s_type">Phạm vi chia sẻ</Label>
+              <select 
+                id="s_type" 
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={shareConfig.type} 
+                onChange={(e) => setShareConfig({...shareConfig, type: e.target.value})}
+              >
+                <option value="public">Công khai (Bất kỳ ai có link)</option>
+                <option value="class">Nội bộ (Chỉ lớp được chỉ định)</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsShareDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleCreateShare} className="bg-indigo-600 hover:bg-indigo-700 text-white">Tạo link chia sẻ</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

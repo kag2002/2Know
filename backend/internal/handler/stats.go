@@ -29,14 +29,16 @@ func (h *StatsHandler) GetDashboardStats(c fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"total_quizzes":     stats.TotalQuizzes,
-		"active_quizzes":    stats.ActiveQuizzes,
-		"total_submissions": stats.TotalSubmissions,
-		"week_submissions":  stats.WeekSubmissions,
-		"avg_score":         stats.AvgScore,
-		"total_classes":     stats.TotalClasses,
-		"total_students":    stats.TotalStudents,
-		"total_questions":   stats.TotalQuestions,
+		"total_quizzes":      stats.TotalQuizzes,
+		"active_quizzes":     stats.ActiveQuizzes,
+		"total_submissions":  stats.TotalSubmissions,
+		"week_submissions":   stats.WeekSubmissions,
+		"avg_score":          stats.AvgScore,
+		"total_classes":      stats.TotalClasses,
+		"total_students":     stats.TotalStudents,
+		"total_questions":    stats.TotalQuestions,
+		"score_distribution": stats.ScoreDistribution,
+		"recent_activity":    stats.RecentActivity,
 	})
 }
 

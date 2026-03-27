@@ -48,11 +48,29 @@ function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string
 import { useTranslation } from "@/context/LanguageContext";
 import { apiFetch } from "@/lib/api";
 
+interface ActivityItem {
+  name: string;
+  action: string;
+  time: string;
+  date: string;
+  status: string;
+  statusColor: string;
+}
+
+interface ScoreDist {
+  excellent: number;
+  good: number;
+  average: number;
+  poor: number;
+}
+
 interface DashboardStats {
   total_quizzes: number;
   total_submissions: number;
   avg_score: number;
   total_questions: number;
+  recent_activity?: ActivityItem[];
+  score_distribution?: ScoreDist;
 }
 
 export default function OverviewPage() {
@@ -180,24 +198,25 @@ export default function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { name: "Lê Uy Đức", action: t("overview.stream.action1"), time: "17:36", status: t("overview.stream.status1"), statusColor: "text-pink-500 bg-pink-50 dark:bg-pink-900/30 dark:text-pink-400" },
-                { name: "Nguyễn Thị Mai", action: t("overview.stream.action2"), time: "16:20", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" },
-                { name: "Trần Văn Hoàng", action: t("overview.stream.action3"), time: "15:45", status: t("overview.stream.status3"), statusColor: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" },
-                { name: t("overview.stream.name4"), action: t("overview.stream.action4"), time: "14:10", status: t("overview.stream.status2"), statusColor: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" },
-              ].map((item, i) => (
-                <div key={i} className="flex flex-col p-3 rounded-lg border text-sm hover:bg-muted/80 transition-colors cursor-pointer group">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="font-medium group-hover:text-indigo-600 transition-colors">
-                      <strong>{item.name}</strong> {item.action}
-                    </span>
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${item.statusColor} shrink-0 ml-2`}>{item.status}</span>
+              {stats?.recent_activity && stats.recent_activity.length > 0 ? (
+                stats.recent_activity.map((item, i) => (
+                  <div key={i} className="flex flex-col p-3 rounded-lg border text-sm hover:bg-muted/80 transition-colors cursor-pointer group">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="font-medium group-hover:text-indigo-600 transition-colors">
+                        <strong>{item.name}</strong> {item.action}
+                      </span>
+                      <span className={`text-xs px-1.5 py-0.5 rounded ${item.statusColor} shrink-0 ml-2`}>{item.status}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
+                      <span>{item.time} {item.date}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
-                    <span>{item.time} {dateStr}</span>
-                  </div>
+                ))
+              ) : (
+                <div className="p-4 text-center text-sm text-muted-foreground border rounded-lg bg-card">
+                  Chưa có hoạt động nộp bài nào gần đây.
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -212,25 +231,33 @@ export default function OverviewPage() {
             </div>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center p-6">
-              {/* Doughnut Chart */}
+              {/* Doughnut Chart Mock using real sum */}
               <div className="w-48 h-48 rounded-full border-[16px] border-emerald-400 border-t-amber-400 border-r-rose-500 border-b-blue-400 flex items-center justify-center relative shadow-inner">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">108</div>
+                  <div className="text-3xl font-bold">
+                    {stats?.score_distribution ? 
+                      (stats.score_distribution.excellent + stats.score_distribution.good + stats.score_distribution.average + stats.score_distribution.poor) 
+                      : 0}
+                  </div>
                   <div className="text-xs text-muted-foreground">{t("overview.graded")}</div>
                 </div>
               </div>
               <div className="flex gap-4 mt-6">
                 {[
-                  { label: t("overview.excellent"), color: "bg-emerald-400", pct: "42%" },
-                  { label: t("overview.good"), color: "bg-blue-400", pct: "28%" },
-                  { label: t("overview.average"), color: "bg-amber-400", pct: "20%" },
-                  { label: t("overview.poor"), color: "bg-rose-500", pct: "10%" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-1.5 text-xs">
-                    <div className={`w-2.5 h-2.5 rounded-full ${item.color}`}></div>
-                    <span className="text-muted-foreground">{item.label} ({item.pct})</span>
-                  </div>
-                ))}
+                  { label: t("overview.excellent"), color: "bg-emerald-400", count: stats?.score_distribution?.excellent || 0 },
+                  { label: t("overview.good"), color: "bg-blue-400", count: stats?.score_distribution?.good || 0 },
+                  { label: t("overview.average"), color: "bg-amber-400", count: stats?.score_distribution?.average || 0 },
+                  { label: t("overview.poor"), color: "bg-rose-500", count: stats?.score_distribution?.poor || 0 },
+                ].map((item) => {
+                  const total = stats?.score_distribution ? (stats.score_distribution.excellent + stats.score_distribution.good + stats.score_distribution.average + stats.score_distribution.poor) : 0;
+                  const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+                  return (
+                    <div key={item.label} className="flex items-center gap-1.5 text-xs">
+                      <div className={`w-2.5 h-2.5 rounded-full ${item.color}`}></div>
+                      <span className="text-muted-foreground">{item.label} ({pct}%)</span>
+                    </div>
+                  );
+                })}
               </div>
           </CardContent>
         </Card>
