@@ -1,23 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Share2, Copy, QrCode, Link2, Users, Check, ExternalLink, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
+import { apiFetch } from "@/lib/api";
 
-const sharedQuizzes = [
-  { id: "1", title: "Kiểm tra Toán HK2", shareCode: "TN-2026-001", url: "https://2know.edu.vn/test/abc123", accessCount: 45, status: "active", type: "public" },
-  { id: "2", title: "Khảo sát Tiếng Anh B1", shareCode: "EN-2026-042", url: "https://2know.edu.vn/test/def456", accessCount: 120, status: "active", type: "public" },
-  { id: "3", title: "Bài tập Đạo hàm nâng cao", shareCode: "TN-2026-003", url: "https://2know.edu.vn/test/ghi789", accessCount: 38, status: "expired", type: "class" },
-  { id: "4", title: "Kiểm tra Lý 45 phút", shareCode: "LY-2026-008", url: "https://2know.edu.vn/test/jkl012", accessCount: 22, status: "active", type: "class" },
-];
+export interface ShareData {
+  id: string;
+  quiz_id: string;
+  title: string;
+  share_code: string;
+  url: string;
+  access_count: number;
+  status: string;
+  type: string;
+  created_at: string;
+}
 
 export default function SharingPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sharedQuizzes, setSharedQuizzes] = useState<ShareData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadShares();
+  }, []);
+
+  const loadShares = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch("/shares");
+      setSharedQuizzes(data || []);
+    } catch {
+      toast.error("Không thể tải danh sách chia sẻ");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const copyLink = (id: string, url: string) => {
     navigator.clipboard.writeText(url);
@@ -27,8 +51,8 @@ export default function SharingPage() {
   };
 
   const filtered = sharedQuizzes.filter(q =>
-    q.title.toLowerCase().includes(search.toLowerCase()) ||
-    q.shareCode.toLowerCase().includes(search.toLowerCase())
+    (q.title || "").toLowerCase().includes(search.toLowerCase()) ||
+    (q.share_code || "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -38,7 +62,7 @@ export default function SharingPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("sharing.title")}</h1>
           <p className="text-muted-foreground mt-1 text-sm">{t("sharing.subtitle")}</p>
         </div>
-        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => toast.info("Hãy tạo bài kiểm tra trước để chia sẻ!")}>
+        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => window.location.href = '/quizzes'}>
           <Share2 className="w-4 h-4" /> {t("sharing.shareNew")}
         </Button>
       </div>
@@ -47,7 +71,7 @@ export default function SharingPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: t("sharing.activeShares"), value: sharedQuizzes.filter(q => q.status === "active").length, icon: Share2, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-950" },
-          { label: t("sharing.totalAccess"), value: sharedQuizzes.reduce((a, q) => a + q.accessCount, 0), icon: Users, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950" },
+          { label: t("sharing.totalAccess"), value: sharedQuizzes.reduce((a, q) => a + q.access_count, 0), icon: Users, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950" },
           { label: t("sharing.publicLinks"), value: sharedQuizzes.filter(q => q.type === "public").length, icon: Link2, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950" },
           { label: t("sharing.classShares"), value: sharedQuizzes.filter(q => q.type === "class").length, icon: QrCode, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950" },
         ].map((stat, i) => (
@@ -95,9 +119,9 @@ export default function SharingPage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="font-mono">{quiz.shareCode}</span>
+                    <span className="font-mono">{quiz.share_code}</span>
                     <span>•</span>
-                    <span>{quiz.accessCount} lượt truy cập</span>
+                    <span>{quiz.access_count} lượt truy cập</span>
                   </div>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">

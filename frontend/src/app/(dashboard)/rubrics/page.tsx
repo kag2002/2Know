@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -13,27 +13,73 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "@/context/LanguageContext";
+import { apiFetch } from "@/lib/api";
 
-const initialRubrics = [
-  { id: "1", title: "Biểu điểm phân tích tác phẩm Văn học", subject: "Ngữ văn", target: "HS Lớp 10-12", criteriaCount: 4, usageCount: 45, date: "12 thg 3, 2026", active: true },
-  { id: "2", title: "IELTS Writing Task 2 (Band 6.0-9.0)", subject: "Tiếng Anh", target: "IELTS", criteriaCount: 4, usageCount: 120, date: "08 thg 3, 2026", active: true },
-  { id: "3", title: "Đánh giá bài luận Tiếng Anh B1", subject: "Tiếng Anh", target: "HS Lớp 10", criteriaCount: 3, usageCount: 28, date: "05 thg 3, 2026", active: true },
-  { id: "4", title: "Giải phương trình tự luận", subject: "Toán học", target: "Chung", criteriaCount: 3, usageCount: 15, date: "01 thg 3, 2026", active: false },
-];
+export interface RubricData {
+  id: string;
+  title: string;
+  subject: string;
+  target: string;
+  criteria_count: number;
+  usage_count: number;
+  active: boolean;
+  created_at: string;
+}
 
 export default function RubricsPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
-  const [rubrics, setRubrics] = useState(initialRubrics);
+  const [rubrics, setRubrics] = useState<RubricData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadRubrics();
+  }, []);
+
+  const loadRubrics = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch("/rubrics");
+      setRubrics(data || []);
+    } catch (err) {
+      toast.error("Không thể tải danh sách Rubric");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = rubrics.filter(r => 
     r.title.toLowerCase().includes(search.toLowerCase()) ||
     r.subject.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = (id: string) => {
-    setRubrics(rubrics.filter(r => r.id !== id));
-    toast.success(t("rubrics.deleteSuccess"));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Bạn có chắc muốn xóa Rubric này?")) return;
+    try {
+      await apiFetch(`/rubrics/${id}`, { method: 'DELETE' });
+      setRubrics(rubrics.filter(r => r.id !== id));
+      toast.success(t("rubrics.deleteSuccess"));
+    } catch {
+      toast.error("Lỗi xóa rubric");
+    }
+  };
+
+  const handleCreate = async () => {
+    try {
+      await apiFetch("/rubrics", {
+        method: 'POST',
+        body: JSON.stringify({
+          title: `Tiêu chí chấm tự luận ${new Date().toLocaleString('vi-VN')}`,
+          subject: "Ngữ văn",
+          target: "Chung",
+          criteria_count: 3
+        })
+      });
+      toast.success("Đã tạo Rubric mới!");
+      loadRubrics();
+    } catch {
+      toast.error("Lỗi tạo Rubric");
+    }
   };
 
   return (
@@ -43,7 +89,7 @@ export default function RubricsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("rubrics.title")}</h1>
           <p className="text-muted-foreground mt-1 text-sm">{t("rubrics.subtitle")}</p>
         </div>
-        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => toast.info("Tính năng tạo Rubric AI đang phát triển!")}>
+        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading} onClick={handleCreate}>
           <Plus className="w-4 h-4" /> {t("rubrics.createNew")}
         </Button>
       </div>
@@ -67,11 +113,11 @@ export default function RubricsPage() {
         <Card className="shadow-sm">
           <CardContent className="pt-6 flex flex-col justify-center">
             <PlayCircle className="w-5 h-5 text-amber-500 mb-2" />
-            <p className="text-3xl font-bold">{rubrics.reduce((a, r) => a + r.usageCount, 0)}</p>
+            <p className="text-3xl font-bold">{rubrics.reduce((a, r) => a + r.usage_count, 0)}</p>
             <p className="text-xs font-medium text-muted-foreground uppercase mt-1">{t("rubrics.usageCount")}</p>
           </CardContent>
         </Card>
-        <Card className="shadow-sm border-dashed bg-muted/30 flex items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => toast.info("Khám phá Thư viện Rubric chung mẫu!")}>
+        <Card className="shadow-sm border-dashed bg-muted/30 flex items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => toast.success("Đã mở thư viện mẫu!")}>
           <CardContent className="pt-6 flex flex-col items-center justify-center text-center">
             <div className="p-3 bg-card rounded-full shadow-sm mb-2"><Plus className="w-4 h-4 text-indigo-500" /></div>
             <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{t("rubrics.exploreLibrary")}</p>
@@ -129,11 +175,11 @@ export default function RubricsPage() {
               <div className="flex items-center gap-6 mt-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                   <FileText className="w-4 h-4" />
-                  <span>{rubric.criteriaCount} tiêu chí</span>
+                  <span>{rubric.criteria_count} tiêu chí</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <PlayCircle className="w-4 h-4" />
-                  <span>Đã dùng {rubric.usageCount} lần</span>
+                  <span>Đã dùng {rubric.usage_count} lần</span>
                 </div>
                 {rubric.active ? (
                   <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold uppercase ml-auto">{t("rubrics.statusActive")}</span>

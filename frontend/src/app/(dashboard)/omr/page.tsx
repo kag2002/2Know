@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,26 +14,69 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTranslation } from "@/context/LanguageContext";
+import { apiFetch } from "@/lib/api";
 
-const initialBatches = [
-  { id: "1", title: "Kiểm tra Toán 15 phút - Lớp 12A1", sheetsScanned: 45, totalSheets: 45, date: "14:30 Hôm nay", status: "completed", template: "Mẫu 50 câu (A4)" },
-  { id: "2", title: "Thi thử THPT Quốc gia môn Lý", sheetsScanned: 112, totalSheets: 120, date: "09:00 Hôm qua", status: "scanning", template: "Mẫu 120 câu (A4)" },
-  { id: "3", title: "Khảo sát chất lượng Sinh học 11", sheetsScanned: 38, totalSheets: 40, date: "10 thg 3, 2026", status: "completed", template: "Mẫu 40 câu (A5)" },
-  { id: "4", title: "Kiểm tra Hóa học giữa kỳ 2", sheetsScanned: 0, totalSheets: 85, date: "Chưa quét", status: "ready", template: "Mẫu 50 câu (A4)" },
-];
+export interface OmrBatch {
+  id: string;
+  title: string;
+  template: string;
+  sheets_scanned: number;
+  total_sheets: number;
+  status: string;
+  created_at: string;
+}
 
 export default function OmrPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
-  const [batches, setBatches] = useState(initialBatches);
+  const [batches, setBatches] = useState<OmrBatch[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBatches();
+  }, []);
+
+  const loadBatches = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch("/omr/batches");
+      setBatches(data || []);
+    } catch (err) {
+      toast.error("Không thể tải danh sách đợt chấm");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = batches.filter(b => 
     b.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = (id: string) => {
-    setBatches(batches.filter(b => b.id !== id));
-    toast.success(t("omr.deleteSuccess"));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Bạn có chắc muốn xóa đợt quét OMR này?")) return;
+    try {
+      await apiFetch(`/omr/batches/${id}`, { method: 'DELETE' });
+      setBatches(batches.filter(b => b.id !== id));
+      toast.success(t("omr.deleteSuccess"));
+    } catch {
+      toast.error("Lỗi xóa đợt quét");
+    }
+  };
+
+  const handleCreate = async () => {
+    try {
+      await apiFetch("/omr/batches", {
+        method: 'POST',
+        body: JSON.stringify({
+          title: `Đợt chấm điểm ${new Date().toLocaleString('vi-VN')}`,
+          template: "Mẫu 50 câu (A4)"
+        })
+      });
+      toast.success("Đã tạo đợt chấm mới!");
+      loadBatches();
+    } catch {
+      toast.error("Lỗi tạo đợt chấm");
+    }
   };
 
   return (
@@ -44,10 +87,10 @@ export default function OmrPage() {
           <p className="text-muted-foreground mt-1 text-sm">{t("omr.subtitle")}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2 bg-card" onClick={() => toast.info("Đang tải danh sách mẫu phiếu PDF...")}>
+          <Button variant="outline" className="gap-2 bg-card" onClick={() => window.open('/omr-template.pdf', '_blank')}>
             <Printer className="w-4 h-4" /> {t("omr.printTemplate")}
           </Button>
-          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => toast.info("Tạo đợt chấm điểm mới...")}>
+          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading} onClick={handleCreate}>
             <Plus className="w-4 h-4" /> {t("omr.createBatch")}
           </Button>
         </div>
@@ -66,7 +109,7 @@ export default function OmrPage() {
         <Card className="shadow-sm">
           <CardContent className="pt-6 flex flex-col justify-center relative overflow-hidden">
             <FileText className="w-5 h-5 text-emerald-500 mb-2 relative z-10" />
-            <p className="text-3xl font-bold relative z-10">{batches.reduce((a, b) => a + b.sheetsScanned, 0)}</p>
+            <p className="text-3xl font-bold relative z-10">{batches.reduce((a, b) => a + b.sheets_scanned, 0)}</p>
             <p className="text-xs font-medium text-muted-foreground uppercase mt-1 relative z-10">Phiếu đã quét</p>
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-900/20 rounded-full blur-xl z-0"></div>
           </CardContent>
@@ -118,8 +161,7 @@ export default function OmrPage() {
                   
                   <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground mt-2">
                     <div className="flex items-center gap-1.5">
-                      <History className="w-4 h-4" />
-                      <span>{batch.date}</span>
+                      <span>{new Date(batch.created_at).toLocaleDateString('vi-VN')}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <FileText className="w-4 h-4" />
@@ -139,14 +181,14 @@ export default function OmrPage() {
                           fill="none" 
                           stroke="currentColor" 
                           strokeWidth="3" 
-                          strokeDasharray={`${(batch.sheetsScanned / batch.totalSheets) * 100}, 100`}
+                          strokeDasharray={`${batch.total_sheets > 0 ? (batch.sheets_scanned / batch.total_sheets) * 100 : 0}, 100`}
                           className={batch.status === 'completed' ? 'text-emerald-500' : 'text-indigo-500'} 
                         />
                       </svg>
-                      <span className="absolute text-[10px] font-bold">{Math.round((batch.sheetsScanned / batch.totalSheets) * 100)}%</span>
+                      <span className="absolute text-[10px] font-bold">{batch.total_sheets > 0 ? Math.round((batch.sheets_scanned / batch.total_sheets) * 100) : 0}%</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-bold text-lg leading-none">{batch.sheetsScanned} <span className="text-sm font-normal text-muted-foreground">/ {batch.totalSheets}</span></span>
+                      <span className="font-bold text-lg leading-none">{batch.sheets_scanned} <span className="text-sm font-normal text-muted-foreground">/ {batch.total_sheets}</span></span>
                       <span className="text-xs text-muted-foreground mt-1">phiếu đã quét</span>
                     </div>
                   </div>

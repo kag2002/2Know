@@ -131,7 +131,7 @@ export default function ClassesPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => window.location.href = `/classes/${cls.id}`}>{t("classes.editInfo")}</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => toast.info(t("classes.benchmarkReport"))}>{t("classes.benchmarkReport")}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => window.location.href = `/reports`}>{t("classes.benchmarkReport")}</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive" onClick={async () => {
                         if (!confirm(t("classes.confirmDelete"))) return;
                         try {

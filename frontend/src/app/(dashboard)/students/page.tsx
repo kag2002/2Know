@@ -205,7 +205,7 @@ export default function StudentsPage() {
                           <MoreVertical className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem className="gap-2" onClick={() => toast.info(`Mở hồ sơ ${student.name}`)}>
+                          <DropdownMenuItem className="gap-2" onClick={() => window.location.href = `/students/${student.id}`}>
                             <GraduationCap className="w-4 h-4 text-slate-400" /> Xem hồ sơ
                           </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2" onClick={() => apiFetch(`/students/${student.id}`, { method: 'DELETE' }).then(() => setAllStudents(prev => prev.filter(x => x.id !== student.id))).catch(e => toast.error('Lỗi khi xóa'))}>
