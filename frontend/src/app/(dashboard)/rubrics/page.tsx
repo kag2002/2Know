@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from "@/context/LanguageContext";
 
 const initialRubrics = [
   { id: "1", title: "Biểu điểm phân tích tác phẩm Văn học", subject: "Ngữ văn", target: "HS Lớp 10-12", criteriaCount: 4, usageCount: 45, date: "12 thg 3, 2026", active: true },
@@ -21,6 +22,7 @@ const initialRubrics = [
 ];
 
 export default function RubricsPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [rubrics, setRubrics] = useState(initialRubrics);
 
@@ -31,18 +33,18 @@ export default function RubricsPage() {
 
   const handleDelete = (id: string) => {
     setRubrics(rubrics.filter(r => r.id !== id));
-    toast.success("Đã xóa rubric!");
+    toast.success(t("rubrics.deleteSuccess"));
   };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">Thư viện Rubric AI</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Quản lý các tiêu chí đánh giá tự động bằng AI cho bài kiểm tra tự luận.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("rubrics.title")}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">{t("rubrics.subtitle")}</p>
         </div>
         <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => toast.info("Tính năng tạo Rubric AI đang phát triển!")}>
-          <Plus className="w-4 h-4" /> Tạo Rubric mới
+          <Plus className="w-4 h-4" /> {t("rubrics.createNew")}
         </Button>
       </div>
 
@@ -52,27 +54,27 @@ export default function RubricsPage() {
           <CardContent className="pt-6 flex flex-col justify-center">
             <Library className="w-5 h-5 text-indigo-500 mb-2" />
             <p className="text-3xl font-bold">{rubrics.length}</p>
-            <p className="text-xs font-medium text-muted-foreground uppercase mt-1">Tổng Rubric</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase mt-1">{t("rubrics.totalRubrics")}</p>
           </CardContent>
         </Card>
         <Card className="shadow-sm">
           <CardContent className="pt-6 flex flex-col justify-center">
             <CheckCircle2 className="w-5 h-5 text-emerald-500 mb-2" />
             <p className="text-3xl font-bold">{rubrics.filter(r => r.active).length}</p>
-            <p className="text-xs font-medium text-muted-foreground uppercase mt-1">Đang hoạt động</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase mt-1">{t("rubrics.activeCount")}</p>
           </CardContent>
         </Card>
         <Card className="shadow-sm">
           <CardContent className="pt-6 flex flex-col justify-center">
             <PlayCircle className="w-5 h-5 text-amber-500 mb-2" />
             <p className="text-3xl font-bold">{rubrics.reduce((a, r) => a + r.usageCount, 0)}</p>
-            <p className="text-xs font-medium text-muted-foreground uppercase mt-1">Lượt áp dụng chấm</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase mt-1">{t("rubrics.usageCount")}</p>
           </CardContent>
         </Card>
         <Card className="shadow-sm border-dashed bg-muted/30 flex items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => toast.info("Khám phá Thư viện Rubric chung mẫu!")}>
           <CardContent className="pt-6 flex flex-col items-center justify-center text-center">
             <div className="p-3 bg-card rounded-full shadow-sm mb-2"><Plus className="w-4 h-4 text-indigo-500" /></div>
-            <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">Khám phá thư viện mẫu</p>
+            <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{t("rubrics.exploreLibrary")}</p>
           </CardContent>
         </Card>
       </div>
@@ -81,7 +83,7 @@ export default function RubricsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Tìm kiếm rubric theo tên hoặc môn học..."
+            placeholder={t("rubrics.searchPlaceholder")}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-9 bg-card focus:bg-background h-10 transition-colors"
@@ -116,8 +118,8 @@ export default function RubricsPage() {
                     <MoreHorizontal className="w-4 h-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="gap-2"><Edit2 className="w-4 h-4"/> Chỉnh sửa tiêu chí</DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2"><Copy className="w-4 h-4"/> Nhân bản</DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2"><Edit2 className="w-4 h-4"/> {t("rubrics.editCriteria")}</DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2"><Copy className="w-4 h-4"/> {t("rubrics.duplicate")}</DropdownMenuItem>
                     <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive" onClick={() => handleDelete(rubric.id)}><Trash2 className="w-4 h-4"/> Xóa</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -134,9 +136,9 @@ export default function RubricsPage() {
                   <span>Đã dùng {rubric.usageCount} lần</span>
                 </div>
                 {rubric.active ? (
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold uppercase ml-auto">Đang áp dụng</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold uppercase ml-auto">{t("rubrics.statusActive")}</span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-muted-foreground dark:bg-slate-800 text-[10px] font-bold uppercase ml-auto">Bản nháp</span>
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-muted-foreground dark:bg-slate-800 text-[10px] font-bold uppercase ml-auto">{t("rubrics.statusDraft")}</span>
                 )}
               </div>
               
@@ -166,7 +168,7 @@ export default function RubricsPage() {
         ))}
         {filtered.length === 0 && (
           <div className="col-span-1 lg:col-span-2 p-12 text-center text-muted-foreground border rounded-xl bg-card">
-            Không tìm thấy rubric nào phù hợp.
+            {t("rubrics.noResults")}
           </div>
         )}
       </div>

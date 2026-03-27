@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Plus, Tags, Search, X, Hash, BarChart3, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function TagsPage() {
+  const { t } = useTranslation();
   const [tags, setTags] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [newTag, setNewTag] = useState("");
@@ -44,7 +46,7 @@ export default function TagsPage() {
       setNewTag("");
       toast.success(`Đã thêm thẻ "${newTag.trim()}"`);
     } catch (err) {
-      toast.error("Thêm thẻ thất bại.");
+      toast.error(t("tags.addError"));
     }
   };
 
@@ -52,9 +54,9 @@ export default function TagsPage() {
     try {
       await apiFetch(`/tags/${id}`, { method: "DELETE" });
       setTags(tags.filter(t => t.id !== id));
-      toast.success("Đã xóa thẻ!");
+      toast.success(t("tags.deleteSuccess"));
     } catch (err) {
-      toast.error("Lỗi xóa thẻ.");
+      toast.error(t("tags.deleteError"));
     }
   };
 
@@ -64,8 +66,8 @@ export default function TagsPage() {
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">Quản lý Thẻ (Tags)</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Phân loại câu hỏi và bài kiểm tra bằng hệ thống thẻ thông minh.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("tags.title")}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">{t("tags.subtitle")}</p>
         </div>
       </div>
 
@@ -75,7 +77,7 @@ export default function TagsPage() {
           <CardContent className="pt-6 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950"><Tags className="w-5 h-5 text-indigo-500" /></div>
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase">Tổng thẻ</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase">{t("tags.totalTags")}</p>
               <p className="text-2xl font-bold">{tags.length}</p>
             </div>
           </CardContent>
@@ -84,7 +86,7 @@ export default function TagsPage() {
           <CardContent className="pt-6 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950"><BarChart3 className="w-5 h-5 text-emerald-500" /></div>
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase">Câu hỏi đã gắn thẻ</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase">{t("tags.taggedQuestions")}</p>
               <p className="text-2xl font-bold">{tags.reduce((a, t) => a + t.count, 0)}</p>
             </div>
           </CardContent>
@@ -96,7 +98,7 @@ export default function TagsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
-            placeholder="Tìm thẻ..."
+            placeholder={t("tags.searchPlaceholder")}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="pl-9 h-10 w-full rounded-md border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 px-3"
@@ -104,14 +106,14 @@ export default function TagsPage() {
         </div>
         <div className="flex gap-2">
           <input
-            placeholder="Tên thẻ mới..."
+            placeholder={t("tags.newTagPlaceholder")}
             value={newTag}
             onChange={e => setNewTag(e.target.value)}
             onKeyDown={e => e.key === "Enter" && addTag()}
             className="h-10 w-48 rounded-md border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 px-3"
           />
           <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={addTag}>
-            <Plus className="w-4 h-4" /> Thêm
+            <Plus className="w-4 h-4" /> {t("tags.add")}
           </Button>
         </div>
       </div>
@@ -135,7 +137,7 @@ export default function TagsPage() {
           </div>
         ))}
         {filtered.length === 0 && (
-          <p className="text-muted-foreground text-sm py-8">Không tìm thấy thẻ nào phù hợp.</p>
+          <p className="text-muted-foreground text-sm py-8">{t("tags.noResults")}</p>
         )}
       </div>
     </div>

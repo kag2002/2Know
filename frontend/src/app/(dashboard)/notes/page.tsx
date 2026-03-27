@@ -12,8 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { apiFetch } from "@/lib/api";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function NotesPage() {
+  const { t } = useTranslation();
   const [notes, setNotes] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ export default function NotesPage() {
   }, []);
 
   const handleCreate = async () => {
-    if (!newTitle.trim() || !newContent.trim()) return toast.error("Vui lòng nhập cả tiêu đề và nội dung.");
+    if (!newTitle.trim() || !newContent.trim()) return toast.error(t("notes.required"));
     try {
       const colors = [
         "bg-amber-50 border-amber-200", 
@@ -58,9 +60,9 @@ export default function NotesPage() {
       setIsCreating(false);
       setNewTitle("");
       setNewContent("");
-      toast.success("Đã tạo ghi chú mới!");
+      toast.success(t("notes.createSuccess"));
     } catch (err) {
-      toast.error("Tạo ghi chú thất bại.");
+      toast.error(t("notes.createError"));
     }
   };
 
@@ -68,7 +70,7 @@ export default function NotesPage() {
     try {
       await apiFetch(`/notes/${id}`, { method: "DELETE" });
       setNotes(notes.filter(n => n.id !== id));
-      toast.success("Đã xóa ghi chú!");
+      toast.success(t("notes.deleteSuccess"));
     } catch (err) {
       toast.error("Lỗi xóa ghi chú.");
     }
@@ -78,7 +80,7 @@ export default function NotesPage() {
     try {
       await apiFetch(`/notes/${id}/pin`, { method: "PATCH" });
       setNotes(notes.map(n => n.id === id ? { ...n, pinned: !n.pinned } : n));
-      toast.success("Đã cập nhật trạng thái ghim!");
+      toast.success(t("notes.pinSuccess"));
     } catch (err) {
       toast.error("Lỗi ghim ghi chú.");
     }
@@ -98,12 +100,12 @@ export default function NotesPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">Ghi chú cá nhân</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Lưu trữ ý tưởng, kế hoạch giảng dạy và nhắc nhở quan trọng.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("notes.title")}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">{t("notes.subtitle")}</p>
         </div>
         {!isCreating && (
           <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => setIsCreating(true)}>
-            <Plus className="w-4 h-4" /> Tạo ghi chú
+            <Plus className="w-4 h-4" /> {t("notes.create")}
           </Button>
         )}
       </div>
@@ -113,7 +115,7 @@ export default function NotesPage() {
           <CardHeader className="py-3 bg-indigo-50/50">
             <input 
               className="text-lg font-bold bg-transparent outline-none placeholder:text-slate-400" 
-              placeholder="Tiêu đề ghi chú..." 
+              placeholder={t("notes.titlePlaceholder")} 
               value={newTitle}
               onChange={e => setNewTitle(e.target.value)}
               autoFocus
@@ -122,13 +124,13 @@ export default function NotesPage() {
           <CardContent className="pt-2 pb-3">
             <textarea 
                className="w-full text-sm bg-transparent outline-none resize-y min-h-[80px]" 
-               placeholder="Nhập nội dung..."
+               placeholder={t("notes.contentPlaceholder")}
                value={newContent}
                onChange={e => setNewContent(e.target.value)}
             />
             <div className="flex justify-end gap-2 mt-2">
-              <Button variant="ghost" size="sm" onClick={() => setIsCreating(false)}>Hủy</Button>
-              <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 gap-1" onClick={handleCreate}><Save className="w-4 h-4" /> Lưu</Button>
+              <Button variant="ghost" size="sm" onClick={() => setIsCreating(false)}>{t("notes.cancel")}</Button>
+              <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 gap-1" onClick={handleCreate}><Save className="w-4 h-4" /> {t("notes.save")}</Button>
             </div>
           </CardContent>
         </Card>
@@ -137,7 +139,7 @@ export default function NotesPage() {
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
-          placeholder="Tìm kiếm ghi chú..."
+          placeholder={t("notes.searchPlaceholder")}
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="pl-9 h-10 w-full rounded-md border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 px-3"
@@ -147,7 +149,7 @@ export default function NotesPage() {
       {pinned.length > 0 && (
         <>
           <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            <Pin className="w-3.5 h-3.5" /> Đã ghim
+            <Pin className="w-3.5 h-3.5" /> {t("notes.pinned")}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pinned.map(note => (
@@ -160,7 +162,7 @@ export default function NotesPage() {
       {unpinned.length > 0 && (
         <>
           <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider mt-2">
-            <StickyNote className="w-3.5 h-3.5" /> Khác
+            <StickyNote className="w-3.5 h-3.5" /> {t("notes.other")}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {unpinned.map(note => (
@@ -189,13 +191,13 @@ function NoteCard({ note, onDelete, onTogglePin }: { note: typeof initialNotes[0
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem className="gap-2" onClick={() => onTogglePin(note.id)}>
-              <Pin className="w-4 h-4" /> {note.pinned ? "Bỏ ghim" : "Ghim lên đầu"}
+              <Pin className="w-4 h-4" /> {note.pinned ? t("notes.unpin") : t("notes.pin")}
             </DropdownMenuItem>
             <DropdownMenuItem className="gap-2">
-              <Edit2 className="w-4 h-4" /> Chỉnh sửa
+              <Edit2 className="w-4 h-4" /> {t("notes.edit")}
             </DropdownMenuItem>
             <DropdownMenuItem className="gap-2 text-destructive" onClick={() => onDelete(note.id)}>
-              <Trash2 className="w-4 h-4" /> Xóa
+              <Trash2 className="w-4 h-4" /> {t("notes.delete")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from "@/context/LanguageContext";
 
 interface Student {
   id: string;
@@ -31,6 +32,7 @@ interface ClassData {
 }
 
 export default function ClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = useTranslation();
   const { id } = use(params);
   
   const [classData, setClassData] = useState<ClassData | null>(null);
@@ -63,9 +65,9 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
   if (!classData) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-bold text-card-foreground">Không tìm thấy Lớp học</h2>
+        <h2 className="text-xl font-bold text-card-foreground">{t("classDetail.notFound")}</h2>
         <Link href="/classes">
-          <Button variant="outline" className="mt-4">Quay lại danh sách</Button>
+          <Button variant="outline" className="mt-4">{t("classDetail.backToList")}</Button>
         </Link>
       </div>
     );
@@ -84,20 +86,20 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
         </Link>
         <div className="flex-1">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">{name}</h1>
-          <p className="text-muted-foreground mt-1">{subject || "Chưa có môn"} • {grade || "Chưa có khối"} • Năm học {school_year || "---"}</p>
+          <p className="text-muted-foreground mt-1">{subject || t("classDetail.noSubject")} • {grade || t("classDetail.noGrade")} • {t("classDetail.schoolYear")} {school_year || "---"}</p>
         </div>
         <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
-          <Mail className="w-4 h-4" /> Mời học sinh
+          <Mail className="w-4 h-4" /> {t("classDetail.invite")}
         </Button>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Sĩ số", value: students.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
-          { label: "Điểm TB lớp", value: "---", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
-          { label: "HS xuất sắc", value: "---", icon: Award, color: "text-amber-500", bg: "bg-amber-50" },
-          { label: "HS cần hỗ trợ", value: "---", icon: TrendingUp, color: "text-rose-500", bg: "bg-rose-50" },
+          { label: t("classDetail.headcount"), value: students.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
+          { label: t("classDetail.classAvg"), value: "---", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: t("classDetail.excellent"), value: "---", icon: Award, color: "text-amber-500", bg: "bg-amber-50" },
+          { label: t("classDetail.needHelp"), value: "---", icon: TrendingUp, color: "text-rose-500", bg: "bg-rose-50" },
         ].map((stat, i) => (
           <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
@@ -119,13 +121,13 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
       <Card className="shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg">Danh sách học sinh</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">Quản lý và theo dõi kết quả học tập của từng học sinh</p>
+            <CardTitle className="text-lg">{t("classDetail.roster")}</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">{t("classDetail.rosterDesc")}</p>
           </div>
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
-              placeholder="Tìm học sinh..."
+              placeholder={t("classDetail.searchStudent")}
               className="pl-9 h-9 w-full rounded-md border bg-muted text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-background transition-colors px-3"
             />
           </div>
@@ -136,11 +138,11 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
                   <th className="pb-3 font-semibold w-8">#</th>
-                  <th className="pb-3 font-semibold">Tên đăng nhập (SBD)</th>
-                  <th className="pb-3 font-semibold">Họ và Tên</th>
-                  <th className="pb-3 font-semibold">Email</th>
-                  <th className="pb-3 font-semibold text-center">Điểm TB</th>
-                  <th className="pb-3 font-semibold text-center">Trạng thái</th>
+                  <th className="pb-3 font-semibold">{t("classDetail.colSBD")}</th>
+                  <th className="pb-3 font-semibold">{t("classDetail.colName")}</th>
+                  <th className="pb-3 font-semibold">{t("classDetail.colEmail")}</th>
+                  <th className="pb-3 font-semibold text-center">{t("classDetail.colAvg")}</th>
+                  <th className="pb-3 font-semibold text-center">{t("classDetail.colStatus")}</th>
                   <th className="pb-3 font-semibold w-10"></th>
                 </tr>
               </thead>
@@ -160,7 +162,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                     <td className="py-3.5 text-muted-foreground">{student.email || "---"}</td>
                     <td className="py-3.5 text-center text-slate-400">---</td>
                     <td className="py-3.5 text-center">
-                       <span className="px-2 py-0.5 bg-slate-100 text-muted-foreground rounded-full text-[10px] font-semibold uppercase">Đang học</span>
+                       <span className="px-2 py-0.5 bg-slate-100 text-muted-foreground rounded-full text-[10px] font-semibold uppercase">{t("classDetail.statusActive")}</span>
                     </td>
                     <td className="py-3.5">
                       <DropdownMenu>
@@ -168,8 +170,8 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                           <MoreVertical className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Xem hồ sơ chi tiết</DropdownMenuItem>
-                          <DropdownMenuItem className="text-rose-600">Xóa khỏi lớp</DropdownMenuItem>
+                          <DropdownMenuItem>{t("classDetail.viewProfile")}</DropdownMenuItem>
+                          <DropdownMenuItem className="text-rose-600">{t("classDetail.removeFromClass")}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -179,7 +181,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                 {students.length === 0 && (
                   <tr>
                     <td colSpan={7} className="py-8 text-center text-muted-foreground">
-                      Lớp học này chưa có học sinh nào.
+                      {t("classDetail.noStudents")}
                     </td>
                   </tr>
                 )}

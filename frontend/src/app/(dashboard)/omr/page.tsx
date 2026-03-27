@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from "@/context/LanguageContext";
 
 const initialBatches = [
   { id: "1", title: "Kiểm tra Toán 15 phút - Lớp 12A1", sheetsScanned: 45, totalSheets: 45, date: "14:30 Hôm nay", status: "completed", template: "Mẫu 50 câu (A4)" },
@@ -22,6 +23,7 @@ const initialBatches = [
 ];
 
 export default function OmrPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [batches, setBatches] = useState(initialBatches);
 
@@ -31,22 +33,22 @@ export default function OmrPage() {
 
   const handleDelete = (id: string) => {
     setBatches(batches.filter(b => b.id !== id));
-    toast.success("Đã xóa đợt quét OMR!");
+    toast.success(t("omr.deleteSuccess"));
   };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">Chấm điểm giấy (OMR)</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Quản lý phiếu trả lời trắc nghiệm, in mẫu phiếu và quét tự động bằng camera.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("omr.title")}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">{t("omr.subtitle")}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2 bg-card" onClick={() => toast.info("Đang tải danh sách mẫu phiếu PDF...")}>
-            <Printer className="w-4 h-4" /> In mẫu phiếu
+            <Printer className="w-4 h-4" /> {t("omr.printTemplate")}
           </Button>
           <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => toast.info("Tạo đợt chấm điểm mới...")}>
-            <Plus className="w-4 h-4" /> Tạo đợt chấm
+            <Plus className="w-4 h-4" /> {t("omr.createBatch")}
           </Button>
         </div>
       </div>

@@ -22,8 +22,10 @@ const steps = [
 
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function QuizBuilderWizard() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -50,13 +52,13 @@ export default function QuizBuilderWizard() {
 
   const handleSave = async (status: string = "draft") => {
     if (!formData.title) {
-      alert("Vui lòng nhập tên bài kiểm tra");
+      alert(t("quizCreate.alertNoTitle"));
       setCurrentStep(1);
       return;
     }
 
     if (status === "published" && questions.length === 0) {
-      alert("Vui lòng thêm ít nhất một câu hỏi trước khi xuất bản.");
+      alert(t("quizCreate.alertNoQuestions"));
       setCurrentStep(3);
       return;
     }
@@ -82,7 +84,7 @@ export default function QuizBuilderWizard() {
       });
       router.push("/quizzes");
     } catch (err: any) {
-      alert("Lỗi lưu bài kiểm tra: " + err.message);
+      alert(t("quizCreate.saveError") + err.message);
     } finally {
       setLoading(false);
     }
@@ -92,7 +94,7 @@ export default function QuizBuilderWizard() {
     <div className="max-w-7xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Tạo bài kiểm tra mới</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("quizCreate.title")}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Bước {currentStep} / {steps.length}: {steps[currentStep - 1].title}
           </p>
@@ -107,7 +109,7 @@ export default function QuizBuilderWizard() {
             disabled={loading}
           >
             {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            Lưu nháp
+            {t("quizCreate.saveDraft")}
           </Button>
         </div>
       </div>
@@ -413,7 +415,7 @@ export default function QuizBuilderWizard() {
                     <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
                       <Share2 className="w-8 h-8 text-emerald-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-foreground">Mọi thứ đã sẵn sàng!</h3>
+                    <h3 className="text-xl font-bold text-foreground">{t("quizCreate.publishReady")}</h3>
                     <p className="text-muted-foreground mt-2 max-w-sm text-sm">
                       Bài kiểm tra của bạn đã được cấu hình. Chọn Xuất bản để cho phép học viên truy cập ngay bài thi.
                     </p>
@@ -482,14 +484,14 @@ export default function QuizBuilderWizard() {
                   onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
                   disabled={currentStep === 1}
                 >
-                  Quay lại
+                  {t("quizCreate.back")}
                 </Button>
                 {currentStep < steps.length ? (
                   <Button 
                     className="bg-emerald-600 hover:bg-emerald-700 text-white"
                     onClick={() => setCurrentStep(Math.min(steps.length, currentStep + 1))}
                   >
-                    Tiếp tục
+                    {t("quizCreate.next")}
                   </Button>
                 ) : (
                   <Button 
@@ -498,7 +500,7 @@ export default function QuizBuilderWizard() {
                     disabled={loading}
                   >
                     {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    Xuất bản ngay
+                    {t("quizCreate.publish")}
                   </Button>
                 )}
               </div>
