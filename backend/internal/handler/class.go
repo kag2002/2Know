@@ -96,3 +96,24 @@ func (h *ClassHandler) DeleteClass(c fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{"message": "Class deleted"})
 }
+
+// UPDATE Class
+func (h *ClassHandler) UpdateClass(c fiber.Ctx) error {
+	id := c.Params("id")
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	var class model.Class
+	if err := c.Bind().JSON(&class); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+	class.ID = id
+	if err := h.svc.UpdateClass(userId, &class); err != nil {
+		log.Printf("Error updating class: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update class"})
+	}
+
+	return c.JSON(class)
+}

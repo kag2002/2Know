@@ -43,6 +43,20 @@ func (h *OmrBatchHandler) CreateBatch(c fiber.Ctx) error {
 	return c.Status(201).JSON(batch)
 }
 
+func (h *OmrBatchHandler) UpdateBatch(c fiber.Ctx) error {
+	userID, _ := c.Locals("userID").(string)
+	id := c.Params("id")
+	var batch model.OmrBatch
+	if err := c.Bind().JSON(&batch); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+	
+	if err := h.svc.UpdateBatch(id, userID, &batch); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update batch"})
+	}
+	return c.JSON(batch)
+}
+
 func (h *OmrBatchHandler) DeleteBatch(c fiber.Ctx) error {
 	userID, _ := c.Locals("userID").(string)
 	id := c.Params("id")
@@ -82,6 +96,20 @@ func (h *RubricHandler) CreateRubric(c fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create rubric"})
 	}
 	return c.Status(201).JSON(rubric)
+}
+
+func (h *RubricHandler) UpdateRubric(c fiber.Ctx) error {
+	userID, _ := c.Locals("userID").(string)
+	id := c.Params("id")
+	var rubric model.Rubric
+	if err := c.Bind().JSON(&rubric); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+	
+	if err := h.svc.UpdateRubric(id, userID, &rubric); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update rubric"})
+	}
+	return c.JSON(rubric)
 }
 
 func (h *RubricHandler) DeleteRubric(c fiber.Ctx) error {
@@ -129,6 +157,20 @@ func (h *ShareLinkHandler) CreateLink(c fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create share link"})
 	}
 	return c.Status(201).JSON(link)
+}
+
+func (h *ShareLinkHandler) UpdateLink(c fiber.Ctx) error {
+	userID, _ := c.Locals("userID").(string)
+	id := c.Params("id")
+	var link model.ShareLink
+	if err := c.Bind().JSON(&link); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
+	}
+	
+	if err := h.svc.UpdateLink(id, userID, &link); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update share link"})
+	}
+	return c.JSON(link)
 }
 
 func (h *ShareLinkHandler) DeleteLink(c fiber.Ctx) error {

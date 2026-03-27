@@ -142,12 +142,14 @@ func main() {
 	api.Get("/classes", classHandler.GetClasses)
 	api.Post("/classes", classHandler.CreateClass)
 	api.Get("/classes/:id", classHandler.GetClassByID)
+	api.Patch("/classes/:id", classHandler.UpdateClass)
 	api.Delete("/classes/:id", classHandler.DeleteClass)
 	api.Post("/classes/:id/students", classHandler.AddStudent)
 
 	// Global Student Directory endpoints
 	api.Get("/students", studentHandler.GetStudents)
 	api.Post("/students", studentHandler.CreateStudent)
+	api.Patch("/students/:id", studentHandler.UpdateStudent)
 	api.Delete("/students/:id", studentHandler.DeleteStudent)
 
 	// Notes & Tags endpoints
@@ -176,16 +178,19 @@ func main() {
 	// OMR Batch endpoints
 	api.Get("/omr/batches", omrHandler.GetBatches)
 	api.Post("/omr/batches", omrHandler.CreateBatch)
+	api.Patch("/omr/batches/:id", omrHandler.UpdateBatch)
 	api.Delete("/omr/batches/:id", omrHandler.DeleteBatch)
 
 	// Rubric endpoints
 	api.Get("/rubrics", rubricHandler.GetRubrics)
 	api.Post("/rubrics", rubricHandler.CreateRubric)
+	api.Patch("/rubrics/:id", rubricHandler.UpdateRubric)
 	api.Delete("/rubrics/:id", rubricHandler.DeleteRubric)
 
 	// Share Link endpoints
 	api.Get("/shares", shareLinkHandler.GetLinks)
 	api.Post("/shares", shareLinkHandler.CreateLink)
+	api.Patch("/shares/:id", shareLinkHandler.UpdateLink)
 	api.Delete("/shares/:id", shareLinkHandler.DeleteLink)
 
 	port := os.Getenv("PORT")

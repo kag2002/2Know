@@ -3,10 +3,20 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Share2, Copy, QrCode, Link2, Users, Check, ExternalLink, Search } from "lucide-react";
+import { Share2, Copy, QrCode, Link2, Users, Check, ExternalLink, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
 import { apiFetch } from "@/lib/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export interface ShareData {
   id: string;
@@ -26,6 +36,9 @@ export default function SharingPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sharedQuizzes, setSharedQuizzes] = useState<ShareData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingLink, setEditingLink] = useState<ShareData | null>(null);
 
   useEffect(() => {
     loadShares();
@@ -48,6 +61,39 @@ export default function SharingPage() {
     setCopiedId(id);
     toast.success(t("sharing.copySuccess"));
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleEditLink = async () => {
+    if (!editingLink || !editingLink.title) {
+      toast.warning("Vui lòng nhập tên bài test!");
+      return;
+    }
+    try {
+      await apiFetch(`/shares/${editingLink.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          title: editingLink.title,
+          status: editingLink.status,
+          type: editingLink.type
+        })
+      });
+      toast.success("Cập nhật mục chia sẻ thành công!");
+      setIsEditDialogOpen(false);
+      loadShares();
+    } catch {
+      toast.error("Lỗi cập nhật chia sẻ");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Bạn có chắc muốn xóa link chia sẻ này?")) return;
+    try {
+      await apiFetch(`/shares/${id}`, { method: 'DELETE' });
+      setSharedQuizzes(prev => prev.filter(q => q.id !== id));
+      toast.success("Đã xóa link chia sẻ");
+    } catch (err) {
+      toast.error("Lỗi khi xóa");
+    }
   };
 
   const filtered = sharedQuizzes.filter(q =>
@@ -134,8 +180,11 @@ export default function SharingPage() {
                     {copiedId === quiz.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     {copiedId === quiz.id ? t("sharing.copied") : t("sharing.copy")}
                   </Button>
-                  <Button variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-none">
-                    <ExternalLink className="w-3.5 h-3.5" /> {t("sharing.open")}
+                  <Button variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-none" onClick={() => { setEditingLink(quiz); setIsEditDialogOpen(true); }}>
+                    <Edit2 className="w-3.5 h-3.5" /> Sửa
+                  </Button>
+                  <Button variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-none text-destructive hover:text-destructive" onClick={() => handleDelete(quiz.id)}>
+                    <Trash2 className="w-3.5 h-3.5" /> Xóa
                   </Button>
                 </div>
               </div>
@@ -143,6 +192,56 @@ export default function SharingPage() {
           </Card>
         ))}
       </div>
+
+      {/* Edit Share Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa cài đặt chia sẻ</DialogTitle>
+            <DialogDescription>Cập nhật thông tin và quyền truy cập của bài kiểm tra.</DialogDescription>
+          </DialogHeader>
+          {editingLink && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-l-title">Tên hiển thị</Label>
+                <Input 
+                  id="edit-l-title" 
+                  value={editingLink.title} 
+                  onChange={(e) => setEditingLink({...editingLink, title: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-l-status">Trạng thái</Label>
+                <select 
+                  id="edit-l-status" 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={editingLink.status} 
+                  onChange={(e) => setEditingLink({...editingLink, status: e.target.value})}
+                >
+                  <option value="active">Đang mở</option>
+                  <option value="expired">Tạm đóng</option>
+                </select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-l-type">Loại bảo mật</Label>
+                <select 
+                  id="edit-l-type" 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={editingLink.type} 
+                  onChange={(e) => setEditingLink({...editingLink, type: e.target.value})}
+                >
+                  <option value="public">Công khai (Ai có link cũng vào được)</option>
+                  <option value="class">Nội bộ lớp (Cần mã HS)</option>
+                </select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditLink} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

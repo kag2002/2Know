@@ -44,6 +44,9 @@ export default function ClassesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newClass, setNewClass] = useState({ name: "", subject: "", grade: "", school_year: "2025-2026" });
 
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingClass, setEditingClass] = useState<ClassItem | null>(null);
+
   useEffect(() => {
     loadClasses();
   }, []);
@@ -79,6 +82,28 @@ export default function ClassesPage() {
     } catch (err: any) {
       toast.error("Lỗi: " + err.message);
       setLoading(false);
+    }
+  };
+
+  const handleEditClass = async () => {
+    if (!editingClass || !editingClass.name || !editingClass.subject) {
+      toast.warning("Vui lòng điền đủ thông tin!");
+      return;
+    }
+    try {
+      await apiFetch(`/classes/${editingClass.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          name: editingClass.name,
+          subject: editingClass.subject,
+          grade: editingClass.grade,
+        }),
+      });
+      toast.success("Cập nhật thông tin lớp thành công!");
+      setIsEditDialogOpen(false);
+      loadClasses();
+    } catch (err: any) {
+      toast.error("Lỗi cập nhật: " + err.message);
     }
   };
 
@@ -191,7 +216,7 @@ export default function ClassesPage() {
                       <MoreVertical className="w-4 h-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => window.location.href = `/classes/${cls.id}`}>{t("classes.editInfo")}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setEditingClass(cls); setIsEditDialogOpen(true); }}>{t("classes.editInfo")}</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => window.location.href = `/reports`}>{t("classes.benchmarkReport")}</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive" onClick={async () => {
                         if (!confirm(t("classes.confirmDelete"))) return;
@@ -257,6 +282,48 @@ export default function ClassesPage() {
           </div>
         </div>
       )}
+
+      {/* Edit Class Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa lớp học</DialogTitle>
+            <DialogDescription>Thay đổi thông tin cơ bản của lớp học này.</DialogDescription>
+          </DialogHeader>
+          {editingClass && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-name">Tên lớp học</Label>
+                <Input 
+                  id="edit-name" 
+                  value={editingClass.name} 
+                  onChange={(e) => setEditingClass({...editingClass, name: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-grade">Khối / Năm học</Label>
+                <Input 
+                  id="edit-grade" 
+                  value={editingClass.grade} 
+                  onChange={(e) => setEditingClass({...editingClass, grade: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-subject">Môn học phụ trách</Label>
+                <Input 
+                  id="edit-subject" 
+                  value={editingClass.subject} 
+                  onChange={(e) => setEditingClass({...editingClass, subject: e.target.value})} 
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

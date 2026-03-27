@@ -11,6 +11,7 @@ type ClassRepository interface {
 	GetClasses(teacherID string) ([]model.Class, error)
 	GetClassByID(id, teacherID string) (*model.Class, error)
 	VerifyOwnership(id, teacherID string) error
+	UpdateClass(class *model.Class, teacherID string) error
 	CreateStudent(student *model.Student) error
 	DeleteClass(id, teacherID string) error
 }
@@ -58,4 +59,8 @@ func (r *classRepository) CreateStudent(student *model.Student) error {
 
 func (r *classRepository) DeleteClass(id, teacherID string) error {
 	return r.db.Where("id = ? AND teacher_id = ?", id, teacherID).Delete(&model.Class{}).Error
+}
+
+func (r *classRepository) UpdateClass(class *model.Class, teacherID string) error {
+	return r.db.Where("id = ? AND teacher_id = ?", class.ID, teacherID).Updates(class).Error
 }

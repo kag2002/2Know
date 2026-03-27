@@ -46,6 +46,9 @@ export default function StudentsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newStudent, setNewStudent] = useState({ name: "", email: "" });
 
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<StudentMetrics | null>(null);
+
   useEffect(() => {
     const loadStudents = async () => {
       try {
@@ -105,6 +108,29 @@ export default function StudentsPage() {
       toast.error("Lỗi: " + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditStudent = async () => {
+    if (!editingStudent || !editingStudent.name || !editingStudent.email) {
+      toast.warning("Vui lòng điền đủ họ tên và email!");
+      return;
+    }
+    
+    try {
+      await apiFetch(`/students/${editingStudent.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ name: editingStudent.name, email: editingStudent.email }),
+      });
+      toast.success("Cập nhật thông tin học sinh thành công!");
+      setIsEditDialogOpen(false);
+      
+      // Update local state without full reload
+      setAllStudents(prev => prev.map(s => 
+        s.id === editingStudent.id ? { ...s, name: editingStudent.name, email: editingStudent.email } : s
+      ));
+    } catch (err: any) {
+      toast.error("Lỗi cập nhật: " + err.message);
     }
   };
 
@@ -260,6 +286,9 @@ export default function StudentsPage() {
                           <MoreVertical className="w-4 h-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem className="gap-2" onClick={() => { setEditingStudent(student); setIsEditDialogOpen(true); }}>
+                            <Edit2 className="w-4 h-4 text-slate-400" /> Sửa thông tin
+                          </DropdownMenuItem>
                           <DropdownMenuItem className="gap-2" onClick={() => window.location.href = `/students/${student.id}`}>
                             <GraduationCap className="w-4 h-4 text-slate-400" /> Xem hồ sơ
                           </DropdownMenuItem>
@@ -283,6 +312,43 @@ export default function StudentsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Sửa thông tin học sinh</DialogTitle>
+            <DialogDescription>
+              Cập nhật họ tên hoặc email của học sinh này.
+            </DialogDescription>
+          </DialogHeader>
+          {editingStudent && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-s-name">Họ và tên</Label>
+                <Input 
+                  id="edit-s-name" 
+                  value={editingStudent.name} 
+                  onChange={(e) => setEditingStudent({...editingStudent, name: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-s-email">Địa chỉ Email</Label>
+                <Input 
+                  id="edit-s-email" 
+                  type="email"
+                  value={editingStudent.email} 
+                  onChange={(e) => setEditingStudent({...editingStudent, email: e.target.value})} 
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -72,3 +72,27 @@ func (h *StudentHandler) DeleteStudent(c fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Student successfully deleted"})
 }
 
+// UpdateStudent allows the teacher to update student properties like email or name
+func (h *StudentHandler) UpdateStudent(c fiber.Ctx) error {
+	teacherID := getUserIdFromToken(c)
+	if teacherID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	studentID := c.Params("id")
+	if studentID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Student ID is required"})
+	}
+
+	var req model.Student
+	if err := c.Bind().JSON(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input data"})
+	}
+
+	if err := h.studentService.UpdateStudent(studentID, &req); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update student"})
+	}
+
+	return c.JSON(req)
+}
+

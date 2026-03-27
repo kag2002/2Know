@@ -12,6 +12,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/context/LanguageContext";
 import { apiFetch } from "@/lib/api";
 
@@ -31,6 +40,9 @@ export default function RubricsPage() {
   const [search, setSearch] = useState("");
   const [rubrics, setRubrics] = useState<RubricData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingRubric, setEditingRubric] = useState<RubricData | null>(null);
 
   useEffect(() => {
     loadRubrics();
@@ -79,6 +91,28 @@ export default function RubricsPage() {
       loadRubrics();
     } catch {
       toast.error("Lỗi tạo Rubric");
+    }
+  };
+
+  const handleEditRubric = async () => {
+    if (!editingRubric || !editingRubric.title || !editingRubric.subject) {
+      toast.warning("Vui lòng điền đủ thông tin!");
+      return;
+    }
+    try {
+      await apiFetch(`/rubrics/${editingRubric.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          title: editingRubric.title,
+          subject: editingRubric.subject,
+          target: editingRubric.target,
+        }),
+      });
+      toast.success("Cập nhật Rubric thành công!");
+      setIsEditDialogOpen(false);
+      loadRubrics();
+    } catch (err: any) {
+      toast.error("Lỗi cập nhật: " + err.message);
     }
   };
 
@@ -164,7 +198,7 @@ export default function RubricsPage() {
                     <MoreHorizontal className="w-4 h-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="gap-2" onClick={() => toast.info("Tính năng chỉnh sửa Rubric đang phát triển")}><Edit2 className="w-4 h-4"/> {t("rubrics.editCriteria")}</DropdownMenuItem>
+                    <DropdownMenuItem className="gap-2" onClick={() => { setEditingRubric(rubric); setIsEditDialogOpen(true); }}><Edit2 className="w-4 h-4"/> {t("rubrics.editCriteria")}</DropdownMenuItem>
                     <DropdownMenuItem className="gap-2" onClick={async () => {
                       try {
                         await apiFetch("/rubrics", {
@@ -227,6 +261,48 @@ export default function RubricsPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Rubric Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa Rubric</DialogTitle>
+            <DialogDescription>Thay đổi thông tin cơ bản của bộ tiêu chí chấm điểm này.</DialogDescription>
+          </DialogHeader>
+          {editingRubric && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-r-title">Tên Rubric</Label>
+                <Input 
+                  id="edit-r-title" 
+                  value={editingRubric.title} 
+                  onChange={(e) => setEditingRubric({...editingRubric, title: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-r-subject">Môn học</Label>
+                <Input 
+                  id="edit-r-subject" 
+                  value={editingRubric.subject} 
+                  onChange={(e) => setEditingRubric({...editingRubric, subject: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-r-target">Đối tượng áp dụng</Label>
+                <Input 
+                  id="edit-r-target" 
+                  value={editingRubric.target} 
+                  onChange={(e) => setEditingRubric({...editingRubric, target: e.target.value})} 
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditRubric} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import (
 type StudentRepository interface {
 	GetStudentsByTeacherID(teacherID string) ([]StudentWithMetrics, error)
 	CreateStudent(student *model.Student) error
+	UpdateStudent(id string, student *model.Student) error
 	DeleteStudent(id string) error
 }
 
@@ -61,4 +62,8 @@ func (r *studentRepository) CreateStudent(student *model.Student) error {
 
 func (r *studentRepository) DeleteStudent(id string) error {
 	return r.db.Delete(&model.Student{}, "id = ?", id).Error
+}
+
+func (r *studentRepository) UpdateStudent(id string, student *model.Student) error {
+	return r.db.Model(&model.Student{}).Where("id = ?", id).Updates(student).Error
 }

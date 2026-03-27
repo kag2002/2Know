@@ -9,6 +9,7 @@ type ClassService interface {
 	CreateClass(teacherID string, class *model.Class) error
 	GetClasses(teacherID string) ([]model.Class, error)
 	GetClassByID(id, teacherID string) (*model.Class, error)
+	UpdateClass(teacherID string, class *model.Class) error
 	AddStudent(classID, teacherID string, student *model.Student) error
 	DeleteClass(id, teacherID string) error
 }
@@ -45,4 +46,8 @@ func (s *classService) AddStudent(classID, teacherID string, student *model.Stud
 
 func (s *classService) DeleteClass(id, teacherID string) error {
 	return s.repo.DeleteClass(id, teacherID)
+}
+
+func (s *classService) UpdateClass(teacherID string, class *model.Class) error {
+	return s.repo.UpdateClass(class, teacherID)
 }

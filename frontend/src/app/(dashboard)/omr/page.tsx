@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Search, Filter, Scan, Printer, FileText, CheckCircle2, History, Trash2, Smartphone } from "lucide-react";
+import { Plus, Search, Filter, Scan, Printer, FileText, CheckCircle2, History, Trash2, Smartphone, Edit2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -22,7 +22,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/context/LanguageContext";
 import { apiFetch } from "@/lib/api";
 
@@ -41,6 +40,10 @@ export default function OmrPage() {
   const [search, setSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newBatch, setNewBatch] = useState({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)" });
+  
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingBatch, setEditingBatch] = useState<OmrBatch | null>(null);
+
   const [batches, setBatches] = useState<OmrBatch[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -92,6 +95,27 @@ export default function OmrPage() {
       loadBatches();
     } catch {
       toast.error("Lỗi tạo đợt chấm");
+    }
+  };
+
+  const handleEditBatch = async () => {
+    if (!editingBatch || !editingBatch.title) {
+      toast.warning("Vui lòng nhập tên đợt chấm điểm!");
+      return;
+    }
+    try {
+      await apiFetch(`/omr/batches/${editingBatch.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          title: editingBatch.title,
+          template: editingBatch.template
+        })
+      });
+      toast.success("Cập nhật đợt quét OMR thành công!");
+      setIsEditDialogOpen(false);
+      loadBatches();
+    } catch {
+      toast.error("Lỗi cập nhật đợt quét");
     }
   };
 
@@ -259,6 +283,7 @@ export default function OmrPage() {
                         <MoreHorizontal className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="gap-2" onClick={() => { setEditingBatch(batch); setIsEditDialogOpen(true); }}><Edit2 className="w-4 h-4"/> Sửa đợt quét</DropdownMenuItem>
                         <DropdownMenuItem className="gap-2" onClick={() => window.open('/reports', '_blank')}><Printer className="w-4 h-4"/> In bảng điểm</DropdownMenuItem>
                         <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive" onClick={() => handleDelete(batch.id)}><Trash2 className="w-4 h-4"/> Xóa đợt quét</DropdownMenuItem>
                       </DropdownMenuContent>
@@ -276,6 +301,44 @@ export default function OmrPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Batch Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa đợt quét OMR</DialogTitle>
+            <DialogDescription>Thay đổi thông tin cơ bản của đợt quét này.</DialogDescription>
+          </DialogHeader>
+          {editingBatch && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-b-title">Tên đợt chấm</Label>
+                <Input 
+                  id="edit-b-title" 
+                  value={editingBatch.title} 
+                  onChange={(e) => setEditingBatch({...editingBatch, title: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-b-template">Mẫu phiếu (Template)</Label>
+                <select 
+                  id="edit-b-template" 
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={editingBatch.template} 
+                  onChange={(e) => setEditingBatch({...editingBatch, template: e.target.value})}
+                >
+                  <option value="Mẫu 50 câu (A4)">Mẫu 50 câu (A4)</option>
+                  <option value="Mẫu 40 câu (Tự luận)">Mẫu kết hợp 40 MCQ + Tự luận</option>
+                </select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleEditBatch} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
