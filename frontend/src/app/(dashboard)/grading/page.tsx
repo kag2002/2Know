@@ -49,9 +49,16 @@ export default function GradingPage() {
       return;
     }
     
-    // In a full implementation, we would POST to /api/grading/:id here
-    setGraded(prev => [...prev, id]);
-    toast.success(`Đã chấm điểm cho bài nộp #${id}`);
+    try {
+      await apiFetch(`/grading/${id}`, {
+        method: "POST",
+        body: JSON.stringify({ score: scores[id] })
+      });
+      setGraded(prev => [...prev, id]);
+      toast.success(`Đã lưu điểm thành công!`);
+    } catch (err: any) {
+      toast.error("Lỗi khi lưu điểm: " + err.message);
+    }
   };
 
   const filtered = pendingSubmissions.filter(s => 

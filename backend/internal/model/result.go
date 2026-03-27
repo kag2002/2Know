@@ -22,6 +22,9 @@ type TestResult struct {
 	// JSON payload mapping Question ID to Option ID selected (or Essay text)
 	Answers map[string]string `gorm:"type:jsonb;serializer:json" json:"answers"`
 
+	// JSON payload mapping Question ID to points awarded by teacher
+	GradedAnswers map[string]float64 `gorm:"type:jsonb;serializer:json" json:"graded_answers,omitempty"`
+
 	Status         string `gorm:"type:varchar(50);default:'completed'" json:"status"` // completed, abandoned, cheating_flagged
 	TabSwitchCount int    `gorm:"default:0" json:"tab_switch_count"`
 

@@ -56,3 +56,24 @@ func (h *ResultHandler) GetPendingGradings(c fiber.Ctx) error {
 
 	return c.JSON(gradings)
 }
+
+func (h *ResultHandler) GradeSubmission(c fiber.Ctx) error {
+	id := c.Params("id")
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	var req struct {
+		Score float64 `json:"score"`
+	}
+	if err := c.Bind().JSON(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := h.svc.GradeSubmission(userId, id, req.Score); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"message": "Graded successfully"})
+}

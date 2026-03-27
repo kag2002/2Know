@@ -169,8 +169,9 @@ func main() {
 	api.Get("/stats/dashboard", statsHandler.GetDashboardStats)
 	api.Get("/stats/export", statsHandler.ExportCSV)
 
-	// Grading endpoints
+	// Grading & Results endpoints
 	api.Get("/grading/pending", resultHandler.GetPendingGradings)
+	api.Post("/grading/:id", resultHandler.GradeSubmission)
 
 	// User Profile endpoints
 	userHandler := handler.NewUserHandler(userRepo)

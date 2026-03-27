@@ -8,6 +8,8 @@ import (
 
 type ResultRepository interface {
 	CreateResult(result *model.TestResult) error
+	GetResultByID(id string) (*model.TestResult, error)
+	UpdateResult(result *model.TestResult) error
 	GetQuizResults(quizID string) ([]model.TestResult, error)
 	VerifyQuizOwnership(quizID, teacherID string) error
 	VerifyQuizExists(quizID string) error
@@ -24,6 +26,16 @@ func NewResultRepository(db *gorm.DB) ResultRepository {
 
 func (r *resultRepository) CreateResult(result *model.TestResult) error {
 	return r.db.Create(result).Error
+}
+
+func (r *resultRepository) GetResultByID(id string) (*model.TestResult, error) {
+	var result model.TestResult
+	err := r.db.First(&result, "id = ?", id).Error
+	return &result, err
+}
+
+func (r *resultRepository) UpdateResult(result *model.TestResult) error {
+	return r.db.Save(result).Error
 }
 
 func (r *resultRepository) GetQuizResults(quizID string) ([]model.TestResult, error) {

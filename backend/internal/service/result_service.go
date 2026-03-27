@@ -1,6 +1,9 @@
 package service
 
 import (
+	"errors"
+	"strings"
+
 	"backend/internal/model"
 	"backend/internal/repository"
 )
@@ -9,6 +12,7 @@ type ResultService interface {
 	SubmitTest(result *model.TestResult) error
 	GetQuizResults(teacherID, quizID string) ([]model.TestResult, error)
 	GetPendingGradings(teacherID string) ([]PendingGradingResponse, error)
+	GradeSubmission(teacherID, compositeID string, score float64) error
 }
 
 type resultService struct {
@@ -110,15 +114,18 @@ func (s *resultService) GetPendingGradings(teacherID string) ([]PendingGradingRe
 			if q.Type == "essay" {
 				// Check if the student answered this specific essay question
 				if answerText, exists := res.Answers[q.ID]; exists && answerText != "" {
-					responses = append(responses, PendingGradingResponse{
-						ID:          res.ID + "_" + q.ID, // Composite ID for the UI
-						Student:     res.StudentName,
-						Quiz:        quiz.Title,
-						Question:    q.Content,
-						Answer:      answerText,
-						SubmittedAt: res.CreatedAt.Format("02/01/2006 15:04"),
-						MaxScore:    q.Points,
-					})
+					// Check if it's ALREADY graded
+					if _, graded := res.GradedAnswers[q.ID]; !graded {
+						responses = append(responses, PendingGradingResponse{
+							ID:          res.ID + "_" + q.ID, // Composite ID for the UI
+							Student:     res.StudentName,
+							Quiz:        quiz.Title,
+							Question:    q.Content,
+							Answer:      answerText,
+							SubmittedAt: res.CreatedAt.Format("02/01/2006 15:04"),
+							MaxScore:    q.Points,
+						})
+					}
 				}
 			}
 		}
@@ -127,3 +134,64 @@ func (s *resultService) GetPendingGradings(teacherID string) ([]PendingGradingRe
 	return responses, nil
 }
 
+// GradeSubmission processes an individual essay grade
+func (s *resultService) GradeSubmission(teacherID, compositeID string, score float64) error {
+	parts := strings.Split(compositeID, "_")
+	if len(parts) != 2 {
+		return errors.New("invalid grading ID")
+	}
+	resultID := parts[0]
+	questionID := parts[1]
+
+	res, err := s.repo.GetResultByID(resultID)
+	if err != nil {
+		return err
+	}
+
+	quiz, err := s.quizRepo.GetPublicQuizByID(res.QuizID)
+	if err != nil {
+		return err
+	}
+
+	if err := s.repo.VerifyQuizOwnership(res.QuizID, teacherID); err != nil {
+		return errors.New("unauthorized")
+	}
+
+	var essayQ *model.Question
+	for _, q := range quiz.Questions {
+		if q.ID == questionID && q.Type == "essay" {
+			essayQ = &q
+			break
+		}
+	}
+	if essayQ == nil {
+		return errors.New("question not found or not an essay")
+	}
+
+	if score > essayQ.Points {
+		return errors.New("score exceeds max points")
+	}
+
+	if res.GradedAnswers == nil {
+		res.GradedAnswers = make(map[string]float64)
+	}
+
+	if oldScore, exists := res.GradedAnswers[questionID]; exists {
+		res.Score -= oldScore
+	}
+	res.GradedAnswers[questionID] = score
+	res.Score += score
+
+	// Check if all essays are graded
+	essayCount := 0
+	for _, q := range quiz.Questions {
+		if q.Type == "essay" {
+			essayCount++
+		}
+	}
+	if len(res.GradedAnswers) >= essayCount {
+		res.Status = "completed"
+	}
+
+	return s.repo.UpdateResult(res)
+}
