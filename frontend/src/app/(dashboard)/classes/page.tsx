@@ -14,6 +14,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface ClassItem {
   id: string;
@@ -30,6 +40,9 @@ export default function ClassesPage() {
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newClass, setNewClass] = useState({ name: "", subject: "", grade: "", school_year: "2025-2026" });
 
   useEffect(() => {
     loadClasses();
@@ -48,21 +61,24 @@ export default function ClassesPage() {
   };
 
   const handleCreateClass = async () => {
-    const name = prompt("Nhập tên lớp học (VD: 12A1 - Toán Học):");
-    if (!name) return;
-    const subject = prompt("Nhập môn học:");
-    if (!subject) return;
-    const grade = prompt("Nhập khối lớp (VD: Lớp 12):");
-    if (!grade) return;
+    if (!newClass.name || !newClass.subject || !newClass.grade) {
+      toast.warning("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+    
+    setLoading(true);
     try {
       await apiFetch("/classes", {
         method: "POST",
-        body: JSON.stringify({ name, subject, grade, school_year: "2025-2026" }),
+        body: JSON.stringify(newClass),
       });
-      toast.success(`Đã tạo lớp "${name}" thành công!`);
+      toast.success(`Đã tạo lớp "${newClass.name}" thành công!`);
+      setIsDialogOpen(false);
+      setNewClass({ name: "", subject: "", grade: "", school_year: "2025-2026" });
       loadClasses();
     } catch (err: any) {
       toast.error("Lỗi: " + err.message);
+      setLoading(false);
     }
   };
 
@@ -86,9 +102,54 @@ export default function ClassesPage() {
           <Button variant="outline" className="gap-2 bg-background dark:bg-card flex-1 sm:flex-none">
             <Filter className="w-4 h-4" /> Lọc
           </Button>
-          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none" onClick={handleCreateClass}>
+
+          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none" onClick={() => setIsDialogOpen(true)}>
             <Plus className="w-4 h-4" /> {t("classes.createNew")}
           </Button>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Tạo lớp học mới</DialogTitle>
+                <DialogDescription>
+                  Điền các thông tin cơ bản để khởi tạo một lớp học mới trên hệ thống.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Tên lớp học</Label>
+                  <Input 
+                    id="name" 
+                    placeholder="VD: 12A1" 
+                    value={newClass.name} 
+                    onChange={(e) => setNewClass({...newClass, name: e.target.value})} 
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="grade">Khối / Năm học</Label>
+                  <Input 
+                    id="grade" 
+                    placeholder="VD: Lớp 12" 
+                    value={newClass.grade} 
+                    onChange={(e) => setNewClass({...newClass, grade: e.target.value})} 
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="subject">Môn học phụ trách</Label>
+                  <Input 
+                    id="subject" 
+                    placeholder="VD: Toán đại số" 
+                    value={newClass.subject} 
+                    onChange={(e) => setNewClass({...newClass, subject: e.target.value})} 
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy</Button>
+                <Button onClick={handleCreateClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

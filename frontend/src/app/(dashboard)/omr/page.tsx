@@ -13,6 +13,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/context/LanguageContext";
 import { apiFetch } from "@/lib/api";
 
@@ -29,6 +39,8 @@ export interface OmrBatch {
 export default function OmrPage() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newBatch, setNewBatch] = useState({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)" });
   const [batches, setBatches] = useState<OmrBatch[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,15 +76,19 @@ export default function OmrPage() {
   };
 
   const handleCreate = async () => {
+    if (!newBatch.title) {
+      toast.warning("Vui lòng nhập tên đợt chấm điểm!");
+      return;
+    }
+    
     try {
       await apiFetch("/omr/batches", {
         method: 'POST',
-        body: JSON.stringify({
-          title: `Đợt chấm điểm ${new Date().toLocaleString('vi-VN')}`,
-          template: "Mẫu 50 câu (A4)"
-        })
+        body: JSON.stringify(newBatch)
       });
       toast.success(t("omr.createSuccess"));
+      setIsDialogOpen(false);
+      setNewBatch({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)" });
       loadBatches();
     } catch {
       toast.error("Lỗi tạo đợt chấm");
@@ -86,13 +102,51 @@ export default function OmrPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight dark:text-white">{t("omr.title")}</h1>
           <p className="text-muted-foreground mt-1 text-sm">{t("omr.subtitle")}</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2 bg-card" onClick={() => window.open('/omr-template.pdf', '_blank')}>
+        <div className="flex gap-2 w-full sm:w-auto mt-4 sm:mt-0">
+          <Button variant="outline" className="gap-2 bg-card flex-1 sm:flex-none" onClick={() => window.open('/omr-template.pdf', '_blank')}>
             <Printer className="w-4 h-4" /> {t("omr.printTemplate")}
           </Button>
-          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading} onClick={handleCreate}>
+          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none" disabled={loading} onClick={() => setIsDialogOpen(true)}>
             <Plus className="w-4 h-4" /> {t("omr.createBatch")}
           </Button>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Tạo đợt chấm OMR</DialogTitle>
+                <DialogDescription>
+                  Khởi tạo một đợt chấm điểm mới để nhóm các phiếu thi (Scanner) chung với nhau. 
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="b_title">Tên đợt chấm</Label>
+                  <Input 
+                    id="b_title" 
+                    placeholder="VD: Kiểm tra 15p Toán đại" 
+                    value={newBatch.title} 
+                    onChange={(e) => setNewBatch({...newBatch, title: e.target.value})} 
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="b_template">Mẫu phiếu (Template)</Label>
+                  <select 
+                    id="b_template" 
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={newBatch.template} 
+                    onChange={(e) => setNewBatch({...newBatch, template: e.target.value})}
+                  >
+                    <option value="Mẫu 50 câu (A4)">Mẫu 50 câu (A4)</option>
+                    <option value="Mẫu 40 câu (Tự luận)">Mẫu kết hợp 40 MCQ + Tự luận</option>
+                  </select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy</Button>
+                <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

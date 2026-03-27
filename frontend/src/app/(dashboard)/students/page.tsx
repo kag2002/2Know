@@ -10,6 +10,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useTranslation } from "@/context/LanguageContext";
@@ -32,6 +42,9 @@ export default function StudentsPage() {
   
   const [search, setSearch] = useState("");
   const [filterClass, setFilterClass] = useState("all");
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newStudent, setNewStudent] = useState({ name: "", email: "" });
 
   useEffect(() => {
     const loadStudents = async () => {
@@ -73,19 +86,25 @@ export default function StudentsPage() {
   };
 
   const handleAddStudent = async () => {
-    const name = prompt("Nhập họ tên học sinh:");
-    if (!name) return;
-    const email = prompt("Nhập email học sinh:");
-    if (!email) return;
+    if (!newStudent.name || !newStudent.email) {
+      toast.warning("Vui lòng điền đầy đủ tên và email!");
+      return;
+    }
+    
+    setLoading(true);
     try {
-      const newStudent = await apiFetch("/students", {
+      const created = await apiFetch("/students", {
         method: "POST",
-        body: JSON.stringify({ name, email, student_id: `HS${Date.now()}`, class: "Chưa phân lớp" }),
+        body: JSON.stringify({ name: newStudent.name, email: newStudent.email, student_id: `HS${Date.now()}`, class: "Chưa phân lớp" }),
       });
-      setAllStudents(prev => [...prev, newStudent]);
-      toast.success(`Đã thêm học sinh "${name}" thành công!`);
+      setAllStudents(prev => [...prev, created]);
+      toast.success(`Đã thêm học sinh "${created.name}" thành công!`);
+      setIsDialogOpen(false);
+      setNewStudent({ name: "", email: "" });
     } catch (err: any) {
       toast.error("Lỗi: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,9 +124,45 @@ export default function StudentsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("students.title")}</h1>
           <p className="text-muted-foreground mt-1">{t("students.subtitle")}</p>
         </div>
-        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={handleAddStudent}>
+        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => setIsDialogOpen(true)}>
           <Plus className="w-4 h-4" /> {t("students.addNew")}
         </Button>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Thêm học sinh mới</DialogTitle>
+              <DialogDescription>
+                Nhập thông tin cơ bản để đưa học sinh này vào danh bạ tổng. Học sinh có thể được phân lớp sau.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="s_name">Họ và tên</Label>
+                <Input 
+                  id="s_name" 
+                  placeholder="VD: Nguyễn Văn A" 
+                  value={newStudent.name} 
+                  onChange={(e) => setNewStudent({...newStudent, name: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="s_email">Địa chỉ Email</Label>
+                <Input 
+                  id="s_email" 
+                  type="email"
+                  placeholder="VD: nguyenvana@example.com" 
+                  value={newStudent.email} 
+                  onChange={(e) => setNewStudent({...newStudent, email: e.target.value})} 
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy</Button>
+              <Button onClick={handleAddStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận thêm</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Summary Stats */}
