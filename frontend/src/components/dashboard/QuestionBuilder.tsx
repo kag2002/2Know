@@ -1,7 +1,12 @@
 "use client";
 
-import { Copy, GripVertical, MoreVertical, Plus, Sparkles, Trash2, BookOpen } from "lucide-react";
+import { Copy, GripVertical, MoreVertical, Plus, Sparkles, Trash2, BookOpen, Database, Search, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 export interface QuestionOption {
   text: string;
@@ -22,6 +27,23 @@ interface QuestionBuilderProps {
 }
 
 export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProps) {
+  const [isBankOpen, setIsBankOpen] = useState(false);
+  const [bankQuestions, setBankQuestions] = useState<any[]>([]);
+  const [searchBank, setSearchBank] = useState("");
+  const [loadingBank, setLoadingBank] = useState(false);
+  const [selectedBankIds, setSelectedBankIds] = useState<string[]>([]);
+
+  const loadBank = async () => {
+    try {
+      setLoadingBank(true);
+      const data = await apiFetch("/questions");
+      setBankQuestions(data || []);
+    } catch {
+      toast.error("Không thể tải ngân hàng câu hỏi");
+    } finally {
+      setLoadingBank(false);
+    }
+  };
 
   const addQuestion = () => {
     setQuestions([
@@ -71,13 +93,15 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
       
       {/* Header Actions */}
       <div className="flex flex-wrap gap-3">
-        <Button onClick={addQuestion} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+        <Button type="button" onClick={addQuestion} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
           <Plus className="w-4 h-4" /> Thêm câu hỏi
         </Button>
-        <Button variant="outline" className="gap-2 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 hover:bg-indigo-100">
+        <Button type="button" variant="outline" className="gap-2 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 hover:bg-indigo-100" onClick={() => window.location.href = '/quizzes/generate'}>
           <Sparkles className="w-4 h-4" /> AI Tạo tự động
         </Button>
-        <Button variant="outline" className="gap-2">Chọn từ Ngân hàng</Button>
+        <Button type="button" variant="outline" className="gap-2" onClick={() => { setIsBankOpen(true); loadBank(); }}>
+          <Database className="w-4 h-4" /> Chọn từ Ngân hàng
+        </Button>
       </div>
 
       {/* Stats Summary */}
@@ -181,6 +205,84 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
           </div>
         )}
       </div>
+
+      {/* Select From Bank Dialog */}
+      <Dialog open={isBankOpen} onOpenChange={setIsBankOpen}>
+        <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Chọn từ Ngân hàng</DialogTitle>
+            <DialogDescription>Chọn các câu hỏi có sẵn để thêm vào bài kiểm tra này</DialogDescription>
+          </DialogHeader>
+          <div className="relative my-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input 
+              placeholder="Tìm kiếm nội dung câu hỏi..." 
+              value={searchBank}
+              onChange={(e) => setSearchBank(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto space-y-3 p-1">
+            {loadingBank ? (
+               <div className="flex justify-center py-8">Đang tải ngân hàng câu hỏi...</div>
+            ) : bankQuestions.filter(q => q.content.toLowerCase().includes(searchBank.toLowerCase())).map(q => {
+               const isSelected = selectedBankIds.includes(q.id);
+               return (
+                 <div 
+                   key={q.id} 
+                   className={`p-3 border rounded-lg cursor-pointer transition-colors flex gap-3 ${isSelected ? 'border-emerald-500 bg-emerald-50/30' : 'hover:border-indigo-300'}`}
+                   onClick={() => {
+                     if (isSelected) setSelectedBankIds(prev => prev.filter(id => id !== q.id));
+                     else setSelectedBankIds(prev => [...prev, q.id]);
+                   }}
+                 >
+                   <div className="mt-1 shrink-0">
+                     <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? 'bg-emerald-600 border-emerald-600' : 'border-slate-300'}`}>
+                        {isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
+                     </div>
+                   </div>
+                   <div>
+                     <div className="flex items-center gap-2 mb-1">
+                       <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-muted-foreground">{q.subject}</span>
+                       <span className="text-xs text-muted-foreground">{q.difficulty}</span>
+                       <span className="text-xs text-muted-foreground">{q.points} điểm</span>
+                     </div>
+                     <p className="text-sm line-clamp-2 leading-relaxed">{q.content}</p>
+                   </div>
+                 </div>
+               )
+            })}
+            {bankQuestions.length === 0 && !loadingBank && (
+              <p className="text-center text-muted-foreground py-8">Ngân hàng câu hỏi trống</p>
+            )}
+          </div>
+          <DialogFooter className="pt-4 mt-auto">
+            <Button variant="outline" onClick={() => setIsBankOpen(false)}>Hủy</Button>
+            <Button 
+               disabled={selectedBankIds.length === 0} 
+               onClick={() => {
+                 const selectedQ = bankQuestions.filter(q => selectedBankIds.includes(q.id));
+                 const formatted = selectedQ.map(q => ({
+                   id: q.id, // Generate a temporary ID so it triggers creation as a brand new question linked to this quiz if needed, but since it's an existing ID, the backend might handle it. Wait, the endpoint expects payload. If no ID => creates. If exists => maybe updates? Actually just pass the structure.
+                   type: "Trắc nghiệm",
+                   points: q.points || 10,
+                   content: q.content,
+                   options: q.options && q.options.length > 0 ? q.options : [
+                     { text: "", isCorrect: true },
+                     { text: "", isCorrect: false }
+                   ]
+                 }));
+                 setQuestions([...questions, ...formatted]);
+                 setIsBankOpen(false);
+                 setSelectedBankIds([]);
+                 toast.success(`Đã thêm ${formatted.length} câu hỏi vào bài kiểm tra`);
+               }}
+            >
+              Thêm {selectedBankIds.length} câu đã chọn
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
