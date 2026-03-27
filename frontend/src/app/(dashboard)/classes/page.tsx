@@ -24,13 +24,6 @@ interface ClassItem {
   created_at: string;
 }
 
-const fallbackClasses: ClassItem[] = [
-  { id: "1", name: "12A1 - Toán Học - Cô Lan", grade: "Lớp 12", subject: "Toán học", school_year: "2025-2026", students: Array(45).fill({ id: "" }), created_at: "2026-03-12T00:00:00Z" },
-  { id: "2", name: "10A5 - Ngữ Văn Khối C", grade: "Lớp 10", subject: "Ngữ văn", school_year: "2025-2026", students: Array(42).fill({ id: "" }), created_at: "2026-03-10T00:00:00Z" },
-  { id: "3", name: "Luyện thi IELTS Target 7.0+", grade: "Khác", subject: "Tiếng Anh", school_year: "2026", students: Array(15).fill({ id: "" }), created_at: "2026-03-05T00:00:00Z" },
-  { id: "4", name: "11B2 - Vật Lý Thầy Tuấn", grade: "Lớp 11", subject: "Vật lý", school_year: "2025-2026", students: Array(38).fill({ id: "" }), created_at: "2026-03-01T00:00:00Z" },
-];
-
 export default function ClassesPage() {
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,12 +37,30 @@ export default function ClassesPage() {
     try {
       setLoading(true);
       const data = await apiFetch("/classes");
-      setClasses(data && data.length > 0 ? data : fallbackClasses);
+      setClasses(Array.isArray(data) ? data : []);
     } catch {
-      // Fallback to mock data if API is not available
-      setClasses(fallbackClasses);
+      setClasses([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateClass = async () => {
+    const name = prompt("Nhập tên lớp học (VD: 12A1 - Toán Học):");
+    if (!name) return;
+    const subject = prompt("Nhập môn học:");
+    if (!subject) return;
+    const grade = prompt("Nhập khối lớp (VD: Lớp 12):");
+    if (!grade) return;
+    try {
+      await apiFetch("/classes", {
+        method: "POST",
+        body: JSON.stringify({ name, subject, grade, school_year: "2025-2026" }),
+      });
+      toast.success(`Đã tạo lớp "${name}" thành công!`);
+      loadClasses();
+    } catch (err: any) {
+      toast.error("Lỗi: " + err.message);
     }
   };
 
@@ -73,7 +84,7 @@ export default function ClassesPage() {
           <Button variant="outline" className="gap-2 bg-background dark:bg-card flex-1 sm:flex-none">
             <Filter className="w-4 h-4" /> Lọc
           </Button>
-          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none" onClick={() => toast.info("Tính năng tạo lớp đang phát triển!")}>
+          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white flex-1 sm:flex-none" onClick={handleCreateClass}>
             <Plus className="w-4 h-4" /> Tạo lớp mới
           </Button>
         </div>
@@ -166,7 +177,7 @@ export default function ClassesPage() {
           {/* Create New Card */}
           <div 
             className="flex flex-col items-center justify-center min-h-[220px] bg-muted/30 border-2 border-dashed rounded-xl hover:bg-muted/50 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all cursor-pointer group"
-            onClick={() => toast.info("Tính năng tạo lớp đang phát triển!")}
+            onClick={handleCreateClass}
           >
             <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-transform">
               <Plus className="w-6 h-6 text-indigo-500" />

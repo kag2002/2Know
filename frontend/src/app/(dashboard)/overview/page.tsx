@@ -46,36 +46,50 @@ function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string
 }
 
 import { useTranslation } from "@/context/LanguageContext";
+import { apiFetch } from "@/lib/api";
+
+interface DashboardStats {
+  total_quizzes: number;
+  total_submissions: number;
+  avg_score: number;
+  total_questions: number;
+}
 
 export default function OverviewPage() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    apiFetch("/stats/dashboard")
+      .then((data) => setStats(data))
+      .catch(() => {});
+  }, []);
 
   const statCards = [
     {
-      value: "56", label: t("overview.stat.active"), desc: t("overview.stat.quizzes"),
+      value: String(stats?.total_quizzes ?? "—"), label: t("overview.stat.active"), desc: t("overview.stat.quizzes"),
       icon: Layers, iconColor: "text-indigo-500", badgeColor: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400",
       badge: t("overview.badge.stable"), change: null, changeLabel: t("overview.badge.noChange"),
     },
     {
-      value: "7", label: t("overview.stat.last7days"), desc: t("overview.stat.submissions"),
+      value: String(stats?.total_submissions ?? "—"), label: t("overview.stat.last7days"), desc: t("overview.stat.submissions"),
       icon: CheckSquare, iconColor: "text-rose-500", badgeColor: "bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400",
-      badge: t("overview.badge.decreased"), change: -91, changeLabel: "-91",
+      badge: t("overview.badge.decreased"), change: null, changeLabel: t("overview.badge.noChange"),
     },
     {
-      value: "78,1", label: t("overview.stat.avgScore"), desc: t("overview.stat.global"),
+      value: stats?.avg_score != null ? stats.avg_score.toFixed(1).replace(".", ",") : "—", label: t("overview.stat.avgScore"), desc: t("overview.stat.global"),
       icon: BarChart, iconColor: "text-emerald-500", badgeColor: "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
-      badge: t("overview.badge.increased"), change: 5.8, changeLabel: "+5.8", suffix: "%",
+      badge: t("overview.badge.increased"), change: null, changeLabel: t("overview.badge.noChange"), suffix: "%",
     },
     {
-      value: "135", label: t("sidebar.grading"), desc: t("overview.badge.essayQueue"),
+      value: String(stats?.total_questions ?? "—"), label: t("sidebar.grading"), desc: t("overview.badge.essayQueue"),
       icon: null, iconColor: "text-orange-500", badgeColor: "bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
       badge: t("overview.badge.needsAttention"), change: null, changeLabel: t("overview.badge.noChange"),
     },
   ];
-
-  useEffect(() => setMounted(true), []);
 
   const now = new Date();
   const dateStr = now.toLocaleDateString("vi-VN", { day: "numeric", month: "short", year: "numeric" });

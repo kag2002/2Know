@@ -91,15 +91,16 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
       setScanProgress(stage.p);
     }
 
-    // Mock Result
+    // Demo Mode Result (Real AI integration pending)
     setTimeout(() => {
       setScanResult({
         student_id: "HS" + Math.floor(10000 + Math.random() * 90000),
-        score: (Math.random() * 4 + 6).toFixed(1), // Score 6-10
+        score: (Math.random() * 4 + 6).toFixed(1),
         total_correct: Math.floor(Math.random() * 10 + 30),
         total_questions: 40,
         confidence: 0.98,
-        capturedImage: rawImage
+        capturedImage: rawImage,
+        isDemo: true,
       });
       setIsScanning(false);
     }, 300);
@@ -202,6 +203,9 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
                     <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-3" />
                     <h2 className="text-2xl font-bold text-card-foreground">Chấm điểm thành công!</h2>
+                    {scanResult?.isDemo && (
+                      <span className="inline-block mt-2 px-3 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold rounded-full">⚠️ CHẾ ĐỘ DEMO</span>
+                    )}
                     <p className="text-emerald-700 text-sm mt-1 font-medium">OMR AI phân tích hoàn tất với độ chính xác {(scanResult.confidence * 100).toFixed(1)}%</p>
                   </div>
                   

@@ -37,8 +37,8 @@ export default function SettingsPage() {
     setSaving(true);
     setTimeout(() => {
       setSaving(false);
-      toast.success("Đã lưu cài đặt thành công!");
-    }, 1000);
+      toast.info("Tính năng lưu sẽ hoạt động sau khi kết nối API Profile.");
+    }, 500);
   };
 
   return (

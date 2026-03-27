@@ -70,6 +70,23 @@ export default function StudentsPage() {
     }
   };
 
+  const handleAddStudent = async () => {
+    const name = prompt("Nhập họ tên học sinh:");
+    if (!name) return;
+    const email = prompt("Nhập email học sinh:");
+    if (!email) return;
+    try {
+      const newStudent = await apiFetch("/students", {
+        method: "POST",
+        body: JSON.stringify({ name, email, student_id: `HS${Date.now()}`, class: "Chưa phân lớp" }),
+      });
+      setAllStudents(prev => [...prev, newStudent]);
+      toast.success(`Đã thêm học sinh "${name}" thành công!`);
+    } catch (err: any) {
+      toast.error("Lỗi: " + err.message);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
@@ -86,7 +103,7 @@ export default function StudentsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Quản lý Học sinh</h1>
           <p className="text-muted-foreground mt-1">Tổng hợp hồ sơ, điểm số và phân loại năng lực học tập của toàn bộ học sinh.</p>
         </div>
-        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => toast.info("Tính năng thêm học sinh đang phát triển!")}>
+        <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={handleAddStudent}>
           <Plus className="w-4 h-4" /> Thêm học sinh
         </Button>
       </div>
