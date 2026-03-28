@@ -64,7 +64,7 @@ func (h *StudentHandler) CreateStudent(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input data"})
 	}
 
-	if err := h.studentService.CreateStudent(&req); err != nil {
+	if err := h.studentService.CreateStudent(teacherID, &req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create student"})
 	}
 

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"backend/internal/model"
 	"backend/internal/repository"
 )
@@ -8,17 +10,18 @@ import (
 type StudentService interface {
 	GetStudentsByTeacherID(teacherID string) ([]repository.StudentWithMetrics, error)
 	GetStudentByID(id string, teacherID string) (*model.Student, error)
-	CreateStudent(student *model.Student) error
+	CreateStudent(teacherID string, student *model.Student) error
 	UpdateStudent(id string, teacherID string, student *model.Student) error
 	DeleteStudent(id string, teacherID string) error
 }
 
 type studentService struct {
-	repo repository.StudentRepository
+	repo      repository.StudentRepository
+	classRepo repository.ClassRepository
 }
 
-func NewStudentService(repo repository.StudentRepository) StudentService {
-	return &studentService{repo}
+func NewStudentService(repo repository.StudentRepository, classRepo repository.ClassRepository) StudentService {
+	return &studentService{repo: repo, classRepo: classRepo}
 }
 
 func (s *studentService) GetStudentsByTeacherID(teacherID string) ([]repository.StudentWithMetrics, error) {
@@ -57,7 +60,13 @@ func (s *studentService) GetStudentByID(id string, teacherID string) (*model.Stu
 	return s.repo.GetStudentByID(id, teacherID)
 }
 
-func (s *studentService) CreateStudent(student *model.Student) error {
+func (s *studentService) CreateStudent(teacherID string, student *model.Student) error {
+	// SECURITY: Verify the teacher owns the class before allowing student insertion
+	if student.ClassID != "" {
+		if err := s.classRepo.VerifyOwnership(student.ClassID, teacherID); err != nil {
+			return errors.New("unauthorized: class does not belong to you")
+		}
+	}
 	return s.repo.CreateStudent(student)
 }
 

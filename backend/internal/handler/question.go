@@ -19,7 +19,12 @@ func NewQuestionHandler(svc service.QuestionService) *QuestionHandler {
 }
 
 func (h *QuestionHandler) GetQuestions(c fiber.Ctx) error {
-	questions, err := h.svc.GetQuestions()
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	questions, err := h.svc.GetQuestions(userId)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch questions"})
 	}

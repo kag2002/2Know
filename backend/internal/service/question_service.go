@@ -6,7 +6,7 @@ import (
 )
 
 type QuestionService interface {
-	GetQuestions() ([]model.Question, error)
+	GetQuestions(teacherID string) ([]model.Question, error)
 	CreateQuestion(teacherID string, question *model.Question) error
 	GetQuizQuestions(teacherID, quizID string) ([]model.Question, error)
 	UpdateQuestion(teacherID, questionID string, params map[string]interface{}) error
@@ -21,8 +21,8 @@ func NewQuestionService(repo repository.QuestionRepository) QuestionService {
 	return &questionService{repo: repo}
 }
 
-func (s *questionService) GetQuestions() ([]model.Question, error) {
-	return s.repo.GetQuestions()
+func (s *questionService) GetQuestions(teacherID string) ([]model.Question, error) {
+	return s.repo.GetQuestions(teacherID)
 }
 
 func (s *questionService) CreateQuestion(teacherID string, question *model.Question) error {

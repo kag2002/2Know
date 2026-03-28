@@ -89,7 +89,7 @@ func main() {
 	quizSvc := service.NewQuizService(quizRepo)
 	questionSvc := service.NewQuestionService(questionRepo)
 	resultSvc := service.NewResultService(resultRepo, quizRepo, classRepo)
-	studentSvc := service.NewStudentService(studentRepo)
+	studentSvc := service.NewStudentService(studentRepo, classRepo)
 	materialSvc := service.NewMaterialService(materialRepo, classRepo)
 	aiSvc := service.NewAIService()
 	noteSvc := service.NewNoteService(noteRepo)

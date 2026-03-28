@@ -7,7 +7,7 @@ import (
 )
 
 type QuestionRepository interface {
-	GetQuestions() ([]model.Question, error)
+	GetQuestions(teacherID string) ([]model.Question, error)
 	GetQuizQuestions(quizID string) ([]model.Question, error)
 	GetQuestionByID(id string) (*model.Question, error)
 	CreateQuestion(question *model.Question) error
@@ -24,9 +24,15 @@ func NewQuestionRepository(db *gorm.DB) QuestionRepository {
 	return &questionRepository{db: db}
 }
 
-func (r *questionRepository) GetQuestions() ([]model.Question, error) {
+func (r *questionRepository) GetQuestions(teacherID string) ([]model.Question, error) {
 	var questions []model.Question
-	err := r.db.Preload("Options").Order("created_at desc").Find(&questions).Error
+	// SECURITY: Scope questions to teacher's quizzes only (prevent cross-tenant data leak)
+	err := r.db.Preload("Options").
+		Joins("JOIN quizzes ON quizzes.id = questions.quiz_id").
+		Where("quizzes.teacher_id = ?", teacherID).
+		Order("questions.created_at desc").
+		Limit(200).
+		Find(&questions).Error
 	return questions, err
 }
 

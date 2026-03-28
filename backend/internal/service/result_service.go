@@ -235,6 +235,9 @@ func (s *resultService) GradeSubmission(teacherID, compositeID string, score flo
 	if score > essayQ.Points {
 		return errors.New("score exceeds max points")
 	}
+	if score < 0 {
+		return errors.New("score cannot be negative")
+	}
 
 	if res.GradedAnswers == nil {
 		res.GradedAnswers = make(map[string]float64)
