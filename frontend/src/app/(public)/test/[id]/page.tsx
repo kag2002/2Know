@@ -41,7 +41,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
         if (!data.questions) data.questions = [];
         setQuiz(data);
       } catch (err: any) {
-        setError("Không thể tải thông tin bài kiểm tra: " + (err.message || "Lỗi mạng"));
+        setError(t("testIntro.loadError") + (err.message || "Lỗi mạng"));
       } finally {
         setLoading(false);
       }

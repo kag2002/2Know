@@ -209,7 +209,7 @@ export default function OmrPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy</Button>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
                 <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
               </DialogFooter>
             </DialogContent>
@@ -327,7 +327,7 @@ export default function OmrPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem className="gap-2" onClick={() => { setEditingBatch(batch); setIsEditDialogOpen(true); }}><Edit2 className="w-4 h-4"/> Sửa đợt quét</DropdownMenuItem>
-                        <DropdownMenuItem className="gap-2" onClick={() => window.open('/reports', '_blank')}><Printer className="w-4 h-4"/> In bảng điểm</DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2" onClick={() => window.open(`/reports?search=${encodeURIComponent(batch.title)}`, '_blank')}><Printer className="w-4 h-4"/> In bảng điểm</DropdownMenuItem>
                         <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive" onClick={() => handleDelete(batch.id)}><Trash2 className="w-4 h-4"/> Xóa đợt quét</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -391,8 +391,8 @@ export default function OmrPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditBatch} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditBatch} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

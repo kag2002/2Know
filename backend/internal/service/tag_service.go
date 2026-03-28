@@ -6,6 +6,7 @@ import "backend/internal/repository"
 type TagService interface {
 	GetTags(userID string) ([]model.Tag, error)
 	CreateTag(tag *model.Tag) error
+	UpdateTag(tag *model.Tag) error
 	DeleteTag(id, userID string) error
 }
 
@@ -23,6 +24,10 @@ func (s *tagService) GetTags(userID string) ([]model.Tag, error) {
 
 func (s *tagService) CreateTag(tag *model.Tag) error {
 	return s.repo.CreateTag(tag)
+}
+
+func (s *tagService) UpdateTag(tag *model.Tag) error {
+	return s.repo.UpdateTag(tag)
 }
 
 func (s *tagService) DeleteTag(id, userID string) error {

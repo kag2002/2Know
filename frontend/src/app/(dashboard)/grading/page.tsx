@@ -146,7 +146,7 @@ export default function GradingPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs bg-slate-100 text-muted-foreground px-2 py-1 rounded font-medium">{t("grading.maxScore")}: {sub.maxScore} điểm</span>
+                <span className="text-xs bg-slate-100 text-muted-foreground px-2 py-1 rounded font-medium">{t("grading.maxScore")}: {sub.maxScore} {t("grading.maxScoreUnit")}</span>
                 <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${expanded === sub.id ? 'rotate-180' : ''}`} />
               </div>
             </div>
@@ -184,10 +184,10 @@ export default function GradingPage() {
                         />
                         <span className="text-slate-400 text-sm">/ {sub.maxScore}</span>
                         <div className="flex gap-1 ml-2">
-                          <button onClick={() => setScores({...scores, [sub.id]: sub.maxScore})} className="p-1.5 rounded bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-100" title="Điểm tối đa">
+                          <button onClick={() => setScores({...scores, [sub.id]: sub.maxScore})} className="p-1.5 rounded bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-100" title={t("grading.maxScoreTooltip")}>
                             <ThumbsUp className="w-4 h-4" />
                           </button>
-                          <button onClick={() => setScores({...scores, [sub.id]: 0})} className="p-1.5 rounded bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 hover:bg-rose-100" title="0 điểm">
+                          <button onClick={() => setScores({...scores, [sub.id]: 0})} className="p-1.5 rounded bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 hover:bg-rose-100" title={t("grading.zeroScoreTooltip")}>
                             <ThumbsDown className="w-4 h-4" />
                           </button>
                         </div>
@@ -231,7 +231,7 @@ export default function GradingPage() {
               <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">{t("grading.allGraded")}</p>
               <a href="/reports">
                 <Button variant="outline" className="gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50">
-                  <Star className="w-4 h-4" /> Xem báo cáo điểm
+                  <Star className="w-4 h-4" /> {t("grading.viewReport")}
                 </Button>
               </a>
             </CardContent>

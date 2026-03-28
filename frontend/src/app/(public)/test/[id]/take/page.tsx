@@ -185,9 +185,9 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
     return (
       <div className="flex flex-col h-screen items-center justify-center space-y-4">
         <ShieldAlert className="w-16 h-16 text-rose-500" />
-        <h1 className="text-2xl font-bold">Không thể tải bài thi</h1>
+        <h1 className="text-2xl font-bold">{t("testRoom.quizLoadError")}</h1>
         <p className="text-muted-foreground">{error}</p>
-        <Button onClick={() => router.push("/")}>Quay lại trang chủ</Button>
+        <Button onClick={() => router.push("/")}>{t("testRoom.backToHome")}</Button>
       </div>
     );
   }
@@ -196,7 +196,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   if (questions.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <p className="text-lg text-muted-foreground">Bài thi này chưa có câu hỏi nào.</p>
+        <p className="text-lg text-muted-foreground">{t("testRoom.emptyTest")}</p>
       </div>
     );
   }
@@ -213,22 +213,22 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
             <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-4">
               <ShieldAlert className="w-8 h-8 text-rose-600" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Phát hiện chuyển tab!</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">{t("testRoom.proctorWarningTitle")}</h2>
             <p className="text-muted-foreground mb-4">
-              Hệ thống đã ghi nhận bạn rời khỏi trang thi. Hành vi này sẽ được báo cáo cho giáo viên.
+              {t("testRoom.proctorWarningDesc")}
             </p>
             <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-6">
               <div className="flex items-center justify-center gap-2 text-rose-700 font-bold text-lg">
                 <AlertTriangle className="w-5 h-5" />
-                Lần vi phạm: {tabSwitchCount} / {MAX_TAB_SWITCHES}
+                {t("testRoom.proctorViolationCount", { current: tabSwitchCount, max: MAX_TAB_SWITCHES })}
               </div>
               {tabSwitchCount > MAX_TAB_SWITCHES ? (
                 <p className="text-sm text-rose-600 mt-2 font-medium">
-                  Bạn đã hết số lần cảnh báo. Bài thi sẽ được nộp tự động.
+                  {t("testRoom.proctorNoMoreWarnings")}
                 </p>
               ) : (
                 <p className="text-sm text-rose-600 mt-2">
-                  Đến lần thứ {MAX_TAB_SWITCHES}, bài thi của bạn sẽ bị nộp tự động.
+                  {t("testRoom.proctorWarningLimit", { max: MAX_TAB_SWITCHES })}
                 </p>
               )}
             </div>
@@ -237,7 +237,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
                 className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base"
                 onClick={dismissWarning}
               >
-                Tôi đã hiểu, tiếp tục làm bài
+                {t("testRoom.proctorUnderstood")}
               </Button>
             )}
           </div>
@@ -372,21 +372,21 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         <div className="px-6 py-4 grid grid-cols-3 gap-4 text-center border-b text-sm bg-background">
           <div>
             <div className="font-bold text-lg text-emerald-600">{Object.keys(answers).length}</div>
-            <div className="text-muted-foreground text-xs">Đã làm</div>
+            <div className="text-muted-foreground text-xs">{t("testRoom.metricsDone")}</div>
           </div>
           <div>
             <div className="font-bold text-lg text-amber-500">{flagged.length}</div>
-            <div className="text-muted-foreground text-xs">Phân vân</div>
+            <div className="text-muted-foreground text-xs">{t("testRoom.metricsFlagged")}</div>
           </div>
           <div>
             <div className={`font-bold text-lg ${tabSwitchCount > 0 ? 'text-rose-500' : 'text-slate-400'}`}>{tabSwitchCount}</div>
-            <div className="text-muted-foreground text-xs">Vi phạm</div>
+            <div className="text-muted-foreground text-xs">{t("testRoom.metricsViolation")}</div>
           </div>
         </div>
 
         {/* Question Palette */}
         <div className="flex-1 overflow-y-auto p-6">
-          <h3 className="font-semibold text-card-foreground mb-4">Danh sách câu hỏi</h3>
+          <h3 className="font-semibold text-card-foreground mb-4">{t("testRoom.questionListTitle")}</h3>
           <div className="grid grid-cols-5 gap-2">
             {questions.map((q, i) => {
               const isDone = answers[q.id] !== undefined;
@@ -412,16 +412,16 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
           </div>
           
           <div className="mt-8 space-y-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-emerald-500"></div> Đã trả lời</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-amber-500"></div> Đang phân vân (cắm cờ)</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-background"></div> Chưa trả lời</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-rose-500"></div> Vi phạm tab</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-emerald-500"></div> {t("testRoom.statusAnswered")}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-amber-500"></div> {t("testRoom.statusFlagged")}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border bg-background"></div> {t("testRoom.statusUnanswered")}</div>
+            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-rose-500"></div> {t("testRoom.statusViolation")}</div>
           </div>
         </div>
 
         <div className="p-4 bg-background border-t">
           <Button variant="destructive" className="w-full text-base font-bold shadow-sm" onClick={handleSubmit} disabled={Object.keys(answers).length === 0}>
-            NỘP BÀI NGAY
+            {t("testRoom.submitNow")}
           </Button>
         </div>
 

@@ -14,11 +14,11 @@ import { useTranslation } from "@/context/LanguageContext";
 
 const themes = [
   { id: "indigo", label: "Indigo", color: "bg-indigo-600" },
-  { id: "emerald", label: "Xanh lá", color: "bg-emerald-600" },
-  { id: "rose", label: "Hồng", color: "bg-rose-500" },
-  { id: "amber", label: "Cam", color: "bg-amber-500" },
-  { id: "violet", label: "Tím", color: "bg-violet-600" },
-  { id: "slate", label: "Xám", color: "bg-slate-700" },
+  { id: "emerald", labelKey: "settings.colorEmerald", color: "bg-emerald-600" },
+  { id: "rose", labelKey: "settings.colorRose", color: "bg-rose-500" },
+  { id: "amber", labelKey: "settings.colorAmber", color: "bg-amber-500" },
+  { id: "violet", labelKey: "settings.colorViolet", color: "bg-violet-600" },
+  { id: "slate", labelKey: "settings.colorSlate", color: "bg-slate-700" },
 ];
 
 export default function SettingsPage() {
@@ -57,7 +57,7 @@ export default function SettingsPage() {
       updateUser({ name: fullName });
       toast.success(t("settings.account.save") + " ✓");
     } catch (err: any) {
-      toast.error("Lỗi: " + err.message);
+      toast.error(t("settings.saveError") + err.message);
     } finally {
       setSaving(false);
     }
@@ -65,10 +65,10 @@ export default function SettingsPage() {
 
   const handleChangePassword = async () => {
     if (passwords.new !== passwords.confirm) {
-      return toast.warning("Mật khẩu xác nhận không khớp!");
+      return toast.warning(t("settings.security.passwordMismatch"));
     }
     if (passwords.new.length < 6) {
-      return toast.warning("Mật khẩu mới phải có ít nhất 6 ký tự!");
+      return toast.warning(t("settings.security.passwordTooShort"));
     }
     
     setPasswordSaving(true);
@@ -80,10 +80,10 @@ export default function SettingsPage() {
           new_password: passwords.new 
         }),
       });
-      toast.success("Đổi mật khẩu thành công!");
+      toast.success(t("settings.security.passwordSuccess"));
       setPasswords({ current: "", new: "", confirm: "" });
     } catch (err: any) {
-      toast.error("Đổi mật khẩu thất bại: Sai mật khẩu cũ");
+      toast.error(t("settings.security.passwordError"));
     } finally {
       setPasswordSaving(false);
     }
@@ -233,7 +233,7 @@ export default function SettingsPage() {
                         <div className={`w-8 h-8 rounded-full ${theme.color} shadow-inner flex items-center justify-center`}>
                           {selectedTheme === theme.id && <Check className="w-4 h-4 text-white" />}
                         </div>
-                        <span className="text-[11px] font-medium text-muted-foreground">{theme.label}</span>
+                        <span className="text-[11px] font-medium text-muted-foreground">{theme.labelKey ? t(theme.labelKey) : theme.label}</span>
                       </button>
                     ))}
                   </div>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-card-foreground">{t("settings.security.currentSession")}</p>
-                      <p className="text-xs text-muted-foreground">Phiên hiện tại • Hoạt động</p>
+                      <p className="text-xs text-muted-foreground">{t("settings.security.sessionDesc")}</p>
                     </div>
                     <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-semibold rounded-full">{t("settings.security.active")}</span>
                   </div>

@@ -232,7 +232,7 @@ export default function StudentsPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy</Button>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
               <Button onClick={handleAddStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận thêm</Button>
             </DialogFooter>
           </DialogContent>
@@ -407,8 +407,8 @@ export default function StudentsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

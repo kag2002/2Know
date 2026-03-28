@@ -172,6 +172,7 @@ func main() {
 
 	api.Get("/tags", tagHandler.GetTags)
 	api.Post("/tags", tagHandler.CreateTag)
+	api.Patch("/tags/:id", tagHandler.UpdateTag)
 	api.Delete("/tags/:id", tagHandler.DeleteTag)
 
 	// Stats/Dashboard endpoint

@@ -328,8 +328,8 @@ export default function QuizzesPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditQuiz} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditQuiz} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -364,7 +364,7 @@ export default function QuizzesPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsShareDialogOpen(false)}>Hủy</Button>
+            <Button variant="outline" onClick={() => setIsShareDialogOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleCreateShare} className="bg-indigo-600 hover:bg-indigo-700 text-white">Tạo link chia sẻ</Button>
           </DialogFooter>
         </DialogContent>

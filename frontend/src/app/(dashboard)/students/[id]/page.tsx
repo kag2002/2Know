@@ -82,10 +82,10 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 border-b">
                     <tr>
-                      <th className="text-left font-medium p-3 text-muted-foreground">Bài thi</th>
-                      <th className="text-left font-medium p-3 text-muted-foreground">Thời gian</th>
-                      <th className="text-right font-medium p-3 text-muted-foreground">Điểm</th>
-                      <th className="text-center font-medium p-3 text-muted-foreground">Trạng thái</th>
+                      <th className="text-left font-medium p-3 text-muted-foreground">{t("studentProfile.colQuiz")}</th>
+                      <th className="text-left font-medium p-3 text-muted-foreground">{t("studentProfile.colTime")}</th>
+                      <th className="text-right font-medium p-3 text-muted-foreground">{t("studentProfile.colScore")}</th>
+                      <th className="text-center font-medium p-3 text-muted-foreground">{t("studentProfile.colStatus")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
@@ -105,15 +105,15 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
                         <td className="p-3 text-center">
                           {item.status === 'completed' ? (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
-                              Đã chấm
+                              {t("studentProfile.statusCompleted")}
                             </span>
                           ) : item.status === 'pending' ? (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-                              Chờ chấm
+                              {t("studentProfile.statusPending")}
                             </span>
                           ) : (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400">
-                              Bị gắn cờ
+                              {t("studentProfile.statusFlagged")}
                             </span>
                           )}
                         </td>

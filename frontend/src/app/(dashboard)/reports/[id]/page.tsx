@@ -126,7 +126,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       <div className="flex flex-col items-center justify-center py-32 text-center">
         <AlertTriangle className="w-12 h-12 text-destructive mb-4" />
         <h2 className="text-xl font-bold mb-2">{error}</h2>
-        <Link href="/reports"><Button variant="outline">← Quay lại</Button></Link>
+        <Link href="/reports"><Button variant="outline">{t("reportDetail.goBack")}</Button></Link>
       </div>
     );
   }
@@ -142,9 +142,9 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         </Link>
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            {t("reportDetail.title") !== "reportDetail.title" ? t("reportDetail.title") : "Chi tiết Báo cáo"}
+            {t("reportDetail.title")}
           </h1>
-          <p className="text-muted-foreground mt-1">Mã đề: {id} • {totalSubmissions} bài nộp</p>
+          <p className="text-muted-foreground mt-1">{t("reportDetail.quizCode")}: {id} • {totalSubmissions} {t("reportDetail.submissions")}</p>
         </div>
         <div className="ml-auto">
           <Button 
@@ -153,7 +153,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-shadow-indigo-600/20 shadow-md transition-all"
           >
             {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
-            {isExporting ? "Đang xuất..." : "Xuất CSV"}
+            {isExporting ? t("reportDetail.exporting") : t("reportDetail.exportCSV")}
           </Button>
         </div>
       </div>
@@ -161,10 +161,10 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Tổng bài nộp", value: String(totalSubmissions), icon: Users, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-900/30" },
-          { label: "Điểm trung bình", value: avgScore.toFixed(1), icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
-          { label: "Điểm cao nhất", value: maxScore.toFixed(1), icon: Award, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-900/30" },
-          { label: "Vi phạm tab", value: String(totalViolations), icon: ShieldAlert, color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-900/30" },
+          { label: t("reportDetail.totalSubmissions"), value: String(totalSubmissions), icon: Users, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-900/30" },
+          { label: t("reportDetail.avgScore"), value: avgScore.toFixed(1), icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/30" },
+          { label: t("reportDetail.maxScore"), value: maxScore.toFixed(1), icon: Award, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-900/30" },
+          { label: t("reportDetail.tabViolations"), value: String(totalViolations), icon: ShieldAlert, color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-900/30" },
         ].map((stat, i) => (
           <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
@@ -187,12 +187,12 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         {/* Score Distribution */}
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Phân bố điểm số</CardTitle>
-            <p className="text-sm text-muted-foreground">Biểu đồ phân phối điểm của toàn bộ học sinh</p>
+            <CardTitle className="text-lg">{t("reportDetail.scoreDistTitle")}</CardTitle>
+            <p className="text-sm text-muted-foreground">{t("reportDetail.scoreDistDesc")}</p>
           </CardHeader>
           <CardContent>
             {totalSubmissions === 0 ? (
-              <p className="text-center text-muted-foreground py-12">Chưa có bài nộp nào.</p>
+              <p className="text-center text-muted-foreground py-12">{t("reportDetail.noSubmissions")}</p>
             ) : (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={scoreDistribution} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
@@ -201,7 +201,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
                   <YAxis tick={{ fontSize: 11 }} stroke="#94a3b8" />
                   <Tooltip
                     contentStyle={{ borderRadius: "8px", border: "1px solid #e2e8f0", fontSize: "13px" }}
-                    formatter={(value) => [`${value} học sinh`, "Số lượng"]}
+                    formatter={(value) => [`${value} ${t("reportDetail.studentsUnit")}`, t("reportDetail.countLabel")]}
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                     {scoreDistribution.map((entry, index) => (
@@ -217,22 +217,22 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
         {/* Top Students */}
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Bảng xếp hạng TOP 5</CardTitle>
-            <p className="text-sm text-muted-foreground">Học sinh có điểm số cao nhất</p>
+            <CardTitle className="text-lg">{t("reportDetail.top5Title")}</CardTitle>
+            <p className="text-sm text-muted-foreground">{t("reportDetail.top5Desc")}</p>
           </CardHeader>
           <CardContent>
             {topStudents.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">Chưa có dữ liệu.</p>
+              <p className="text-center text-muted-foreground py-12">{t("reportDetail.noData")}</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b text-left text-muted-foreground">
                       <th className="pb-3 font-semibold">#</th>
-                      <th className="pb-3 font-semibold">Họ và Tên</th>
-                      <th className="pb-3 font-semibold text-center">Điểm</th>
-                      <th className="pb-3 font-semibold text-center">Thời gian</th>
-                      <th className="pb-3 font-semibold text-center">Vi phạm</th>
+                      <th className="pb-3 font-semibold">{t("reportDetail.colName")}</th>
+                      <th className="pb-3 font-semibold text-center">{t("reportDetail.colScore")}</th>
+                      <th className="pb-3 font-semibold text-center">{t("reportDetail.colTime")}</th>
+                      <th className="pb-3 font-semibold text-center">{t("reportDetail.colViolation")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -260,7 +260,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
                               <AlertTriangle className="w-3 h-3" /> {s.violations}
                             </span>
                           ) : (
-                            <span className="text-emerald-500 text-xs font-medium">Không</span>
+                            <span className="text-emerald-500 text-xs font-medium">{t("reportDetail.noViolation")}</span>
                           )}
                         </td>
                       </tr>

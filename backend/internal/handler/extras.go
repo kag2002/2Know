@@ -22,7 +22,7 @@ func NewOmrBatchHandler(svc service.OmrBatchService) *OmrBatchHandler {
 }
 
 func (h *OmrBatchHandler) GetBatches(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	batches, err := h.svc.GetBatches(userID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to get batches"})
@@ -31,7 +31,7 @@ func (h *OmrBatchHandler) GetBatches(c fiber.Ctx) error {
 }
 
 func (h *OmrBatchHandler) CreateBatch(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	var batch model.OmrBatch
 	if err := c.Bind().JSON(&batch); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
@@ -44,7 +44,7 @@ func (h *OmrBatchHandler) CreateBatch(c fiber.Ctx) error {
 }
 
 func (h *OmrBatchHandler) UpdateBatch(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	id := c.Params("id")
 	var batch model.OmrBatch
 	if err := c.Bind().JSON(&batch); err != nil {
@@ -58,7 +58,7 @@ func (h *OmrBatchHandler) UpdateBatch(c fiber.Ctx) error {
 }
 
 func (h *OmrBatchHandler) DeleteBatch(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	id := c.Params("id")
 	if err := h.svc.DeleteBatch(id, userID); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete batch"})
@@ -77,7 +77,7 @@ func NewRubricHandler(svc service.RubricService) *RubricHandler {
 }
 
 func (h *RubricHandler) GetRubrics(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	rubrics, err := h.svc.GetRubrics(userID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to get rubrics"})
@@ -86,7 +86,7 @@ func (h *RubricHandler) GetRubrics(c fiber.Ctx) error {
 }
 
 func (h *RubricHandler) CreateRubric(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	var rubric model.Rubric
 	if err := c.Bind().JSON(&rubric); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
@@ -99,7 +99,7 @@ func (h *RubricHandler) CreateRubric(c fiber.Ctx) error {
 }
 
 func (h *RubricHandler) UpdateRubric(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	id := c.Params("id")
 	var rubric model.Rubric
 	if err := c.Bind().JSON(&rubric); err != nil {
@@ -113,7 +113,7 @@ func (h *RubricHandler) UpdateRubric(c fiber.Ctx) error {
 }
 
 func (h *RubricHandler) DeleteRubric(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	id := c.Params("id")
 	if err := h.svc.DeleteRubric(id, userID); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete rubric"})
@@ -132,7 +132,7 @@ func NewShareLinkHandler(svc service.ShareLinkService) *ShareLinkHandler {
 }
 
 func (h *ShareLinkHandler) GetLinks(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	links, err := h.svc.GetLinks(userID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to get share links"})
@@ -141,7 +141,7 @@ func (h *ShareLinkHandler) GetLinks(c fiber.Ctx) error {
 }
 
 func (h *ShareLinkHandler) CreateLink(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	var link model.ShareLink
 	if err := c.Bind().JSON(&link); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
@@ -160,7 +160,7 @@ func (h *ShareLinkHandler) CreateLink(c fiber.Ctx) error {
 }
 
 func (h *ShareLinkHandler) UpdateLink(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	id := c.Params("id")
 	var link model.ShareLink
 	if err := c.Bind().JSON(&link); err != nil {
@@ -174,7 +174,7 @@ func (h *ShareLinkHandler) UpdateLink(c fiber.Ctx) error {
 }
 
 func (h *ShareLinkHandler) DeleteLink(c fiber.Ctx) error {
-	userID, _ := c.Locals("userID").(string)
+	userID := getUserIdFromToken(c)
 	id := c.Params("id")
 	if err := h.svc.DeleteLink(id, userID); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete link"})

@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { Search, Filter, BarChart3, TrendingUp, Users, ArrowRight, Loader2, FileText, Download } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
@@ -27,10 +29,12 @@ interface Quiz {
   avg_score: number;
 }
 
-export default function ReportsPage() {
+function ReportsContent() {
   const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -178,6 +182,8 @@ export default function ReportsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder={t("reports.searchPlaceholder")} 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="pl-9 h-10 w-full bg-background/80 focus:bg-background transition-colors"
             />
           </div>
@@ -187,14 +193,14 @@ export default function ReportsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6 bg-slate-50/50 dark:bg-slate-900/20">
-          {quizzes.length === 0 ? (
+          {quizzes.filter(q => q.title.toLowerCase().includes(search.toLowerCase())).length === 0 ? (
             <div className="col-span-full p-16 text-center text-muted-foreground border-2 border-dashed rounded-2xl bg-muted/30">
               <BarChart3 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground">{t("reports.noReports")}</h3>
               <p className="text-sm mt-1">{t("dashboard.reports.emptyState")}</p>
             </div>
           ) : (
-            quizzes.map(quiz => (
+            quizzes.filter(q => q.title.toLowerCase().includes(search.toLowerCase())).map(quiz => (
               <Card key={quiz.id} className="group overflow-hidden border bg-background hover:shadow-xl hover:border-indigo-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col">
                 <div className="p-6 flex flex-col h-full relative">
                   {/* Decorative Background Glow */}
@@ -237,5 +243,13 @@ export default function ReportsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ReportsPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center flex-col items-center h-[60vh] text-muted-foreground"><Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-4" /></div>}>
+      <ReportsContent />
+    </Suspense>
   );
 }

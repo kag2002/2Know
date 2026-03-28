@@ -49,6 +49,28 @@ func (h *TagHandler) CreateTag(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(tag)
 }
 
+func (h *TagHandler) UpdateTag(c fiber.Ctx) error {
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	id := c.Params("id")
+	tag := new(model.Tag)
+	if err := c.Bind().JSON(tag); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	tag.ID = id
+	tag.UserID = userId
+
+	if err := h.svc.UpdateTag(tag); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update tag"})
+	}
+
+	return c.JSON(tag)
+}
+
 func (h *TagHandler) DeleteTag(c fiber.Ctx) error {
 	userId := getUserIdFromToken(c)
 	if userId == "" {

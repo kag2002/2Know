@@ -356,8 +356,8 @@ export default function QuestionBankPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditQuestion} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditQuestion} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -9,6 +9,7 @@ import (
 type TagRepository interface {
 	GetTags(userID string) ([]model.Tag, error)
 	CreateTag(tag *model.Tag) error
+	UpdateTag(tag *model.Tag) error
 	DeleteTag(id, userID string) error
 }
 
@@ -28,6 +29,10 @@ func (r *tagRepository) GetTags(userID string) ([]model.Tag, error) {
 
 func (r *tagRepository) CreateTag(tag *model.Tag) error {
 	return r.db.Create(tag).Error
+}
+
+func (r *tagRepository) UpdateTag(tag *model.Tag) error {
+	return r.db.Save(tag).Error
 }
 
 func (r *tagRepository) DeleteTag(id, userID string) error {

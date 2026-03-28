@@ -51,7 +51,7 @@ func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentW
 		Joins("JOIN classes ON students.class_id = classes.id").
 		Joins("LEFT JOIN test_results ON test_results.student_id = students.id").
 		Where("classes.teacher_id = ?", teacherID).
-		Group("students.id, classes.name").
+		Group("students.id, students.full_name, students.student_id, students.email, classes.name").
 		Scan(&results).Error
 
 	return results, err

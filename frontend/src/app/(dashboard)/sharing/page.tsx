@@ -52,7 +52,7 @@ export default function SharingPage() {
       const data = await apiFetch("/shares");
       setSharedQuizzes(data || []);
     } catch {
-      toast.error("Không thể tải danh sách chia sẻ");
+      toast.error(t("sharing.loadError"));
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ export default function SharingPage() {
 
   const handleEditLink = async () => {
     if (!editingLink || !editingLink.title) {
-      toast.warning("Vui lòng nhập tên bài test!");
+      toast.warning(t("sharing.editRequireTitle"));
       return;
     }
     try {
@@ -79,28 +79,28 @@ export default function SharingPage() {
           type: editingLink.type
         })
       });
-      toast.success("Cập nhật mục chia sẻ thành công!");
+      toast.success(t("sharing.editSuccess"));
       setIsEditDialogOpen(false);
       loadShares();
     } catch {
-      toast.error("Lỗi cập nhật chia sẻ");
+      toast.error(t("sharing.editError"));
     }
   };
 
   const handleDelete = async (id: string) => {
     const ok = await confirm({
-      title: "Xóa link chia sẻ",
-      description: "Học sinh sẽ không thể truy cập bài thi qua link này nữa.",
-      confirmLabel: "Xóa link",
+      title: t("sharing.deleteTitle"),
+      description: t("sharing.deleteDesc"),
+      confirmLabel: t("sharing.deleteBtn"),
       variant: "warning"
     });
     if (!ok) return;
     try {
       await apiFetch(`/shares/${id}`, { method: 'DELETE' });
       setSharedQuizzes(prev => prev.filter(q => q.id !== id));
-      toast.success("Đã xóa link chia sẻ");
+      toast.success(t("sharing.deleteSuccess"));
     } catch (err) {
-      toast.error("Lỗi khi xóa");
+      toast.error(t("sharing.deleteError"));
     }
   };
 
@@ -166,16 +166,16 @@ export default function SharingPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-semibold truncate">{quiz.title}</h3>
                     <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${quiz.status === "active" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-muted-foreground"}`}>
-                      {quiz.status === "active" ? "Đang mở" : "Hết hạn"}
+                      {quiz.status === "active" ? t("sharing.optionActive") : t("sharing.optionExpired")}
                     </span>
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${quiz.type === "public" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"}`}>
-                      {quiz.type === "public" ? "Công khai" : "Theo lớp"}
+                      {quiz.type === "public" ? t("sharing.typePublic") : t("sharing.typeClass")}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="font-mono">{quiz.share_code}</span>
                     <span>•</span>
-                    <span>{quiz.access_count} lượt truy cập</span>
+                    <span>{quiz.access_count} {t("sharing.accessCount")}</span>
                   </div>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
@@ -189,10 +189,10 @@ export default function SharingPage() {
                     {copiedId === quiz.id ? t("sharing.copied") : t("sharing.copy")}
                   </Button>
                   <Button variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-none" onClick={() => { setEditingLink(quiz); setIsEditDialogOpen(true); }}>
-                    <Edit2 className="w-3.5 h-3.5" /> Sửa
+                    <Edit2 className="w-3.5 h-3.5" /> {t("sharing.editBtn")}
                   </Button>
                   <Button variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-none text-destructive hover:text-destructive" onClick={() => handleDelete(quiz.id)}>
-                    <Trash2 className="w-3.5 h-3.5" /> Xóa
+                    <Trash2 className="w-3.5 h-3.5" /> {t("sharing.deleteSmall")}
                   </Button>
                 </div>
               </div>
@@ -205,13 +205,13 @@ export default function SharingPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa cài đặt chia sẻ</DialogTitle>
-            <DialogDescription>Cập nhật thông tin và quyền truy cập của bài kiểm tra.</DialogDescription>
+            <DialogTitle>{t("sharing.editTitle")}</DialogTitle>
+            <DialogDescription>{t("sharing.editDesc")}</DialogDescription>
           </DialogHeader>
           {editingLink && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-l-title">Tên hiển thị</Label>
+                <Label htmlFor="edit-l-title">{t("sharing.labelDisplayName")}</Label>
                 <Input 
                   id="edit-l-title" 
                   value={editingLink.title} 
@@ -219,34 +219,34 @@ export default function SharingPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-l-status">Trạng thái</Label>
+                <Label htmlFor="edit-l-status">{t("sharing.labelStatus")}</Label>
                 <select 
                   id="edit-l-status" 
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editingLink.status} 
                   onChange={(e) => setEditingLink({...editingLink, status: e.target.value})}
                 >
-                  <option value="active">Đang mở</option>
-                  <option value="expired">Tạm đóng</option>
+                  <option value="active">{t("sharing.optionActive")}</option>
+                  <option value="expired">{t("sharing.optionExpired")}</option>
                 </select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-l-type">Loại bảo mật</Label>
+                <Label htmlFor="edit-l-type">{t("sharing.labelSecurityType")}</Label>
                 <select 
                   id="edit-l-type" 
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   value={editingLink.type} 
                   onChange={(e) => setEditingLink({...editingLink, type: e.target.value})}
                 >
-                  <option value="public">Công khai (Ai có link cũng vào được)</option>
-                  <option value="class">Nội bộ lớp (Cần mã HS)</option>
+                  <option value="public">{t("sharing.optionPublic")}</option>
+                  <option value="class">{t("sharing.optionClass")}</option>
                 </select>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditLink} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditLink} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -173,7 +173,7 @@ export default function ClassesPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy</Button>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
                 <Button onClick={handleCreateClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
               </DialogFooter>
             </DialogContent>
@@ -240,7 +240,7 @@ export default function ClassesPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => { setEditingClass(cls); setIsEditDialogOpen(true); }}>{t("classes.editInfo")}</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => window.location.href = `/reports`}>{t("classes.benchmarkReport")}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => window.location.href = `/reports?search=${encodeURIComponent(cls.name)}`}>{t("classes.benchmarkReport")}</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive" onClick={async () => {
                         const ok = await confirm({
                           title: "Xóa lớp học",
@@ -348,8 +348,8 @@ export default function ClassesPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

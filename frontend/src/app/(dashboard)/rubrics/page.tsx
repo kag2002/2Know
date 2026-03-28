@@ -177,7 +177,7 @@ export default function RubricsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>Hủy</Button>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
           </DialogFooter>
         </DialogContent>
@@ -353,8 +353,8 @@ export default function RubricsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditRubric} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditRubric} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -11,11 +11,11 @@ import { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 
-function getGreeting() {
+function getGreeting(t: (key: string) => string) {
   const h = new Date().getHours();
-  if (h < 12) return "☀️ Chào buổi sáng";
-  if (h < 18) return "🌤️ Chào buổi chiều";
-  return "🌙 Chào buổi tối";
+  if (h < 12) return t("overview.greetingMorning");
+  if (h < 18) return t("overview.greetingAfternoon");
+  return t("overview.greetingEvening");
 }
 
 function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string }) {
@@ -169,7 +169,7 @@ export default function OverviewPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="bg-muted px-2.5 py-0.5 rounded-full text-xs font-medium text-muted-foreground">
-              {getGreeting()}
+              {getGreeting(t)}
             </span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-white">
@@ -185,7 +185,7 @@ export default function OverviewPage() {
           </Button>
           <Link href="/quizzes/create">
             <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
-              <Plus className="w-4 h-4" /> Tạo bài mới
+              <Plus className="w-4 h-4" /> {t("overview.createNew")}
             </Button>
           </Link>
         </div>
@@ -274,7 +274,7 @@ export default function OverviewPage() {
                 ))
               ) : (
                 <div className="p-4 text-center text-sm text-muted-foreground border rounded-lg bg-card">
-                  Chưa có hoạt động nộp bài nào gần đây.
+                  {t("overview.noActivity")}
                 </div>
               )}
             </div>
@@ -323,7 +323,7 @@ export default function OverviewPage() {
                 </div>
               ) : (
                 <div className="h-56 flex flex-col items-center justify-center">
-                  <span className="text-sm font-medium text-muted-foreground">Chưa có bài chấm</span>
+                  <span className="text-sm font-medium text-muted-foreground">{t("overview.noGraded")}</span>
                 </div>
               )}
               

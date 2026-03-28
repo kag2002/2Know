@@ -220,10 +220,10 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
           setEditingClass({ name, subject, grade, school_year });
           setIsEditDialogOpen(true);
         }}>
-          Chỉnh sửa thông tin
+          {t("classDetail.editBtn")}
         </Button>
         <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => setIsInviteDialogOpen(true)}>
-          <Plus className="w-4 h-4" /> Thêm học sinh
+          <Plus className="w-4 h-4" /> {t("classDetail.addStudentBtn")}
         </Button>
       </div>
 
@@ -254,9 +254,9 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
       {/* Main Content Tabs */}
       <Tabs defaultValue="students" className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-[500px] mb-6 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl">
-          <TabsTrigger value="students" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> Danh sách Lớp</TabsTrigger>
-          <TabsTrigger value="grades" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> Bảng điểm</TabsTrigger>
-          <TabsTrigger value="materials" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> Tài liệu & Kế hoạch</TabsTrigger>
+          <TabsTrigger value="students" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> {t("classDetail.tabStudents")}</TabsTrigger>
+          <TabsTrigger value="grades" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> {t("classDetail.tabGrades")}</TabsTrigger>
+          <TabsTrigger value="materials" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> {t("classDetail.tabMaterials")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="students" className="mt-0 outline-none">
@@ -331,8 +331,8 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                            {isActive ? (
                              <span className="inline-flex px-2.5 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-bold uppercase tracking-wide ring-1 ring-emerald-600/20 inset-ring">{t("classDetail.statusActive")}</span>
                            ) : (
-                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-[10px] font-bold uppercase tracking-wide ring-1 ring-rose-600/20 inset-ring cursor-help" title={`Phát hiện gian lận trong ${violationCount} bài kiểm tra`}>
-                                ⚠️ Vi phạm
+                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-full text-[10px] font-bold uppercase tracking-wide ring-1 ring-rose-600/20 inset-ring cursor-help" title={t("classDetail.violationHint", { count: violationCount })}>
+                                {t("classDetail.statusViolation")}
                              </span>
                            )}
                         </td>
@@ -345,9 +345,9 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                               <DropdownMenuItem className="cursor-pointer font-medium" onClick={() => window.location.href = `/students/${student.id}`}>{t("classDetail.viewProfile")}</DropdownMenuItem>
                               <DropdownMenuItem className="text-rose-600 focus:text-rose-700 cursor-pointer font-medium" onClick={async () => {
                                 const ok = await confirm({
-                                  title: "Xóa học sinh khỏi lớp",
-                                  description: `Bạn có chắc muốn xóa "${student.full_name}" khỏi lớp học này?`,
-                                  confirmLabel: "Xóa khỏi lớp",
+                                  title: t("classDetail.deleteStudentTitle"),
+                                  description: t("classDetail.deleteStudentDesc", { name: student.full_name }),
+                                  confirmLabel: t("classDetail.deleteStudentBtn"),
                                   variant: "danger"
                                 });
                                 if (!ok) return;
@@ -383,9 +383,9 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
         <TabsContent value="grades" className="mt-0 outline-none">
           <Card className="shadow-sm border-0 ring-1 ring-slate-200/50 dark:ring-slate-800/50 rounded-2xl overflow-hidden min-h-[400px]">
              <CardHeader className="bg-white dark:bg-card">
-                <CardTitle className="text-lg font-bold">Bảng điểm Ma trận (Master Gradebook)</CardTitle>
+                <CardTitle className="text-lg font-bold">{t("classDetail.gradebookTitle")}</CardTitle>
                 <p className="text-sm text-slate-500 mt-1">
-                  Quan sát toàn diện tiến độ và điểm số của tất cả học sinh trong các bài kiểm tra gần nhất.
+                  {t("classDetail.gradebookDesc")}
                 </p>
              </CardHeader>
              <CardContent className="p-0">
@@ -393,8 +393,8 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                   <div className="flex flex-col justify-center items-center h-48 border-2 border-dashed border-slate-200 dark:border-slate-800 m-6 rounded-xl bg-slate-50/50 dark:bg-slate-900/20 gap-3">
                      <BarChart3 className="w-10 h-10 text-slate-300 dark:text-slate-700" />
                      <div className="text-center">
-                        <p className="text-slate-600 dark:text-slate-400 font-semibold">Chưa có bài thi nào ghi nhận điểm số trong lớp này.</p>
-                        <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">Hệ thống sẽ tự động tổng hợp khi học sinh làm bài.</p>
+                        <p className="text-slate-600 dark:text-slate-400 font-semibold">{t("classDetail.gradebookEmpty")}</p>
+                        <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">{t("classDetail.gradebookAutoHint")}</p>
                      </div>
                   </div>
                 ) : (
@@ -402,13 +402,13 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                     <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-slate-50/80 dark:bg-slate-900/40 text-left border-b border-slate-200 dark:border-slate-800">
-                            <th className="py-3 px-4 font-semibold text-slate-600 dark:text-slate-400 sticky left-0 top-0 bg-slate-50 dark:bg-slate-900 z-20 w-48 shadow-[1px_0_0_0_#e2e8f0] dark:shadow-[1px_0_0_0_#1e293b]">Học sinh</th>
+                            <th className="py-3 px-4 font-semibold text-slate-600 dark:text-slate-400 sticky left-0 top-0 bg-slate-50 dark:bg-slate-900 z-20 w-48 shadow-[1px_0_0_0_#e2e8f0] dark:shadow-[1px_0_0_0_#1e293b]">{t("classDetail.colStudent")}</th>
                             {gradebook.quizzes.map(q => (
                                 <th key={q.id} className="py-3 px-4 font-semibold text-slate-600 dark:text-slate-400 min-w-[120px] text-center border-l dark:border-slate-800 border-slate-200 sticky top-0 bg-slate-50 dark:bg-slate-900 z-10">
                                   {q.title}
                                 </th>
                             ))}
-                            <th className="py-3 px-4 font-bold text-indigo-600 dark:text-indigo-400 text-center border-l border-slate-200 dark:border-slate-800 min-w-[100px] sticky top-0 right-0 bg-indigo-50/50 dark:bg-indigo-900/20 z-20 shadow-[-1px_0_0_0_#e2e8f0] dark:shadow-[-1px_0_0_0_#312e81]">Điểm TB</th>
+                            <th className="py-3 px-4 font-bold text-indigo-600 dark:text-indigo-400 text-center border-l border-slate-200 dark:border-slate-800 min-w-[100px] sticky top-0 right-0 bg-indigo-50/50 dark:bg-indigo-900/20 z-20 shadow-[-1px_0_0_0_#e2e8f0] dark:shadow-[-1px_0_0_0_#312e81]">{t("classDetail.colAvgScore")}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -455,7 +455,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                                                   <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded-md text-sm font-extrabold tracking-tight ${score >= 8 ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-400/20' : score < 5 ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-600/20 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-400/20' : 'bg-slate-100 text-slate-700 ring-1 ring-slate-400/20 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-600/30'}`}>
                                                     {score.toFixed(1)}
                                                   </span>
-                                                  {hasViolation && <span className="text-[9px] uppercase font-bold text-rose-500 tracking-wider">Cảnh cáo</span>}
+                                                  {hasViolation && <span className="text-[9px] uppercase font-bold text-rose-500 tracking-wider">{t("classDetail.warningLabel")}</span>}
                                                 </div>
                                             ) : (
                                                 <span className="text-slate-300 dark:text-slate-600 text-[11px] font-bold uppercase tracking-wider">—</span>
@@ -481,18 +481,18 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
           <Card className="shadow-sm border-0 ring-1 ring-slate-200/50 dark:ring-slate-800/50 rounded-2xl overflow-hidden min-h-[400px]">
              <CardHeader className="flex flex-row justify-between items-center bg-white dark:bg-card">
                 <div>
-                  <CardTitle className="text-lg font-bold">Tài liệu & Kế hoạch Giảng dạy</CardTitle>
-                  <p className="text-sm text-slate-500 mt-1">Quản lý bài giảng PDF, Links và Video Youtube nội bộ chia sẻ cho lớp học này.</p>
+                  <CardTitle className="text-lg font-bold">{t("classDetail.materialsTitle")}</CardTitle>
+                  <p className="text-sm text-slate-500 mt-1">{t("classDetail.materialsDesc")}</p>
                 </div>
                 <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 font-semibold shadow-sm rounded-xl" onClick={() => setIsMaterialDialogOpen(true)}>
-                   <Plus className="w-4 h-4" /> Thêm tài liệu
+                   <Plus className="w-4 h-4" /> {t("classDetail.addMaterialBtn")}
                 </Button>
              </CardHeader>
              <CardContent className="p-6">
                 {materials.length === 0 ? (
                   <div className="flex flex-col justify-center items-center h-48 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/20 gap-3">
                      <Files className="w-10 h-10 text-slate-300 dark:text-slate-700" />
-                     <p className="text-slate-500 font-semibold">Chưa có tài liệu nào được đính kèm vào lớp này.</p>
+                     <p className="text-slate-500 font-semibold">{t("classDetail.materialsEmpty")}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -505,10 +505,10 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                               </Button>
                            </div>
                            <h3 className="font-bold text-slate-900 dark:text-slate-100 truncate mt-3">{mat.title}</h3>
-                           <p className="text-sm text-slate-500 line-clamp-2 mt-1 min-h-[40px]">{mat.description || "Không có mô tả"}</p>
+                           <p className="text-sm text-slate-500 line-clamp-2 mt-1 min-h-[40px]">{mat.description || t("classDetail.noDescription")}</p>
                            {mat.link_url && (
                              <a href={mat.link_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-700 font-semibold mt-4 bg-indigo-50 dark:bg-indigo-900/40 px-3 py-1.5 rounded-full">
-                                <LinkIcon className="w-3 h-3" /> Mở liên kết 
+                                <LinkIcon className="w-3 h-3" /> {t("classDetail.openLink")} 
                              </a>
                            )}
                         </div>
@@ -524,12 +524,12 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
       <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Thêm học sinh mới</DialogTitle>
-            <DialogDescription>Học sinh sẽ được thêm trực tiếp vào danh sách lớp {classData.name}.</DialogDescription>
+            <DialogTitle>{t("classDetail.inviteDialogTitle")}</DialogTitle>
+            <DialogDescription>{t("classDetail.inviteDialogDesc", { name: classData.name })}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="sbd">Mã học sinh (SBD) <span className="text-rose-500">*</span></Label>
+              <Label htmlFor="sbd">{t("classDetail.labelSBD")} <span className="text-rose-500">*</span></Label>
               <Input 
                 id="sbd" 
                 placeholder="VD: HS001" 
@@ -538,7 +538,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="fullname">Họ và Tên <span className="text-rose-500">*</span></Label>
+              <Label htmlFor="fullname">{t("classDetail.labelFullName")} <span className="text-rose-500">*</span></Label>
               <Input 
                 id="fullname" 
                 placeholder="VD: Nguyễn Văn A" 
@@ -547,7 +547,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email liên hệ (Tùy chọn)</Label>
+              <Label htmlFor="email">{t("classDetail.labelEmail")}</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -558,9 +558,9 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>Hủy</Button>
+            <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleInviteStudent} disabled={isInviting} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-              {isInviting ? "Đang thêm..." : "Xác nhận thêm"}
+              {isInviting ? t("classDetail.inviting") : t("classDetail.confirmInvite")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -602,8 +602,8 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleEditClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">Lưu thay đổi</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -612,12 +612,12 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
       <Dialog open={isMaterialDialogOpen} onOpenChange={setIsMaterialDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Thêm Tài liệu / Kế hoạch</DialogTitle>
-            <DialogDescription>Gắn thẻ nội dung số vào Lớp {classData.name}.</DialogDescription>
+            <DialogTitle>{t("classDetail.materialDialogTitle")}</DialogTitle>
+            <DialogDescription>{t("classDetail.materialDialogDesc", { name: classData.name })}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="mat-title">Tên tài liệu <span className="text-rose-500">*</span></Label>
+              <Label htmlFor="mat-title">{t("classDetail.labelMaterialTitle")} <span className="text-rose-500">*</span></Label>
               <Input 
                 id="mat-title" 
                 placeholder="VD: Giáo án Tuần 1" 
@@ -626,7 +626,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="mat-desc">Mô tả ngắn</Label>
+              <Label htmlFor="mat-desc">{t("classDetail.labelMaterialDesc")}</Label>
               <Input 
                 id="mat-desc" 
                 placeholder="Lưu ý quan trọng cho bài giảng này..." 
@@ -635,7 +635,7 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="mat-link">Liên kết Đính kèm (Drive, Youtube URL)</Label>
+              <Label htmlFor="mat-link">{t("classDetail.labelMaterialLink")}</Label>
               <Input 
                 id="mat-link" 
                 placeholder="https://..." 
@@ -645,9 +645,9 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsMaterialDialogOpen(false)}>Hủy</Button>
+            <Button variant="outline" onClick={() => setIsMaterialDialogOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleAddMaterial} disabled={isAddingMaterial} className="bg-indigo-600 hover:bg-indigo-700 text-white">
-              {isAddingMaterial ? "Đang lưu..." : "Xác nhận thêm"}
+              {isAddingMaterial ? t("classDetail.saving") : t("classDetail.confirmAdd")}
             </Button>
           </DialogFooter>
         </DialogContent>

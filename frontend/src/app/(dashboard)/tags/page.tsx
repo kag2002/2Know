@@ -3,7 +3,17 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Tags, Search, X, Hash, BarChart3, Loader2 } from "lucide-react";
+import { Plus, Tags, Search, X, Hash, BarChart3, Loader2, Edit2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useTranslation } from "@/context/LanguageContext";
@@ -14,6 +24,9 @@ export default function TagsPage() {
   const [search, setSearch] = useState("");
   const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingTag, setEditingTag] = useState<any>(null);
 
   const loadTags = async () => {
     try {
@@ -57,6 +70,22 @@ export default function TagsPage() {
       toast.success(t("tags.deleteSuccess"));
     } catch (err) {
       toast.error(t("dashboard.tags.deleteError"));
+    }
+  };
+
+  const handleEditTag = async () => {
+    if (!editingTag || !editingTag.name.trim()) return;
+    try {
+      await apiFetch(`/tags/${editingTag.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ name: editingTag.name.trim() })
+      });
+      setTags(tags.map(t => t.id === editingTag.id ? { ...t, name: editingTag.name.trim() } : t));
+      setIsEditDialogOpen(false);
+      setEditingTag(null);
+      toast.success(t("dashboard.tags.updateSuccess") || "Đã lưu thay đổi thẻ");
+    } catch (err) {
+      toast.error(t("dashboard.tags.updateError") || "Lỗi cập nhật thẻ");
     }
   };
 
@@ -123,23 +152,59 @@ export default function TagsPage() {
         {filtered.map(tag => (
           <div 
             key={tag.id} 
-            className={`group inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all hover:shadow-md cursor-default ${tag.color}`}
+            className={`group inline-flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all hover:shadow-md cursor-default ${tag.color}`}
           >
-            <Hash className="w-3.5 h-3.5 opacity-50" />
-            {tag.name}
-            <span className="text-[10px] opacity-60 font-normal">({tag.count})</span>
-            <button 
-              onClick={() => deleteTag(tag.id)} 
-              className="w-4 h-4 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/10"
-            >
-              <X className="w-3 h-3" />
-            </button>
+            <div className="flex items-center gap-1.5">
+              <Hash className="w-3.5 h-3.5 opacity-50" />
+              {tag.name}
+              <span className="text-[10px] opacity-60 font-normal">({tag.count})</span>
+            </div>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+              <button 
+                onClick={() => { setEditingTag(tag); setIsEditDialogOpen(true); }} 
+                className="w-5 h-5 rounded flex items-center justify-center hover:bg-black/10"
+                title="Sửa thẻ"
+              >
+                <Edit2 className="w-3 h-3" />
+              </button>
+              <button 
+                onClick={() => deleteTag(tag.id)} 
+                className="w-5 h-5 rounded flex items-center justify-center hover:bg-black/10"
+                title="Xóa thẻ"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         ))}
         {filtered.length === 0 && (
           <p className="text-muted-foreground text-sm py-8">{t("tags.noResults")}</p>
         )}
       </div>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa Thẻ (Tag)</DialogTitle>
+            <DialogDescription>Thay đổi tên hiển thị của thẻ này.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-tag-name">Tên thẻ</Label>
+              <Input
+                id="edit-tag-name"
+                value={editingTag?.name || ""}
+                onChange={(e) => setEditingTag({ ...editingTag, name: e.target.value })}
+                onKeyDown={(e) => e.key === "Enter" && handleEditTag()}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditTag} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
