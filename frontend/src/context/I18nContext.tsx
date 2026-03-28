@@ -36,7 +36,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: keyof Translations): string => {
-    return dictionaries[language][key] || key;
+    return (dictionaries[language] as any)[key] || key;
   };
 
   return (

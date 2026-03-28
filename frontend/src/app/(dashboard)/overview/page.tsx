@@ -8,8 +8,14 @@ import Link from "next/link";
 import { vi, enUS, it } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false, loading: () => <Skeleton className="w-full h-full rounded-full opacity-20" /> });
+const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie), { ssr: false });
+const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), { ssr: false });
+const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip), { ssr: false });
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false });
 
 function getGreeting(t: (key: string) => string) {
   const h = new Date().getHours();

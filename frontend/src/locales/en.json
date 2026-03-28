@@ -124,6 +124,8 @@
   "settings.notifications.cheatAlertDesc": "Instant notification when suspicious behavior is detected",
   "settings.notifications.weeklyReport": "Assessment report reminder",
   "settings.notifications.weeklyReportDesc": "Remind to review weekly score distribution reports",
+  "settings.notifications.saved": "Notification preferences saved!",
+  "settings.account.avatarWip": "Avatar changing is a Work in Progress.",
 
   "classes.title": "Class Management",
   "classes.subtitle": "Organize students by class, easily assign tasks and track learning progress.",
