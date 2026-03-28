@@ -23,6 +23,7 @@ type ResultRepository interface {
 		CreatedAt string `json:"created_at"`
 		TimeTakenSeconds int `json:"time_taken_seconds"`
 	}, error)
+	GetAttemptCount(quizID string, studentIdentifier string) (int64, error)
 }
 
 type resultRepository struct {
@@ -108,4 +109,12 @@ func (r *resultRepository) GetStudentHistory(studentID string, teacherID string)
 		Scan(&history).Error
 
 	return history, err
+}
+
+func (r *resultRepository) GetAttemptCount(quizID string, studentIdentifier string) (int64, error) {
+	var count int64
+	err := r.db.Model(&model.TestResult{}).
+		Where("quiz_id = ? AND student_identifier = ?", quizID, studentIdentifier).
+		Count(&count).Error
+	return count, err
 }

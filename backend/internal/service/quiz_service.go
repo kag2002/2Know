@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"backend/internal/model"
 	"backend/internal/repository"
 )
@@ -39,6 +41,14 @@ func (s *quizService) GetPublicQuizByID(id string) (*model.Quiz, error) {
 	quiz, err := s.repo.GetPublicQuizByID(id)
 	if err != nil {
 		return nil, err
+	}
+
+	// SECURITY: Pre-fetch exploit prevention
+	// If the quiz hasn't started yet, or has already closed, hide the questions.
+	now := time.Now()
+	if (quiz.OpenTime != nil && now.Before(*quiz.OpenTime)) || (quiz.CloseTime != nil && now.After(*quiz.CloseTime)) {
+		quiz.Questions = nil
+		return quiz, nil
 	}
 
 	// SECURITY: Strip the IsCorrect flags from options so students can't inspect network payload to cheat

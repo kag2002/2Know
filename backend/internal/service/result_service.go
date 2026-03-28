@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"strings"
+	"time"
 
 	"backend/internal/model"
 	"backend/internal/repository"
@@ -39,6 +40,31 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 	quiz, err := s.quizRepo.GetPublicQuizByID(result.QuizID)
 	if err != nil {
 		return err
+	}
+
+	// SECURITY: Time Logic validation
+	now := time.Now()
+	if quiz.OpenTime != nil && now.Before(*quiz.OpenTime) {
+		return errors.New("quiz has not started yet")
+	}
+	if quiz.CloseTime != nil && now.After(*quiz.CloseTime) {
+		return errors.New("quiz has already closed")
+	}
+
+	// SECURITY: Max Attempts Validation
+	if quiz.MaxAttempts > 0 && result.StudentIdentifier != "" {
+		attempts, err := s.repo.GetAttemptCount(quiz.ID, result.StudentIdentifier)
+		if err == nil && attempts >= int64(quiz.MaxAttempts) {
+			return errors.New("maximum attempts reached for this student")
+		}
+	}
+
+	// SECURITY: Time Taken Sanity Check (Allow 5 minutes slack for lag)
+	if quiz.TimeLimitMinutes > 0 {
+		maxAllowedSeconds := (quiz.TimeLimitMinutes * 60) + 300
+		if result.TimeTakenSeconds > maxAllowedSeconds {
+			result.Status = "cheating_flagged"
+		}
 	}
 
 	// Calculate Score securely on the server
