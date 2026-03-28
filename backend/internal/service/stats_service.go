@@ -23,9 +23,27 @@ type statsService struct {
 }
 
 func NewStatsService(repo repository.StatsRepository) StatsService {
-	return &statsService{
+	s := &statsService{
 		repo:  repo,
 		cache: make(map[string]cacheEntry),
+	}
+	// PERFORMANCE: Start background eviction to prevent unbounded memory growth
+	go s.startEviction()
+	return s
+}
+
+// startEviction periodically sweeps expired cache entries to prevent RAM leaks
+func (s *statsService) startEviction() {
+	ticker := time.NewTicker(5 * time.Minute)
+	for range ticker.C {
+		s.mu.Lock()
+		now := time.Now()
+		for key, entry := range s.cache {
+			if now.After(entry.expiresAt) {
+				delete(s.cache, key)
+			}
+		}
+		s.mu.Unlock()
 	}
 }
 

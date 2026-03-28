@@ -160,10 +160,18 @@ func (s *resultService) GetPendingGradings(teacherID string) ([]PendingGradingRe
 		return nil, err
 	}
 
+	// PERFORMANCE: Local quiz cache to prevent N+1 DB calls when multiple results share the same Quiz
+	quizCache := make(map[string]*model.Quiz)
+
 	for _, res := range results {
-		quiz, err := s.quizRepo.GetPublicQuizByID(res.QuizID)
-		if err != nil {
-			continue
+		quiz, cached := quizCache[res.QuizID]
+		if !cached {
+			var err error
+			quiz, err = s.quizRepo.GetPublicQuizByID(res.QuizID)
+			if err != nil {
+				continue
+			}
+			quizCache[res.QuizID] = quiz
 		}
 
 		for _, q := range quiz.Questions {

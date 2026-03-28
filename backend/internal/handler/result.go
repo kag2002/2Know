@@ -30,7 +30,16 @@ func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
 
 	if err := h.svc.SubmitTest(&result); err != nil {
 		log.Printf("Error submitting test: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to submit test or quiz not found"})
+
+		// SECURITY: Classify Business Logic errors (safe to expose) vs System errors (hide details)
+		errMsg := err.Error()
+		if errMsg == "quiz has not started yet" ||
+			errMsg == "quiz has already closed" ||
+			errMsg == "maximum attempts reached for this student" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errMsg})
+		}
+
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Hệ thống không thể xử lý bài nộp. Vui lòng thử lại sau."})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(result)
