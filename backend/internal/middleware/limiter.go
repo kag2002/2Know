@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
@@ -61,6 +62,14 @@ func SubmitLimiter() fiber.Handler {
 		Max:        10,
 		Expiration: 1 * time.Minute,
 		KeyGenerator: func(c fiber.Ctx) string {
+			if len(c.Body()) > 0 {
+				var payload struct {
+					StudentIdentifier string `json:"student_identifier"`
+				}
+				if err := json.Unmarshal(c.Body(), &payload); err == nil && payload.StudentIdentifier != "" {
+					return c.IP() + "_" + payload.StudentIdentifier
+				}
+			}
 			return c.IP()
 		},
 		LimitReached: func(c fiber.Ctx) error {

@@ -17,7 +17,7 @@ type TestResult struct {
 	Score            float64 `gorm:"default:0" json:"score"`
 	TotalCorrect     int     `gorm:"default:0" json:"total_correct"`
 	TotalIncorrect   int     `gorm:"default:0" json:"total_incorrect"`
-	TimeTakenSeconds int     `gorm:"default:0" json:"time_taken_seconds"`
+	TimeTakenSeconds int     `gorm:"default:0" json:"time_taken_seconds" validate:"min=0"`
 
 	// JSON payload mapping Question ID to Option ID selected (or Essay text)
 	Answers map[string]string `gorm:"type:jsonb;serializer:json" json:"answers" validate:"max=200"`

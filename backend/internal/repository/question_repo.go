@@ -29,7 +29,7 @@ func (r *questionRepository) GetQuestions(teacherID string) ([]model.Question, e
 	var questions []model.Question
 	// SECURITY: Scope questions to teacher's quizzes only (prevent cross-tenant data leak)
 	err := r.db.Preload("Options").
-		Joins("JOIN quizzes ON quizzes.id = questions.quiz_id").
+		Joins("JOIN quizzes ON quizzes.id = questions.quiz_id AND quizzes.deleted_at IS NULL").
 		Where("quizzes.teacher_id = ?", teacherID).
 		Order("questions.created_at desc").
 		Limit(200).

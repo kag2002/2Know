@@ -48,7 +48,7 @@ func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentW
 			COALESCE(AVG(test_results.score), 0) as avg_score,
 			COUNT(test_results.id) as tests
 		`).
-		Joins("JOIN classes ON students.class_id = classes.id").
+		Joins("JOIN classes ON students.class_id = classes.id AND classes.deleted_at IS NULL").
 		Joins("LEFT JOIN test_results ON test_results.student_id = students.id").
 		Where("classes.teacher_id = ?", teacherID).
 		Group("students.id, students.full_name, students.student_id, students.email, classes.name").
@@ -61,7 +61,7 @@ func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentW
 func (r *studentRepository) GetStudentByID(id string, teacherID string) (*model.Student, error) {
 	var student model.Student
 	err := r.db.
-		Joins("JOIN classes ON classes.id = students.class_id").
+		Joins("JOIN classes ON classes.id = students.class_id AND classes.deleted_at IS NULL").
 		Where("students.id = ? AND classes.teacher_id = ?", id, teacherID).
 		First(&student).Error
 	if err != nil {
