@@ -39,7 +39,8 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [timeElapsed, setTimeElapsed] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({}); // QuestionID -> OptionID
   const [flagged, setFlagged] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,7 +57,11 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
       try {
         const data = await apiFetch(`/test/quiz/${id}`, { requireAuth: false });
         setQuiz(data);
-        setTimeLeft((data.time_limit_minutes || 45) * 60);
+        if (data.time_limit_minutes > 0) {
+          setTimeLeft(data.time_limit_minutes * 60);
+        } else {
+          setTimeLeft(null); // Unlimited time
+        }
       } catch (err: any) {
         setError(err.message || "Failed to load test. It may be closed or unavailable.");
       } finally {
@@ -106,17 +111,29 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   useEffect(() => {
     if (timerPaused || loading || !quiz) return;
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleAutoSubmit(tabSwitchCount);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeElapsed(prev => prev + 1);
+      
+      if (quiz.time_limit_minutes > 0) {
+        setTimeLeft(prev => {
+          if (prev === null) return null;
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }
     }, 1000);
     return () => clearInterval(timer);
   }, [timerPaused, loading, quiz]);
+
+  // Auto-Submit Watcher
+  useEffect(() => {
+    if (timeLeft === 0 && !isSubmitting) {
+      handleAutoSubmit(tabSwitchCount);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft, isSubmitting]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -152,7 +169,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   const submitPayload = async (switches: number): Promise<boolean> => {
     try {
-      const timeTaken = ((quiz?.time_limit_minutes || 0) * 60) - timeLeft;
+      const timeTaken = timeElapsed; // STRICT TIME ELAPSED, NO NEGATIVE DATA CORRUPTION
       const studentName = sessionStorage.getItem("student_name") || "Guest Student";
       const studentId = sessionStorage.getItem("student_sbd") || ("GUEST-" + Math.floor(Math.random() * 10000));
 
@@ -381,10 +398,10 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         {/* Timer Box */}
         <div className="p-6 border-b bg-background flex flex-col items-center justify-center">
           <div className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
-            <Clock className="w-4 h-4" /> {t("testRoom.timeRemaining")}
+            <Clock className="w-4 h-4" /> {timeLeft === null ? (t("testRoom.timeElapsed") || "Thời gian đã trôi") : t("testRoom.timeRemaining")}
           </div>
-          <div className={`text-4xl font-black font-mono tracking-tight ${timeLeft < 300 ? 'text-rose-600 animate-pulse' : 'text-card-foreground'}`}>
-            {formatTime(timeLeft)}
+          <div className={`text-4xl font-black font-mono tracking-tight ${timeLeft !== null && timeLeft < 300 ? 'text-rose-600 animate-pulse' : 'text-card-foreground'}`}>
+            {timeLeft === null ? formatTime(timeElapsed) : formatTime(timeLeft)}
           </div>
           {timerPaused && (
             <span className="text-xs text-amber-600 font-semibold mt-2 animate-pulse">⏸ Đã tạm dừng</span>
