@@ -35,7 +35,8 @@ type Quiz struct {
 	AccessType      string         `gorm:"type:varchar(20);default:'public'" json:"access_type"` // public, assigned
 	AssignedClasses pq.StringArray `gorm:"type:text[]" json:"assigned_classes"`
 
-	Status    string         `gorm:"type:varchar(20);default:'draft'" json:"status"` // draft, published, archived
+	// PERFORMANCE: Add Index to Status to prevent slow Seq Scans on Dashboard / Published filters
+	Status    string         `gorm:"type:varchar(20);default:'draft';index" json:"status"` // draft, published, archived
 	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
