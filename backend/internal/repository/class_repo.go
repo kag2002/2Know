@@ -15,6 +15,8 @@ type ClassRepository interface {
 	CreateStudent(student *model.Student) error
 	DeleteClass(id, teacherID string) error
 	IsStudentInClasses(studentIdentifier string, classIDs []string) (bool, error)
+	GetStudentUUID(studentIdentifier string, classIDs []string) (string, error)
+	GetStudentUUIDByTeacher(studentIdentifier string, teacherID string) (string, error)
 }
 
 type classRepository struct {
@@ -74,4 +76,24 @@ func (r *classRepository) IsStudentInClasses(studentIdentifier string, classIDs 
 		Where("student_id = ? AND class_id IN ?", studentIdentifier, classIDs).
 		Count(&count).Error
 	return count > 0, err
+}
+
+func (r *classRepository) GetStudentUUID(studentIdentifier string, classIDs []string) (string, error) {
+	var student model.Student
+	err := r.db.Where("student_id = ? AND class_id IN ?", studentIdentifier, classIDs).First(&student).Error
+	if err != nil {
+		return "", err
+	}
+	return student.ID, nil
+}
+
+func (r *classRepository) GetStudentUUIDByTeacher(studentIdentifier string, teacherID string) (string, error) {
+	var student model.Student
+	err := r.db.Joins("JOIN classes ON classes.id = students.class_id AND classes.deleted_at IS NULL").
+		Where("students.student_id = ? AND classes.teacher_id = ?", studentIdentifier, teacherID).
+		First(&student).Error
+	if err != nil {
+		return "", err
+	}
+	return student.ID, nil
 }

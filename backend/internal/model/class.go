@@ -25,9 +25,9 @@ type Class struct {
 
 type Student struct {
 	ID          string     `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-	ClassID     string     `gorm:"type:uuid;not null;index" json:"class_id"`
+	ClassID     string     `gorm:"type:uuid;not null;index;uniqueIndex:idx_class_student,priority:1" json:"class_id"`
 	FullName    string     `gorm:"type:varchar(255);not null" json:"full_name" validate:"required,max=255"`
-	StudentID   string     `gorm:"type:varchar(50);not null;index" json:"student_id" validate:"required,max=50"` // E.g: SBD, MSSV
+	StudentID   string     `gorm:"type:varchar(50);not null;index;uniqueIndex:idx_class_student,priority:2" json:"student_id" validate:"required,max=50"` // E.g: SBD, MSSV
 	Email       string     `gorm:"type:varchar(255)" json:"email" validate:"omitempty,email"`
 	Phone       string     `gorm:"type:varchar(20)" json:"phone" validate:"max=20"`
 	DateOfBirth *time.Time `json:"date_of_birth"`

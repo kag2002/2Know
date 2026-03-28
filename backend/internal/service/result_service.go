@@ -155,6 +155,23 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		result.Status = "completed"
 	}
 
+	// SECURITY & PERFORMANCE: Map Student UUID to enable the Global Analytics Database hook (Preventing Data Vacuum)
+	studentUUID := ""
+	if quiz.AccessType == "assigned" && len(quiz.AssignedClasses) > 0 {
+		uuidStr, err := s.classRepo.GetStudentUUID(result.StudentIdentifier, quiz.AssignedClasses)
+		if err == nil {
+			studentUUID = uuidStr
+		}
+	} else if quiz.TeacherID != "" {
+		uuidStr, err := s.classRepo.GetStudentUUIDByTeacher(result.StudentIdentifier, quiz.TeacherID)
+		if err == nil {
+			studentUUID = uuidStr
+		}
+	}
+	if studentUUID != "" {
+		result.StudentID = studentUUID
+	}
+
 	return s.repo.CreateResult(result)
 }
 
