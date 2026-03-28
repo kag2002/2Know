@@ -4,6 +4,7 @@ import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, Target, Home, RefreshCcw, XCircle, Award, ShieldAlert, PartyPopper } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/context/LanguageContext";
 
 interface TestResultData {
   score: number;
@@ -18,6 +19,7 @@ interface TestResultData {
 
 export default function TestResultPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { t } = useTranslation();
   const [result, setResult] = useState<TestResultData | null>(null);
   const [showConfetti, setShowConfetti] = useState(true);
 
@@ -42,10 +44,10 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
   if (!result) {
     return (
       <div className="flex flex-col h-screen items-center justify-center space-y-4">
-        <h1 className="text-2xl font-bold">Không tìm thấy kết quả</h1>
-        <p className="text-muted-foreground">Có lỗi xảy ra hoặc bạn chưa nộp bài thi này.</p>
+        <h1 className="text-2xl font-bold">{t("testResult.notFoundTitle")}</h1>
+        <p className="text-muted-foreground">{t("testResult.notFoundDesc")}</p>
         <Link href="/">
-          <Button>Quay về trang chủ</Button>
+          <Button>{t("testResult.backHome")}</Button>
         </Link>
       </div>
     );
@@ -88,19 +90,19 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
             <div className="w-20 h-20 bg-background/20 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-md border border-white/30">
               <Award className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-xl font-medium text-indigo-100 mb-2">Chúc mừng bạn đã hoàn thành!</h2>
-            <h1 className="text-3xl font-bold mb-4">Kết Quả Thi</h1>
-            <p className="text-indigo-100">Họ tên: {student_name} • Mã TS: {student_identifier}</p>
+            <h2 className="text-xl font-medium text-indigo-100 mb-2">{t("testResult.congratulations")}</h2>
+            <h1 className="text-3xl font-bold mb-4">{t("testResult.title")}</h1>
+            <p className="text-indigo-100">{t("testResult.studentName")}: {student_name} • {t("testResult.studentId")}: {student_identifier}</p>
 
             {/* Proctoring Status Badge */}
             {tab_switch_count > 0 && (
               <div className="mt-4 inline-flex flex-col items-center gap-2">
                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/80 text-white text-sm font-semibold backdrop-blur-sm">
                   <ShieldAlert className="w-4 h-4" />
-                  Phát hiện {tab_switch_count} lần chuyển tab
+                  {t("testResult.cheatingDetectedPill")?.replace("{count}", String(tab_switch_count))}
                  </div>
                  {status === 'cheating_flagged' && (
-                    <span className="text-xs bg-black/30 px-3 py-1 rounded text-white font-mono uppercase tracking-wider">Hệ thống đã đánh dấu gian lận</span>
+                    <span className="text-xs bg-black/30 px-3 py-1 rounded text-white font-mono uppercase tracking-wider">{t("testResult.cheatingFlaggedPill")}</span>
                  )}
               </div>
             )}
@@ -130,7 +132,7 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-3xl font-black text-card-foreground">{score.toFixed(1)}</span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Điểm</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{t("testResult.scoreWord")}</span>
             </div>
           </div>
         </div>
@@ -143,7 +145,7 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
             </div>
             <div>
               <p className="text-2xl font-bold text-card-foreground">{total_correct}</p>
-              <p className="text-sm text-muted-foreground">Câu đúng</p>
+              <p className="text-sm text-muted-foreground">{t("testResult.correctAnswers")}</p>
             </div>
           </div>
           <div className="flex flex-col items-center text-center space-y-2">
@@ -152,7 +154,7 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
             </div>
             <div>
               <p className="text-2xl font-bold text-card-foreground">{total_incorrect}</p>
-              <p className="text-sm text-muted-foreground">Câu sai / trống</p>
+              <p className="text-sm text-muted-foreground">{t("testResult.incorrectAnswers")}</p>
             </div>
           </div>
           <div className="flex flex-col items-center text-center space-y-2">
@@ -161,7 +163,7 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
             </div>
             <div>
               <p className="text-2xl font-bold text-card-foreground">{formatTime(time_taken_seconds)}</p>
-              <p className="text-sm text-muted-foreground">Thời gian làm</p>
+              <p className="text-sm text-muted-foreground">{t("testResult.timeTaken")}</p>
             </div>
           </div>
           {tab_switch_count > 0 && (
@@ -171,7 +173,7 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
               </div>
               <div>
                 <p className="text-2xl font-bold text-card-foreground">{tab_switch_count}</p>
-                <p className="text-sm text-muted-foreground">Vi phạm tab</p>
+                <p className="text-sm text-muted-foreground">{t("testResult.tabViolations")}</p>
               </div>
             </div>
           )}
@@ -180,36 +182,36 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
         {/* Detailed Breakdown Area */}
         <div className="p-8 bg-muted space-y-6">
           <h3 className="font-semibold text-card-foreground text-lg flex items-center gap-2">
-            <PartyPopper className="w-5 h-5 text-amber-500" /> Đánh giá chung
+            <PartyPopper className="w-5 h-5 text-amber-500" /> {t("testResult.evalTitle")}
           </h3>
           <p className="text-muted-foreground leading-relaxed text-sm">
             {score >= 8 
-              ? "Kết quả xuất sắc! Kiến thức của bạn được củng cố rất vững. Hãy tiếp tục tiến độ này."
+              ? t("testResult.evalExcellent")
               : score >= 5
-                ? "Kết quả đạt yêu cầu cơ bản. Hãy cố gắng xem lại các câu sai để tránh mắc lỗi lần sau nhé."
-                : "Kết quả cần cải thiện đáng kể. Đừng nản chí, hãy lập kế hoạch ôn tập lại và thử sức phục thù!"
+                ? t("testResult.evalGood")
+                : t("testResult.evalNeedsWork")
             }
           </p>
           
           {status === "cheating_flagged" && (
             <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-sm font-medium flex items-start gap-3">
                <ShieldAlert className="w-5 h-5 shrink-0" />
-               Hệ thống đã khóa tính năng xem lại đề do phát hiện gian lận nghiêm trọng (&gt;3 lần rời khỏi màn hình). Giáo viên sẽ trực tiếp liên hệ bạn.
+               {t("testResult.cheatLockedDesc")}
             </div>
           )}
 
           <div className="flex flex-wrap gap-4 pt-4">
             <Button variant="outline" className="gap-2 bg-background flex-1" disabled={status === "cheating_flagged"}>
-              <Target className="w-4 h-4" /> Xem chi tiết bài làm
+              <Target className="w-4 h-4" /> {t("testResult.viewDetailsBtn")}
               {status === "cheating_flagged" ? (
-                 <span className="text-[10px] ml-1 bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 px-2 py-0.5 rounded border border-rose-200">Bị khóa</span>
+                 <span className="text-[10px] ml-1 bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 px-2 py-0.5 rounded border border-rose-200">{t("testResult.lockedBadge")}</span>
               ) : (
-                 <span className="text-[10px] ml-1 bg-slate-100 px-2 py-0.5 rounded text-muted-foreground border">Sắp ra mắt</span>
+                 <span className="text-[10px] ml-1 bg-slate-100 px-2 py-0.5 rounded text-muted-foreground border">{t("testResult.comingSoonBadge")}</span>
               )}
             </Button>
             <Link href={`/test/${id}/take`} className="flex-1">
               <Button className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 font-bold text-white shadow-md shadow-indigo-600/20">
-                <RefreshCcw className="w-4 h-4 hidden sm:block" /> Làm lại
+                <RefreshCcw className="w-4 h-4 hidden sm:block" /> {t("testResult.retryBtn")}
               </Button>
             </Link>
           </div>
@@ -219,7 +221,7 @@ export default function TestResultPage({ params }: { params: Promise<{ id: strin
       <div className="mt-8 text-center">
         <Link href="/">
           <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-foreground">
-            <Home className="w-4 h-4" /> Quay về Trang chủ
+            <Home className="w-4 h-4" /> {t("testResult.backHome")}
           </Button>
         </Link>
       </div>

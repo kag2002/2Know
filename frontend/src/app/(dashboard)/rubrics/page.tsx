@@ -59,7 +59,7 @@ export default function RubricsPage() {
       const data = await apiFetch("/rubrics");
       setRubrics(data || []);
     } catch (err) {
-      toast.error("Không thể tải danh sách Rubric");
+      toast.error(t("dashboard.rubrics.loadError"));
     } finally {
       setLoading(false);
     }
@@ -72,9 +72,9 @@ export default function RubricsPage() {
 
   const handleDelete = async (id: string) => {
     const ok = await confirm({
-      title: "Xóa Rubric",
-      description: "Bạn có chắc muốn xóa tiêu chí AI này? Hành động không thể hoàn tác.",
-      confirmLabel: "Xóa Rubric",
+      title: t("dashboard.rubrics.deleteConfirmTitle"),
+      description: t("dashboard.rubrics.deleteConfirmDesc"),
+      confirmLabel: t("dashboard.rubrics.deleteConfirmBtn"),
       variant: "danger"
     });
     if (!ok) return;
@@ -83,13 +83,13 @@ export default function RubricsPage() {
       setRubrics(rubrics.filter(r => r.id !== id));
       toast.success(t("rubrics.deleteSuccess"));
     } catch {
-      toast.error("Lỗi xóa rubric");
+      toast.error(t("dashboard.rubrics.deleteError"));
     }
   };
 
   const handleCreate = async () => {
     if (!newRubric.title || !newRubric.subject) {
-      toast.warning("Vui lòng điền tên và môn học!");
+      toast.warning(t("dashboard.rubrics.requireNameSubject"));
       return;
     }
     
@@ -103,13 +103,13 @@ export default function RubricsPage() {
       setNewRubric({ title: "", subject: "", target: "", criteria_count: 3 });
       loadRubrics();
     } catch {
-      toast.error("Lỗi tạo Rubric");
+      toast.error(t("dashboard.rubrics.createError"));
     }
   };
 
   const handleEditRubric = async () => {
     if (!editingRubric || !editingRubric.title || !editingRubric.subject) {
-      toast.warning("Vui lòng điền đủ thông tin!");
+      toast.warning(t("dashboard.rubrics.requireAll"));
       return;
     }
     try {
@@ -121,11 +121,11 @@ export default function RubricsPage() {
           target: editingRubric.target,
         }),
       });
-      toast.success("Cập nhật Rubric thành công!");
+      toast.success(t("dashboard.rubrics.updateSuccess"));
       setIsEditDialogOpen(false);
       loadRubrics();
     } catch (err: any) {
-      toast.error("Lỗi cập nhật: " + err.message);
+      toast.error(t("dashboard.rubrics.updateError") + " " + err.message);
     }
   };
 

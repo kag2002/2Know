@@ -5,6 +5,7 @@ import { Clock, HelpCircle, AlertTriangle, ShieldCheck, User, Loader2 } from "lu
 import { useState, use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { useTranslation } from "@/context/LanguageContext";
 
 interface Question {
   id: string;
@@ -25,6 +26,7 @@ interface TestQuizData {
 export default function TestIntroPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { t } = useTranslation();
   
   const [quiz, setQuiz] = useState<TestQuizData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
 
   const handleStart = () => {
     if (!studentInfo.name.trim() || !studentInfo.sbd.trim()) {
-      setError("Vui lòng nhập đầy đủ Họ Tên và Mã Học Sinh trước khi bắt đầu.");
+      setError(t("testIntro.missingInfo") || "Vui lòng nhập đầy đủ Họ Tên và Mã Học Sinh trước khi bắt đầu.");
       return;
     }
     // Store student info for guest mode
@@ -62,7 +64,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
     return (
       <div className="flex justify-center flex-col items-center h-[60vh] text-muted-foreground">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-4" />
-        <p>Đang chuẩn bị đề thi...</p>
+        <p>{t("testIntro.loading")}</p>
       </div>
     );
   }
@@ -70,7 +72,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
   if (!quiz) {
     return (
       <div className="text-center py-20 text-muted-foreground">
-        {error ? error : "Bài kiểm tra không tồn tại hoặc đã bị khóa."}
+        {error ? error : t("testIntro.notFound")}
       </div>
     );
   }
@@ -83,11 +85,11 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
         <div className="text-center space-y-3 pb-8 border-b">
           <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-indigo-50/80 text-indigo-700 text-xs font-semibold uppercase tracking-wider mb-2 border border-indigo-100">
             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-2 animate-pulse"></div>
-            Đang mở
+            {t("testIntro.openNow")}
           </div>
           <h1 className="text-3xl font-bold text-foreground leading-tight">{quiz.title}</h1>
           <p className="text-muted-foreground text-sm">
-            {quiz.subject || "Chưa phân loại"} • {quiz.grade_level || "Tự do"}
+            {quiz.subject || t("testIntro.uncategorized")} • {quiz.grade_level || t("testIntro.freeLevel")}
           </p>
           {quiz.description && (
              <p className="mx-auto max-w-lg mt-4 text-sm text-muted-foreground italic bg-muted p-4 rounded-xl border border-dashed">
@@ -103,8 +105,8 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
               <Clock className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">Thời gian</p>
-              <p className="font-bold text-foreground text-lg">{quiz.time_limit_minutes > 0 ? `${quiz.time_limit_minutes} Phút` : "Không giới hạn"}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">{t("testIntro.timeLimit")}</p>
+              <p className="font-bold text-foreground text-lg">{quiz.time_limit_minutes > 0 ? `${quiz.time_limit_minutes} ${t("testIntro.minutes")}` : t("testIntro.noLimit")}</p>
             </div>
           </div>
           <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-muted hover:bg-muted border border-border transition-colors">
@@ -112,8 +114,8 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
               <HelpCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">Số lượng</p>
-              <p className="font-bold text-foreground text-lg">{quiz.questions.length || 0} Câu hỏi</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">{t("testIntro.quantity")}</p>
+              <p className="font-bold text-foreground text-lg">{quiz.questions.length || 0} {t("testIntro.questions")}</p>
             </div>
           </div>
           <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-muted hover:bg-muted border border-border transition-colors">
@@ -121,8 +123,8 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">Bảo mật</p>
-              <p className="font-bold text-foreground text-lg">{(quiz.require_fullscreen || quiz.disable_copy_paste) ? "Chống gian lận" : "Tiêu chuẩn"}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">{t("testIntro.security")}</p>
+              <p className="font-bold text-foreground text-lg">{(quiz.require_fullscreen || quiz.disable_copy_paste) ? t("testIntro.antiCheat") : t("testIntro.standard")}</p>
             </div>
           </div>
         </div>
@@ -134,11 +136,11 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
                <AlertTriangle className="w-5 h-5 text-amber-600" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-amber-800 text-sm">Quy định chống gian lận được kích hoạt</h4>
+              <h4 className="font-bold text-amber-800 text-sm">{t("testIntro.cheatRuleTitle")}</h4>
               <ul className="text-[13px] text-amber-700 space-y-1 list-disc list-inside mt-2">
-                {quiz.require_fullscreen && <li>Bắt buộc làm bài toàn màn hình. <strong>Cấm chuyển tab (Max 3 lần)</strong>.</li>}
-                {quiz.disable_copy_paste && <li>Chức năng bôi đen, nhấp chuột phải và Copy/Paste bị khóa.</li>}
-                <li>Vi phạm sẽ tự động thu bài và đánh dấu gian lận.</li>
+                {quiz.require_fullscreen && <li dangerouslySetInnerHTML={{ __html: t("testIntro.cheatRule1") }} />}
+                {quiz.disable_copy_paste && <li>{t("testIntro.cheatRule2")}</li>}
+                <li>{t("testIntro.cheatRule3")}</li>
               </ul>
             </div>
           </div>
@@ -147,9 +149,6 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
         {/* Entry Form */}
         <div className="bg-background border shadow-sm p-6 rounded-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-          <h3 className="font-bold text-card-foreground flex items-center gap-2 mb-6">
-            <User className="w-5 h-5 text-indigo-500" /> Thông tin Thí sinh
-          </h3>
           
           {error && (
             <div className="mb-4 p-3 text-sm text-rose-600 border border-rose-200 bg-rose-50 rounded-lg animate-in fade-in">
@@ -159,20 +158,20 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative z-10">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Họ và Tên <span className="text-rose-500">*</span></label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("testIntro.fullName")} <span className="text-rose-500">*</span></label>
               <input 
                 type="text" 
-                placeholder="Ví dụ: Nguyễn Văn A"
+                placeholder={t("testIntro.fullNamePlaceholder") || "Nhập Họ Tên của bạn..."}
                 value={studentInfo.name}
                 onChange={e => { setStudentInfo({...studentInfo, name: e.target.value}); setError(""); }}
                 className="w-full h-11 px-4 rounded-xl border border-border bg-muted text-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium placeholder:font-normal placeholder:text-slate-400" 
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Mã định danh (SBD) <span className="text-rose-500">*</span></label>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("testIntro.studentId")} <span className="text-rose-500">*</span></label>
               <input 
                 type="text" 
-                placeholder="Nhập MSSV / Mã học sinh"
+                placeholder={t("testIntro.studentIdPlaceholder") || "Nhập Mã học sinh..."}
                 value={studentInfo.sbd}
                 onChange={e => { setStudentInfo({...studentInfo, sbd: e.target.value}); setError(""); }}
                 className="w-full h-11 px-4 rounded-xl border border-border bg-muted text-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium placeholder:font-normal placeholder:text-slate-400" 
@@ -188,7 +187,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
             className="w-full md:w-auto md:min-w-[280px] h-14 text-base font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] transition-all hover:-translate-y-0.5"
             onClick={handleStart}
           >
-            Bắt Đầu Làm Bài Ngay
+            {t("testIntro.startTest")}
           </Button>
         </div>
 

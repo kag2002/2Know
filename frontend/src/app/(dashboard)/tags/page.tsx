@@ -44,7 +44,7 @@ export default function TagsPage() {
       });
       setTags([createdTag, ...tags]);
       setNewTag("");
-      toast.success(`Đã thêm thẻ "${newTag.trim()}"`);
+      toast.success(t("dashboard.tags.addSuccess").replace("{name}", newTag.trim()));
     } catch (err) {
       toast.error(t("tags.addError"));
     }
@@ -56,7 +56,7 @@ export default function TagsPage() {
       setTags(tags.filter(t => t.id !== id));
       toast.success(t("tags.deleteSuccess"));
     } catch (err) {
-      toast.error(t("tags.deleteError"));
+      toast.error(t("dashboard.tags.deleteError"));
     }
   };
 

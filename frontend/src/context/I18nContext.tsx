@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { vi } from "@/locales/vi";
-import { en } from "@/locales/en";
+import vi from "@/locales/vi.json";
+import en from "@/locales/en.json";
 
 type Language = "vi" | "en";
 type Translations = typeof vi;

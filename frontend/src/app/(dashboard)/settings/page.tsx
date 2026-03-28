@@ -134,7 +134,7 @@ export default function SettingsPage() {
                     {user?.name?.[0]?.toUpperCase() || "U"}
                   </div>
                   <div>
-                    <Button variant="outline" size="sm">{t("settings.account.changeAvatar")}</Button>
+                    <Button variant="outline" size="sm" onClick={() => toast.info(t("settings.account.avatarWip") || "Tính năng thay đổi Ảnh đại diện đang được phát triển.")}>{t("settings.account.changeAvatar")}</Button>
                     <p className="text-xs text-muted-foreground mt-2">{t("settings.account.avatarHint")}</p>
                   </div>
                 </div>
@@ -338,7 +338,10 @@ export default function SettingsPage() {
                       <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
                     </div>
                     <button 
-                      onClick={() => setNotifPrefs(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
+                      onClick={() => {
+                        setNotifPrefs(prev => ({ ...prev, [item.key]: !prev[item.key] }));
+                        toast.success(t("settings.notifications.saved") || "Đã lưu tùy chọn thông báo!");
+                      }}
                       className={`w-10 h-[22px] rounded-full relative cursor-pointer transition-colors duration-200 ${notifPrefs[item.key] ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-700"}`}
                     >
                       <div className={`w-4 h-4 bg-white rounded-full absolute top-[3px] shadow-sm transition-all duration-200 ${notifPrefs[item.key] ? "right-[3px]" : "left-[3px]"}`}></div>

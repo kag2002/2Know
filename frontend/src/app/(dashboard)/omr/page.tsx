@@ -42,7 +42,7 @@ export default function OmrPage() {
   const confirm = useConfirm();
   const [search, setSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newBatch, setNewBatch] = useState({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)", quiz_id: "" });
+  const [newBatch, setNewBatch] = useState({ title: `${t("dashboard.omr.defaultBatchTitle")}${new Date().toLocaleDateString('vi-VN')}`, template: t("dashboard.omr.defaultTemplate"), quiz_id: "" });
   
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingBatch, setEditingBatch] = useState<OmrBatch | null>(null);
@@ -66,7 +66,7 @@ export default function OmrPage() {
       // Only let them select published quizzes conceptually, but here we list all
       setQuizzes(quizzesData || []);
     } catch (err) {
-      toast.error("Không thể tải dữ liệu OMR");
+      toast.error(t("dashboard.omr.loadError"));
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export default function OmrPage() {
       const data = await apiFetch("/omr/batches");
       setBatches(data || []);
     } catch (err) {
-      toast.error("Không thể tải danh sách đợt chấm");
+      toast.error(t("dashboard.omr.loadBatchError"));
     } finally {
       setLoading(false);
     }
@@ -91,9 +91,9 @@ export default function OmrPage() {
 
   const handleDelete = async (id: string) => {
     const ok = await confirm({
-      title: "Xóa đợt quét OMR",
-      description: "Bạn có chắc muốn xóa đợt quét này? Dữ liệu chấm điểm đã lưu sẽ bị xóa.",
-      confirmLabel: "Xóa đợt quét",
+      title: t("dashboard.omr.deleteConfirmTitle"),
+      description: t("dashboard.omr.deleteConfirmDesc"),
+      confirmLabel: t("dashboard.omr.deleteConfirmBtn"),
       variant: "danger"
     });
     if (!ok) return;
@@ -102,13 +102,13 @@ export default function OmrPage() {
       setBatches(batches.filter(b => b.id !== id));
       toast.success(t("omr.deleteSuccess"));
     } catch {
-      toast.error("Lỗi xóa đợt quét");
+      toast.error(t("dashboard.omr.deleteError"));
     }
   };
 
   const handleCreate = async () => {
     if (!newBatch.title) {
-      toast.warning("Vui lòng nhập tên đợt chấm điểm!");
+      toast.warning(t("dashboard.omr.requireBatchName"));
       return;
     }
     
@@ -119,16 +119,16 @@ export default function OmrPage() {
       });
       toast.success(t("omr.createSuccess"));
       setIsDialogOpen(false);
-      setNewBatch({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)", quiz_id: "" });
+      setNewBatch({ title: `${t("dashboard.omr.defaultBatchTitle")}${new Date().toLocaleDateString('vi-VN')}`, template: t("dashboard.omr.defaultTemplate"), quiz_id: "" });
       loadBatches();
     } catch {
-      toast.error("Lỗi tạo đợt chấm");
+      toast.error(t("dashboard.omr.createError"));
     }
   };
 
   const handleEditBatch = async () => {
     if (!editingBatch || !editingBatch.title) {
-      toast.warning("Vui lòng nhập tên đợt chấm điểm!");
+      toast.warning(t("dashboard.omr.requireBatchName"));
       return;
     }
     try {
@@ -140,11 +140,11 @@ export default function OmrPage() {
           quiz_id: editingBatch.quiz_id
         })
       });
-      toast.success("Cập nhật đợt quét OMR thành công!");
+      toast.success(t("dashboard.omr.updateSuccess"));
       setIsEditDialogOpen(false);
       loadBatches();
     } catch {
-      toast.error("Lỗi cập nhật đợt quét");
+      toast.error(t("dashboard.omr.updateError"));
     }
   };
 

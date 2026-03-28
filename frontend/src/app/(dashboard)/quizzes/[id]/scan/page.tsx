@@ -42,7 +42,7 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
         videoRef.current.srcObject = mediaStream;
       }
     } catch (err: any) {
-      setCameraError("Không thể truy cập Camera. Vui lòng cấp quyền hoặc sử dụng thiết bị có hỗ trợ webcam.");
+      setCameraError(t("scan.cameraPermissionError"));
     }
   }, []);
 

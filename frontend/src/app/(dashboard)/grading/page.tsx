@@ -45,7 +45,7 @@ export default function GradingPage() {
 
   const handleGrade = async (id: string) => {
     if (scores[id] === undefined) {
-      toast.error("Vui lòng nhập điểm trước khi chấm!");
+      toast.error(t("dashboard.grading.requireScore"));
       return;
     }
     
@@ -55,9 +55,9 @@ export default function GradingPage() {
         body: JSON.stringify({ score: scores[id] })
       });
       setGraded(prev => [...prev, id]);
-      toast.success(`Đã lưu điểm thành công!`);
+      toast.success(t("dashboard.grading.saveSuccess"));
     } catch (err: any) {
-      toast.error("Lỗi khi lưu điểm: " + err.message);
+      toast.error(t("dashboard.grading.saveError") + " " + err.message);
     }
   };
 

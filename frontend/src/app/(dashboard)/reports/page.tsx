@@ -54,7 +54,7 @@ export default function ReportsPage() {
   const handleExportCSV = async () => {
     try {
       const token = localStorage.getItem("2know_token");
-      const res = await fetch("http://localhost:8080/api/stats/export", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stats/export`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -70,9 +70,9 @@ export default function ReportsPage() {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-      toast.success("Xuất dữ liệu CSV thành công!");
+      toast.success(t("dashboard.reports.exportSuccess"));
     } catch (err: any) {
-      toast.error("Lỗi khi xuất CSV: " + err.message);
+      toast.error(t("dashboard.reports.exportError") + " " + err.message);
     }
   };
 
@@ -145,7 +145,7 @@ export default function ReportsPage() {
       {quizzes.length > 0 && (
         <Card className="border-none shadow-sm bg-background mb-6">
           <CardHeader>
-            <CardTitle className="text-lg">Xu hướng Điểm trung bình</CardTitle>
+            <CardTitle className="text-lg">{t("dashboard.reports.trendTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -162,7 +162,7 @@ export default function ReportsPage() {
                 <RechartsTooltip 
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   itemStyle={{ fontSize: '14px', fontWeight: 500, color: '#4f46e5' }}
-                  formatter={(value: any) => [`${Number(value).toFixed(1)} Điểm`, 'Trung bình']}
+                  formatter={(value: any) => [`${Number(value).toFixed(1)} ${t("dashboard.reports.scorePoint")}`, t("dashboard.reports.average")]}
                   labelStyle={{ color: '#6b7280', fontSize: '12px', marginBottom: '4px' }}
                 />
                 <Area type="monotone" dataKey="avg_score" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
@@ -191,7 +191,7 @@ export default function ReportsPage() {
             <div className="col-span-full p-16 text-center text-muted-foreground border-2 border-dashed rounded-2xl bg-muted/30">
               <BarChart3 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground">{t("reports.noReports")}</h3>
-              <p className="text-sm mt-1">Chưa có bài thi nào được tạo để lập báo cáo.</p>
+              <p className="text-sm mt-1">{t("dashboard.reports.emptyState")}</p>
             </div>
           ) : (
             quizzes.map(quiz => (

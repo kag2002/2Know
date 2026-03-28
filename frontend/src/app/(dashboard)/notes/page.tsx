@@ -84,7 +84,7 @@ export default function NotesPage() {
       setNotes(notes.filter(n => n.id !== id));
       toast.success(t("notes.deleteSuccess"));
     } catch (err) {
-      toast.error("Lỗi xóa ghi chú.");
+      toast.error(t("dashboard.notes.deleteError"));
     }
   };
 
@@ -94,7 +94,7 @@ export default function NotesPage() {
       setNotes(notes.map(n => n.id === id ? { ...n, pinned: !n.pinned } : n));
       toast.success(t("notes.pinSuccess"));
     } catch (err) {
-      toast.error("Lỗi ghim ghi chú.");
+      toast.error(t("dashboard.notes.pinError"));
     }
   };
 
@@ -114,9 +114,9 @@ export default function NotesPage() {
       setNotes(notes.map(n => n.id === editingNote.id ? { ...n, title: editingNote.title, content: editingNote.content } : n));
       setIsEditing(false);
       setEditingNote(null);
-      toast.success("Cập nhật ghi chú thành công!");
+      toast.success(t("dashboard.notes.updateSuccess"));
     } catch (err) {
-      toast.error("Lỗi cập nhật ghi chú.");
+      toast.error(t("dashboard.notes.updateError"));
     }
   };
 

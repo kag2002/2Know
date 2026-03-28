@@ -29,7 +29,7 @@ interface QuestionBuilderProps {
   setQuestions: React.Dispatch<React.SetStateAction<QuestionPayload[]>>;
 }
 
-function SortableQuestionItem({ q, index, updateQuestion, updateOption, setCorrectOption, removeQuestion, addOption }: any) {
+function SortableQuestionItem({ q, index, updateQuestion, updateOption, setCorrectOption, removeQuestion, addOption, removeOption }: any) {
   const sortableId = q.id ? q.id.toString() : `temp-${index}`;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortableId });
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -116,13 +116,21 @@ function SortableQuestionItem({ q, index, updateQuestion, updateOption, setCorre
                         <input 
                            type="text"
                            placeholder={`Nhập đáp án ${String.fromCharCode(65 + i)}`}
-                           className="flex-1 bg-transparent border-none focus:ring-0 p-0 text-foreground placeholder:text-muted-foreground outline-none"
+                           className="flex-[1_1_0%] bg-transparent border-none focus:ring-0 p-0 text-foreground placeholder:text-muted-foreground outline-none min-w-0"
                            value={opt.text}
                            onChange={(e) => updateOption(index, i, e.target.value)}
                            onKeyDown={handleKeyDown}
                         />
+                        {q.options.length > 2 && (
+                          <button type="button" className="text-slate-400 hover:text-rose-500 shrink-0 p-1 rounded-md hover:bg-rose-50 transition-colors" onClick={() => removeOption(index, i)}>
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     ))}
+                    <button type="button" className="flex items-center justify-center w-full border border-dashed rounded-md h-10 gap-2 text-sm text-muted-foreground hover:bg-muted transition-colors col-span-1 sm:col-span-2 mt-1 font-medium" onClick={() => addOption(index)}>
+                      <Plus className="w-4 h-4" /> Thêm đáp án khác
+                    </button>
                   </div>
                 )}
               </div>
@@ -224,6 +232,19 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
     setQuestions(updated);
   };
 
+  const removeOption = (qIndex: number, optIndex: number) => {
+    const updated = [...questions];
+    if (updated[qIndex].options.length <= 2) {
+      toast.warning("Phải có ít nhất 2 đáp án");
+      return;
+    }
+    updated[qIndex].options = updated[qIndex].options.filter((_, i) => i !== optIndex);
+    if (!updated[qIndex].options.some(o => o.isCorrect)) {
+       updated[qIndex].options[0].isCorrect = true;
+    }
+    setQuestions(updated);
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       
@@ -280,6 +301,7 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
                 setCorrectOption={setCorrectOption}
                 removeQuestion={removeQuestion}
                 addOption={addOption}
+                removeOption={removeOption}
               />
             ))}
           </SortableContext>

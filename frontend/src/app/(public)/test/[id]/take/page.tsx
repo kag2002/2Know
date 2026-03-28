@@ -6,6 +6,7 @@ import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Sh
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/context/LanguageContext";
 
 const MAX_TAB_SWITCHES = 3;
 
@@ -31,6 +32,7 @@ interface QuizData {
 export default function TakeTestPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
+  const { t } = useTranslation();
   
   const [quiz, setQuiz] = useState<QuizData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,7 +139,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   };
 
   const handleSubmit = async () => {
-    if (confirm("Bạn có chắc chắn muốn nộp bài không? Thời gian vẫn còn dư.")) {
+    if (confirm(t("testRoom.confirmSubmit") || "Bạn có chắc chắn muốn nộp bài không? Thời gian vẫn còn dư.")) {
       sessionStorage.setItem("tabSwitchCount", String(tabSwitchCount));
       await submitPayload(tabSwitchCount);
       router.push(`/test/${id}/result`);
@@ -172,8 +174,9 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center flex-col gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <p className="text-muted-foreground font-medium">{t("testRoom.loading")}</p>
       </div>
     );
   }
@@ -247,7 +250,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         {/* Question Header */}
         <div className="h-16 border-b flex items-center justify-between px-6 bg-muted/50">
           <div className="font-semibold text-lg text-card-foreground">
-            Câu {currentIdx + 1} <span className="text-slate-400 font-normal text-sm">/ {questions.length}</span>
+            {t("testRoom.question")} {currentIdx + 1} <span className="text-slate-400 font-normal text-sm">/ {questions.length}</span>
           </div>
           <div className="flex items-center gap-3">
             {tabSwitchCount > 0 && (
@@ -261,7 +264,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
               onClick={() => toggleFlag(currentQ.id)}
             >
               <Flag className="w-4 h-4" /> 
-              {flagged.includes(currentQ.id) ? 'Bỏ cắm cờ' : 'Cắm cờ xem lại'}
+              {t("testRoom.flagLabel")}
             </Button>
           </div>
         </div>
@@ -326,7 +329,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
             disabled={currentIdx === 0}
             onClick={() => setCurrentIdx(prev => prev - 1)}
           >
-            <ChevronLeft className="w-5 h-5" /> Câu trước
+            <ChevronLeft className="w-5 h-5" /> {t("testRoom.prevButton")}
           </Button>
           
           {currentIdx === questions.length - 1 ? (
@@ -335,7 +338,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
               className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
               onClick={handleSubmit}
             >
-              <CheckCircle2 className="w-5 h-5" /> Nộp bài
+              <CheckCircle2 className="w-5 h-5" /> {t("testRoom.submitButton")}
             </Button>
           ) : (
             <Button 
@@ -343,7 +346,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
               className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
               onClick={() => setCurrentIdx(prev => prev + 1)}
             >
-              Câu tiếp <ChevronRight className="w-5 h-5" />
+              {t("testRoom.nextButton")} <ChevronRight className="w-5 h-5" />
             </Button>
           )}
         </div>
@@ -355,7 +358,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         {/* Timer Box */}
         <div className="p-6 border-b bg-background flex flex-col items-center justify-center">
           <div className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">
-            <Clock className="w-4 h-4" /> Thời gian còn lại
+            <Clock className="w-4 h-4" /> {t("testRoom.timeRemaining")}
           </div>
           <div className={`text-4xl font-black font-mono tracking-tight ${timeLeft < 300 ? 'text-rose-600 animate-pulse' : 'text-card-foreground'}`}>
             {formatTime(timeLeft)}

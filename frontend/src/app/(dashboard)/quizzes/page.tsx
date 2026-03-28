@@ -272,7 +272,10 @@ export default function QuizzesPage() {
                           toast.success(t("quizzes.duplicateSuccess"));
                         } catch { toast.error(t("quizzes.duplicateError")); }
                       }}><Copy className="w-4 h-4 text-slate-400"/> {t("quizzes.duplicate")}</DropdownMenuItem>
-                      <DropdownMenuItem className="gap-2" onClick={() => window.location.href = '/classes'}><Users className="w-4 h-4 text-slate-400"/> {t("quizzes.assignClass")}</DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2" onClick={() => {
+                        setShareConfig({ quiz_id: quiz.id, title: `Giao lớp: ${quiz.title}`, type: "class" });
+                        setIsShareDialogOpen(true);
+                      }}><Users className="w-4 h-4 text-slate-400"/> {t("quizzes.assignClass")}</DropdownMenuItem>
                       <DropdownMenuItem className="gap-2 text-rose-600 focus:text-rose-600" onClick={async () => {
                           const ok = await confirm({
                             title: "Xóa bài kiểm tra",

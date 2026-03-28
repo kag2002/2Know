@@ -25,7 +25,20 @@ export default function CreateQuestionPage() {
     { id: 3, text: "", isCorrect: false },
     { id: 4, text: "", isCorrect: false },
   ]);
+  const [difficulty, setDifficulty] = useState("Trung bình");
+  const [folder, setFolder] = useState("Chưa phân loại");
+  const [explanation, setExplanation] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const addOption = () => {
+    const newId = options.length > 0 ? Math.max(...options.map(o => o.id)) + 1 : 1;
+    setOptions([...options, { id: newId, text: "", isCorrect: false }]);
+  };
+
+  const removeOption = (id: number) => {
+    if (options.length <= 2) return toast.warning("Phải có ít nhất 2 đáp án!");
+    setOptions(options.filter(o => o.id !== id));
+  };
 
   const toggleCorrect = (id: number) => {
     setOptions(options.map(opt =>
@@ -42,8 +55,9 @@ export default function CreateQuestionPage() {
         body: JSON.stringify({
           type: qType,
           content: content,
-          difficulty: "Trung bình",
-          folder: "Chưa phân loại",
+          difficulty: difficulty,
+          folder: folder,
+          explanation: explanation,
           options: options.map(o => ({ content: o.text, is_correct: o.isCorrect }))
         })
       });
@@ -84,25 +98,37 @@ export default function CreateQuestionPage() {
         <div className="grid grid-cols-3 gap-6">
           <div className="col-span-1 space-y-2">
             <label className="text-sm font-medium">Loại câu hỏi</label>
-            <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-              <option>Trắc nghiệm (1 đáp án)</option>
-              <option>Nhiều đáp án (Checkboxes)</option>
-              <option>Đúng / Sai</option>
-              <option>Tự luận</option>
-              <option>Điền vào chỗ trống</option>
+            <select 
+               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+               value={qType}
+               onChange={(e) => setQType(e.target.value)}
+            >
+              <option value="multiple_choice">Trắc nghiệm (1 đáp án)</option>
+              <option value="multiple_answers">Nhiều đáp án (Checkboxes)</option>
+              <option value="true_false">Đúng / Sai</option>
+              <option value="essay">Tự luận</option>
+              <option value="fill_in_the_blank">Điền vào chỗ trống</option>
             </select>
           </div>
           <div className="col-span-1 space-y-2">
             <label className="text-sm font-medium">Chủ đề (Môn học)</label>
-            <Input defaultValue="Toán học" />
+            <Input 
+               value={folder} 
+               onChange={(e) => setFolder(e.target.value)} 
+               placeholder="VD: Toán học" 
+            />
           </div>
           <div className="col-span-1 space-y-2">
             <label className="text-sm font-medium">Mức độ / Lớp</label>
-            <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-              <option>Dễ (Nhận biết)</option>
-              <option>Trung bình (Thông hiểu)</option>
-              <option>Khó (Vận dụng)</option>
-              <option>Rất khó (Vận dụng cao)</option>
+            <select 
+               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+               value={difficulty}
+               onChange={(e) => setDifficulty(e.target.value)}
+            >
+              <option value="Dễ">Dễ (Nhận biết)</option>
+              <option value="Trung bình">Trung bình (Thông hiểu)</option>
+              <option value="Khó">Khó (Vận dụng)</option>
+              <option value="Rất khó">Rất khó (Vận dụng cao)</option>
             </select>
           </div>
         </div>
@@ -158,14 +184,14 @@ export default function CreateQuestionPage() {
                     className={`bg-background ${opt.isCorrect ? 'border-emerald-300' : ''}`}
                   />
                 </div>
-                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-rose-500 mt-0.5">
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-rose-500 mt-0.5" onClick={() => removeOption(opt.id)}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             ))}
           </div>
 
-          <Button variant="outline" className="w-full border-dashed gap-2 text-muted-foreground mt-2">
+          <Button variant="outline" className="w-full border-dashed gap-2 text-muted-foreground mt-2" onClick={addOption}>
             <Plus className="w-4 h-4" /> Thêm đáp án khác
           </Button>
         </div>
@@ -175,7 +201,9 @@ export default function CreateQuestionPage() {
           <textarea 
             className="flex min-h-[80px] w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500"
             placeholder="Giải thích tại sao đáp án lại đúng để học sinh có thể tham khảo sau khi thi xong..."
-          ></textarea>
+            value={explanation}
+            onChange={(e) => setExplanation(e.target.value)}
+          />
         </div>
       </div>
     </div>
