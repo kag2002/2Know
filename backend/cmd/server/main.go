@@ -8,12 +8,12 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
 
 	"backend/internal/config"
 	"backend/internal/handler"
 	"backend/internal/middleware"
-	"backend/internal/model"
 	"backend/internal/repository"
 	"backend/internal/service"
 )
@@ -24,27 +24,8 @@ func main() {
 		log.Println("No .env file found, using environment variables")
 	}
 
-	// Connect to database
+	// Connect to database (AutoMigrate runs inside config.ConnectDB)
 	config.ConnectDB()
-
-	// Auto-migrate all models
-	err := config.DB.AutoMigrate(
-		&model.User{},
-		&model.Quiz{},
-		&model.Question{},
-		&model.Option{},
-		&model.Class{},
-		&model.Student{},
-		&model.TestResult{},
-		&model.Note{},
-		&model.Tag{},
-		&model.OmrBatch{},
-		&model.Rubric{},
-		&model.ShareLink{},
-	)
-	if err != nil {
-		log.Fatalf("Failed to auto-migrate: %v", err)
-	}
 
 	app := fiber.New(fiber.Config{
 		BodyLimit:    5 * 1024 * 1024, // Limit request body to 5MB to prevent spam/OOM
@@ -61,12 +42,16 @@ func main() {
 					"error": "Dữ liệu tải lên quá lớn (Vượt mức 5MB). Vui lòng kiểm tra lại.",
 				})
 			}
+			// SECURITY: Never leak Go internal error details to clients
+			log.Printf("[ErrorHandler] code=%d err=%v", code, err)
 			return c.Status(code).JSON(fiber.Map{
-				"error": err.Error(),
+				"error": "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.",
 			})
 		},
 	})
 
+	// SECURITY: Recover from panics to prevent total server crash
+	app.Use(recover.New())
 	app.Use(logger.New())
 	app.Use(middleware.SecurityHeaders())
 	app.Use(middleware.GlobalLimiter())

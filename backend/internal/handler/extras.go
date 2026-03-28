@@ -1,9 +1,9 @@
 package handler
 
 import (
+	crypto_rand "crypto/rand"
 	"fmt"
-	"math/rand"
-	"time"
+	"math/big"
 
 	"github.com/gofiber/fiber/v3"
 
@@ -156,7 +156,8 @@ func (h *ShareLinkHandler) CreateLink(c fiber.Ctx) error {
 	}
 	link.UserID = userID
 	if link.ShareCode == "" {
-		link.ShareCode = fmt.Sprintf("2K-%04d", rand.Intn(10000))
+		// SECURITY: Use crypto/rand for unpredictable 6-char alphanumeric codes (36^6 = 2.1B possibilities)
+		link.ShareCode = "2K-" + generateSecureCode(6)
 	}
 	if link.URL == "" {
 		link.URL = fmt.Sprintf("http://localhost:3000/test/%s", link.QuizID)
@@ -165,6 +166,17 @@ func (h *ShareLinkHandler) CreateLink(c fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create share link"})
 	}
 	return c.Status(201).JSON(link)
+}
+
+// generateSecureCode creates a cryptographically secure alphanumeric string
+func generateSecureCode(length int) string {
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	result := make([]byte, length)
+	for i := range result {
+		n, _ := crypto_rand.Int(crypto_rand.Reader, big.NewInt(int64(len(charset))))
+		result[i] = charset[n.Int64()]
+	}
+	return string(result)
 }
 
 func (h *ShareLinkHandler) UpdateLink(c fiber.Ctx) error {
@@ -192,8 +204,4 @@ func (h *ShareLinkHandler) DeleteLink(c fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete link"})
 	}
 	return c.JSON(fiber.Map{"message": "Share link deleted"})
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }
