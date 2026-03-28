@@ -156,7 +156,7 @@ func main() {
 	api.Get("/quizzes/:quizId/results", resultHandler.GetQuizResults)
 
 	// AI endpoints
-	api.Post("/ai/generate-quiz", aiHandler.GenerateQuiz)
+	api.Post("/ai/generate-quiz", middleware.AILimiter(), aiHandler.GenerateQuiz)
 
 	// Question endpoints
 	api.Get("/quizzes/:quizId/questions", questionHandler.GetQuizQuestions)

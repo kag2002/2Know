@@ -38,3 +38,19 @@ func AuthLimiter() fiber.Handler {
 		},
 	})
 }
+
+// AILimiter apply extremely strict 3 requests per 1 minute limit dedicated for AI operations to prevent billing exhaustion.
+func AILimiter() fiber.Handler {
+	return limiter.New(limiter.Config{
+		Max:        3,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: func(c fiber.Ctx) string {
+			return c.IP()
+		},
+		LimitReached: func(c fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error": "Hệ thống AI đang xử lý quá tải thao tác từ bạn. Vui lòng đợi 1 phút để tiếp tục tạo đề.",
+			})
+		},
+	})
+}
