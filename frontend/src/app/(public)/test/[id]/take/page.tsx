@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, ShieldAlert, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -143,13 +143,13 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const toggleFlag = (qid: string) => {
+  const toggleFlag = useCallback((qid: string) => {
     setFlagged(prev => prev.includes(qid) ? prev.filter(x => x !== qid) : [...prev, qid]);
-  };
+  }, []);
 
-  const handleSelect = (qId: string, oId: string) => {
+  const handleSelect = useCallback((qId: string, oId: string) => {
     setAnswers(prev => ({ ...prev, [qId]: oId }));
-  };
+  }, []);
 
   const handleAutoSubmit = async (switches: number) => {
     sessionStorage.setItem("tabSwitchCount", String(switches));
@@ -243,6 +243,90 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   const currentQ = questions[currentIdx];
 
+  // ===================== PERFORMANCE BASTION (PASS 11) =====================
+  // Lock heavy calculations out of the 1-second timer rendering cascade
+
+  const progressWidth = useMemo(() => {
+    if (questions.length === 0) return 0;
+    return (Object.keys(answers).length / questions.length) * 100;
+  }, [answers, questions.length]);
+
+  const questionContentMemo = useMemo(() => {
+    if (!currentQ) return null;
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={currentIdx}
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -20, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex-1 overflow-y-auto p-6 md:p-12"
+        >
+          <div className="max-w-3xl mx-auto space-y-8">
+            <h2 className="text-xl md:text-2xl font-medium text-foreground leading-relaxed whitespace-pre-wrap">
+              {currentQ.content}
+            </h2>
+            
+            <div className="space-y-4">
+              {(currentQ.options || []).map((opt) => {
+                const isSelected = answers[currentQ.id] === opt.id;
+                return (
+                  <label 
+                    key={opt.id} 
+                    onClick={() => handleSelect(currentQ.id, opt.id)}
+                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                      isSelected ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm' : 'border-border bg-background hover:border-indigo-200'
+                    }`}
+                  >
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                      isSelected ? 'border-indigo-600' : 'border-border'
+                    }`}>
+                      {isSelected && <div className="w-3 h-3 bg-indigo-600 rounded-full" />}
+                    </div>
+                    <span className={`text-base font-medium ${isSelected ? 'text-indigo-900 dark:text-indigo-300' : 'text-foreground'}`}>
+                      {opt.label && <span className="font-bold mr-2">{opt.label}.</span>}
+                      {opt.content}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }, [currentQ, currentIdx, answers, handleSelect]);
+
+  const questionPaletteMemo = useMemo(() => {
+    return (
+      <div className="grid grid-cols-5 gap-2">
+        {questions.map((q, i) => {
+          const isDone = answers[q.id] !== undefined;
+          const isFlagged = flagged.includes(q.id);
+          const isActive = currentIdx === i;
+          
+          let btnClass = "border-border text-muted-foreground hover:border-border bg-background";
+          if (isActive) btnClass = "border-indigo-600 bg-indigo-600 text-white ring-2 ring-indigo-200 ring-offset-1";
+          else if (isFlagged && isDone) btnClass = "border-amber-500 bg-amber-500 text-white";
+          else if (isFlagged) btnClass = "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400";
+          else if (isDone) btnClass = "border-emerald-500 bg-emerald-500 text-white";
+
+          return (
+            <button
+              key={q.id}
+              onClick={() => setCurrentIdx(i)}
+              className={`h-10 rounded-md border font-medium text-sm transition-all focus:outline-none ${btnClass}`}
+            >
+              {i + 1}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }, [questions, answers, flagged, currentIdx]);
+  // ===================== PERFORMANCE BASTION END =====================
+
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-3.5rem)] relative">
 
@@ -313,52 +397,12 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         <div className="h-1 w-full bg-slate-100 dark:bg-slate-800">
           <div 
             className="h-full bg-indigo-600 transition-all duration-500 ease-out" 
-            style={{ width: `${(Object.keys(answers).length / questions.length) * 100}%` }}
+            style={{ width: `${progressWidth}%` }}
           />
         </div>
 
         {/* Question Content */}
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={currentIdx}
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -20, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="flex-1 overflow-y-auto p-6 md:p-12"
-          >
-            <div className="max-w-3xl mx-auto space-y-8">
-              <h2 className="text-xl md:text-2xl font-medium text-foreground leading-relaxed">
-                {currentQ.content}
-              </h2>
-              
-              <div className="space-y-4">
-                {(currentQ.options || []).map((opt) => {
-                  const isSelected = answers[currentQ.id] === opt.id;
-                  return (
-                    <label 
-                      key={opt.id} 
-                      onClick={() => handleSelect(currentQ.id, opt.id)}
-                      className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                        isSelected ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm' : 'border-border bg-background hover:border-indigo-200'
-                      }`}
-                    >
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                        isSelected ? 'border-indigo-600' : 'border-border'
-                      }`}>
-                        {isSelected && <div className="w-3 h-3 bg-indigo-600 rounded-full" />}
-                      </div>
-                      <span className={`text-base font-medium ${isSelected ? 'text-indigo-900 dark:text-indigo-300' : 'text-foreground'}`}>
-                        {opt.label && <span className="font-bold mr-2">{opt.label}.</span>}
-                        {opt.content}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+        {questionContentMemo}
 
         {/* Question Footer Navigation */}
         <div className="h-20 border-t flex items-center justify-between px-6 bg-background shrink-0 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)]">
@@ -427,29 +471,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         {/* Question Palette */}
         <div className="flex-1 overflow-y-auto p-6">
           <h3 className="font-semibold text-card-foreground mb-4">{t("testRoom.questionListTitle")}</h3>
-          <div className="grid grid-cols-5 gap-2">
-            {questions.map((q, i) => {
-              const isDone = answers[q.id] !== undefined;
-              const isFlagged = flagged.includes(q.id);
-              const isActive = currentIdx === i;
-              
-              let btnClass = "border-border text-muted-foreground hover:border-border bg-background";
-              if (isActive) btnClass = "border-indigo-600 bg-indigo-600 text-white ring-2 ring-indigo-200 ring-offset-1";
-              else if (isFlagged && isDone) btnClass = "border-amber-500 bg-amber-500 text-white";
-              else if (isFlagged) btnClass = "border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400";
-              else if (isDone) btnClass = "border-emerald-500 bg-emerald-500 text-white";
-
-              return (
-                <button
-                  key={q.id}
-                  onClick={() => setCurrentIdx(i)}
-                  className={`h-10 rounded-md border font-medium text-sm transition-all focus:outline-none ${btnClass}`}
-                >
-                  {i + 1}
-                </button>
-              );
-            })}
-          </div>
+          {questionPaletteMemo}
           
           <div className="mt-8 space-y-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-emerald-500"></div> {t("testRoom.statusAnswered")}</div>
