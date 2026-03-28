@@ -42,7 +42,8 @@ type Quiz struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	Questions []Question `gorm:"foreignKey:QuizID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"questions,omitempty"`
+	Questions   []Question   `gorm:"foreignKey:QuizID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"questions,omitempty"`
+	TestResults []TestResult `gorm:"foreignKey:QuizID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"test_results,omitempty"`
 
 	// Contextual Stats (Not stored directly in DB)
 	Submissions int64   `gorm:"-" json:"submissions"`

@@ -19,7 +19,8 @@ type Class struct {
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	Students []Student `gorm:"foreignKey:ClassID" json:"students,omitempty"`
+	Students  []Student  `gorm:"foreignKey:ClassID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"students,omitempty"`
+	Materials []Material `gorm:"foreignKey:ClassID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"materials,omitempty"`
 }
 
 type Student struct {
