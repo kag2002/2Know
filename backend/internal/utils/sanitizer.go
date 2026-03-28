@@ -45,6 +45,10 @@ func SanitizeResult(r *model.TestResult) {
 		return
 	}
 	for k, v := range r.Answers {
+		runes := []rune(v)
+		if len(runes) > 2000 {
+			v = string(runes[:2000]) // Truncate to shield against OOM Postgres attacks
+		}
 		r.Answers[k] = policy.Sanitize(v)
 	}
 }
