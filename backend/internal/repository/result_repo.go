@@ -49,7 +49,7 @@ func (r *resultRepository) UpdateResult(result *model.TestResult) error {
 
 func (r *resultRepository) GetQuizResults(quizID string) ([]model.TestResult, error) {
 	var results []model.TestResult
-	err := r.db.Where("quiz_id = ?", quizID).Order("score desc").Find(&results).Error
+	err := r.db.Where("quiz_id = ?", quizID).Order("score desc").Limit(500).Find(&results).Error
 	return results, err
 }
 
@@ -68,6 +68,7 @@ func (r *resultRepository) GetPendingResults(teacherID string) ([]model.TestResu
 	err := r.db.
 		Joins("JOIN quizzes ON quizzes.id = test_results.quiz_id").
 		Where("quizzes.teacher_id = ? AND test_results.status = ?", teacherID, "pending").
+		Limit(500).
 		Find(&results).Error
 	return results, err
 }
@@ -103,6 +104,7 @@ func (r *resultRepository) GetStudentHistory(studentID string, teacherID string)
 		Joins("JOIN quizzes ON quizzes.id = test_results.quiz_id").
 		Where("test_results.student_id = ? AND quizzes.teacher_id = ?", studentID, teacherID).
 		Order("test_results.created_at DESC").
+		Limit(100).
 		Scan(&history).Error
 
 	return history, err

@@ -10,8 +10,8 @@ type TestResult struct {
 	ID                string `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	QuizID            string `gorm:"type:uuid;not null;index" json:"quiz_id"`
 	StudentID         string `gorm:"type:uuid;index" json:"student_id"` // Can be nullable if guest
-	StudentName       string `gorm:"type:varchar(255);not null" json:"student_name"`
-	StudentIdentifier string `gorm:"type:varchar(100);not null" json:"student_identifier"` // E.g: SBD
+	StudentName       string `gorm:"type:varchar(255);not null" json:"student_name" validate:"required,max=255"`
+	StudentIdentifier string `gorm:"type:varchar(100);not null" json:"student_identifier" validate:"required,max=100"` // E.g: SBD
 
 	// Scores
 	Score            float64 `gorm:"default:0" json:"score"`
@@ -20,7 +20,7 @@ type TestResult struct {
 	TimeTakenSeconds int     `gorm:"default:0" json:"time_taken_seconds"`
 
 	// JSON payload mapping Question ID to Option ID selected (or Essay text)
-	Answers map[string]string `gorm:"type:jsonb;serializer:json" json:"answers"`
+	Answers map[string]string `gorm:"type:jsonb;serializer:json" json:"answers" validate:"max=200"`
 
 	// JSON payload mapping Question ID to points awarded by teacher
 	GradedAnswers map[string]float64 `gorm:"type:jsonb;serializer:json" json:"graded_answers,omitempty"`

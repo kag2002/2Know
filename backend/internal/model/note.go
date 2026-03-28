@@ -10,8 +10,8 @@ import (
 type Note struct {
 	ID        string    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()" json:"id"`
 	UserID    string    `gorm:"type:uuid;not null;index" json:"-"`
-	Title     string    `gorm:"type:varchar(255);not null" json:"title"`
-	Content   string    `gorm:"type:text;not null" json:"content"`
+	Title     string    `gorm:"type:varchar(255);not null" json:"title" validate:"required,max=255"`
+	Content   string    `gorm:"type:text;not null" json:"content" validate:"required,max=5000"`
 	Color     string    `gorm:"type:varchar(50);default:'bg-amber-50 border-amber-200'" json:"color"`
 	Pinned    bool      `gorm:"default:false" json:"pinned"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`

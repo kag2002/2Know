@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 type AIHandler struct {
@@ -21,11 +22,15 @@ func (h *AIHandler) GenerateQuiz(c fiber.Ctx) error {
 	}
 
 	var req struct {
-		Prompt string `json:"prompt"`
+		Prompt string `json:"prompt" validate:"required,max=1000"`
 	}
 
 	if err := c.Bind().JSON(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := utils.ValidateStruct(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Prompt must be less than 1000 characters"})
 	}
 
 	if req.Prompt == "" {

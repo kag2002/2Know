@@ -23,7 +23,7 @@ func NewTagRepository(db *gorm.DB) TagRepository {
 
 func (r *tagRepository) GetTags(userID string) ([]model.Tag, error) {
 	var tags []model.Tag
-	err := r.db.Where("user_id = ?", userID).Order("created_at desc").Find(&tags).Error
+	err := r.db.Where("user_id = ?", userID).Order("created_at desc").Limit(200).Find(&tags).Error
 	return tags, err
 }
 

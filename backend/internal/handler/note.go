@@ -5,6 +5,7 @@ import (
 
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 type NoteHandler struct {
@@ -38,6 +39,10 @@ func (h *NoteHandler) CreateNote(c fiber.Ctx) error {
 	note := new(model.Note)
 	if err := c.Bind().JSON(note); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := utils.ValidateStruct(note); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
 	note.UserID = userId

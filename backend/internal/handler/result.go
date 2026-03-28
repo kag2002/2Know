@@ -7,6 +7,7 @@ import (
 
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 type ResultHandler struct {
@@ -21,6 +22,10 @@ func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
 	var result model.TestResult
 	if err := c.Bind().JSON(&result); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := utils.ValidateStruct(&result); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
 	if err := h.svc.SubmitTest(&result); err != nil {

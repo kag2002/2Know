@@ -5,6 +5,7 @@ import (
 
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 type TagHandler struct {
@@ -40,6 +41,10 @@ func (h *TagHandler) CreateTag(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
+	if err := utils.ValidateStruct(tag); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
 	tag.UserID = userId
 
 	if err := h.svc.CreateTag(tag); err != nil {
@@ -59,6 +64,10 @@ func (h *TagHandler) UpdateTag(c fiber.Ctx) error {
 	tag := new(model.Tag)
 	if err := c.Bind().JSON(tag); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := utils.ValidateStruct(tag); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
 	tag.ID = id
