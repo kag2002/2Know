@@ -33,6 +33,23 @@ func (h *StudentHandler) GetStudents(c fiber.Ctx) error {
 	return c.JSON(students)
 }
 
+// GetStudentByID returns details for a single student
+func (h *StudentHandler) GetStudentByID(c fiber.Ctx) error {
+	teacherID := getUserIdFromToken(c)
+	if teacherID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	id := c.Params("id")
+	student, err := h.studentService.GetStudentByID(id)
+	if err != nil {
+		log.Printf("GetStudentByID Error: %v", err)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Student not found"})
+	}
+
+	return c.JSON(student)
+}
+
 // CreateStudent allows the teacher to manually register a student to a class
 func (h *StudentHandler) CreateStudent(c fiber.Ctx) error {
 	// Security check: Make sure they are authenticated

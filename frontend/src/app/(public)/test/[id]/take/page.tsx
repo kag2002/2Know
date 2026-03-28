@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, ShieldAlert, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MAX_TAB_SWITCHES = 3;
 
@@ -265,39 +266,56 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
           </div>
         </div>
 
-        {/* Question Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-12">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-xl md:text-2xl font-medium text-foreground leading-relaxed">
-              {currentQ.content}
-            </h2>
-            
-            <div className="space-y-4">
-              {(currentQ.options || []).map((opt) => {
-                const isSelected = answers[currentQ.id] === opt.id;
-                return (
-                  <label 
-                    key={opt.id} 
-                    onClick={() => handleSelect(currentQ.id, opt.id)}
-                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                      isSelected ? 'border-indigo-600 bg-indigo-50/50 shadow-sm' : 'border-border bg-background hover:border-indigo-200'
-                    }`}
-                  >
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      isSelected ? 'border-indigo-600' : 'border-border'
-                    }`}>
-                      {isSelected && <div className="w-3 h-3 bg-indigo-600 rounded-full" />}
-                    </div>
-                    <span className={`text-base font-medium ${isSelected ? 'text-indigo-900' : 'text-slate-700'}`}>
-                      {opt.label && <span className="font-bold mr-2">{opt.label}.</span>}
-                      {opt.content}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
+        {/* Progress Bar overlay */}
+        <div className="h-1 w-full bg-slate-100 dark:bg-slate-800">
+          <div 
+            className="h-full bg-indigo-600 transition-all duration-500 ease-out" 
+            style={{ width: `${(Object.keys(answers).length / questions.length) * 100}%` }}
+          />
         </div>
+
+        {/* Question Content */}
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={currentIdx}
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex-1 overflow-y-auto p-6 md:p-12"
+          >
+            <div className="max-w-3xl mx-auto space-y-8">
+              <h2 className="text-xl md:text-2xl font-medium text-foreground leading-relaxed">
+                {currentQ.content}
+              </h2>
+              
+              <div className="space-y-4">
+                {(currentQ.options || []).map((opt) => {
+                  const isSelected = answers[currentQ.id] === opt.id;
+                  return (
+                    <label 
+                      key={opt.id} 
+                      onClick={() => handleSelect(currentQ.id, opt.id)}
+                      className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                        isSelected ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm' : 'border-border bg-background hover:border-indigo-200'
+                      }`}
+                    >
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        isSelected ? 'border-indigo-600' : 'border-border'
+                      }`}>
+                        {isSelected && <div className="w-3 h-3 bg-indigo-600 rounded-full" />}
+                      </div>
+                      <span className={`text-base font-medium ${isSelected ? 'text-indigo-900 dark:text-indigo-300' : 'text-foreground'}`}>
+                        {opt.label && <span className="font-bold mr-2">{opt.label}.</span>}
+                        {opt.content}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
 
         {/* Question Footer Navigation */}
         <div className="h-20 border-t flex items-center justify-between px-6 bg-background shrink-0 shadow-[0_-4px_10px_-4px_rgba(0,0,0,0.05)]">

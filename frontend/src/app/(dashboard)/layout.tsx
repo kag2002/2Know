@@ -1,5 +1,8 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header";
+import { Breadcrumb } from "@/components/layout/Breadcrumb";
+import { CommandPalette } from "@/components/layout/CommandPalette";
+import GlobalFAB from "@/components/layout/FAB";
 
 export default function DashboardLayout({
   children,
@@ -12,9 +15,12 @@ export default function DashboardLayout({
       <div className="flex flex-col flex-1 min-w-0">
         <Header />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 dark:bg-slate-900/50">
+          <Breadcrumb />
           {children}
         </main>
       </div>
+      <GlobalFAB />
+      <CommandPalette />
     </div>
   );
 }

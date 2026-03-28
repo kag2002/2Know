@@ -7,6 +7,7 @@ import (
 
 type StudentService interface {
 	GetStudentsByTeacherID(teacherID string) ([]repository.StudentWithMetrics, error)
+	GetStudentByID(id string) (*model.Student, error)
 	CreateStudent(student *model.Student) error
 	UpdateStudent(id string, student *model.Student) error
 	DeleteStudent(id string) error
@@ -50,6 +51,10 @@ func (s *studentService) GetStudentsByTeacherID(teacherID string) ([]repository.
 	}
 
 	return students, nil
+}
+
+func (s *studentService) GetStudentByID(id string) (*model.Student, error) {
+	return s.repo.GetStudentByID(id)
 }
 
 func (s *studentService) CreateStudent(student *model.Student) error {

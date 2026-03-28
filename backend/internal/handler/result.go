@@ -77,3 +77,35 @@ func (h *ResultHandler) GradeSubmission(c fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "Graded successfully"})
 }
+
+func (h *ResultHandler) GetClassGradebook(c fiber.Ctx) error {
+	classId := c.Params("id")
+	userId := getUserIdFromToken(c)
+
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	gradebook, err := h.svc.GetClassGradebook(userId, classId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(gradebook)
+}
+
+func (h *ResultHandler) GetStudentHistory(c fiber.Ctx) error {
+	studentId := c.Params("id")
+	teacherID := getUserIdFromToken(c)
+
+	if teacherID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	history, err := h.svc.GetStudentHistory(studentId, teacherID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch student history"})
+	}
+
+	return c.JSON(history)
+}

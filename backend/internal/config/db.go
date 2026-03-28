@@ -50,6 +50,7 @@ func ConnectDB() {
 		&model.Rubric{},
 		&model.ShareLink{},
 		&model.OmrBatch{},
+		&model.Material{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)

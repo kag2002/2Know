@@ -1,65 +1,37 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-
-type Theme = "light" | "dark" | "eye-care" | "system";
-type ResolvedTheme = "light" | "dark" | "eye-care";
-
-interface ThemeContextType {
-  theme: Theme;
-  setTheme: (t: Theme) => void;
-  resolvedTheme: ResolvedTheme;
-}
-
-const ThemeContext = createContext<ThemeContextType>({
-  theme: "system",
-  setTheme: () => {},
-  resolvedTheme: "light",
-});
+import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
-
+  const [mounted, setMounted] = useState(false);
+  
+  // Prevent hydration mismatch
   useEffect(() => {
-    const stored = localStorage.getItem("2know-theme") as Theme | null;
-    if (stored) setThemeState(stored);
+    setMounted(true);
   }, []);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    const applyTheme = (t: Theme, systemIsDark: boolean) => {
-      root.classList.remove("dark", "eye-care");
-      if (t === "eye-care") {
-        root.classList.add("eye-care");
-        setResolvedTheme("eye-care");
-      } else if (t === "dark" || (t === "system" && systemIsDark)) {
-        root.classList.add("dark");
-        setResolvedTheme("dark");
-      } else {
-        setResolvedTheme("light");
-      }
-    };
-
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    applyTheme(theme, mq.matches);
-
-    const handler = (e: MediaQueryListEvent) => applyTheme(theme, e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, [theme]);
-
-  const setTheme = (t: Theme) => {
-    setThemeState(t);
-    localStorage.setItem("2know-theme", t);
-  };
+  if (!mounted) {
+    return <div className="invisible">{children}</div>;
+  }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
+    <NextThemesProvider 
+      attribute="class" 
+      defaultTheme="system" 
+      enableSystem 
+      themes={["light", "dark", "eye-care"]}
+    >
       {children}
-    </ThemeContext.Provider>
+    </NextThemesProvider>
   );
 }
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const { theme, setTheme, resolvedTheme } = useNextTheme();
+  return { 
+    theme: theme as any, 
+    setTheme, 
+    resolvedTheme: (resolvedTheme || "light") as any 
+  };
+};

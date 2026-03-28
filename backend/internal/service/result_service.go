@@ -13,15 +13,25 @@ type ResultService interface {
 	GetQuizResults(teacherID, quizID string) ([]model.TestResult, error)
 	GetPendingGradings(teacherID string) ([]PendingGradingResponse, error)
 	GradeSubmission(teacherID, compositeID string, score float64) error
+	GetClassGradebook(teacherID, classID string) (map[string]interface{}, error)
+	GetStudentHistory(studentID string, teacherID string) ([]struct{
+		ID string `json:"id"`
+		QuizTitle string `json:"quiz_title"`
+		Score float64 `json:"score"`
+		Status string `json:"status"`
+		CreatedAt string `json:"created_at"`
+		TimeTakenSeconds int `json:"time_taken_seconds"`
+	}, error)
 }
 
 type resultService struct {
-	repo     repository.ResultRepository
-	quizRepo repository.QuizRepository
+	repo      repository.ResultRepository
+	quizRepo  repository.QuizRepository
+	classRepo repository.ClassRepository
 }
 
-func NewResultService(repo repository.ResultRepository, quizRepo repository.QuizRepository) ResultService {
-	return &resultService{repo: repo, quizRepo: quizRepo}
+func NewResultService(repo repository.ResultRepository, quizRepo repository.QuizRepository, classRepo repository.ClassRepository) ResultService {
+	return &resultService{repo: repo, quizRepo: quizRepo, classRepo: classRepo}
 }
 
 func (s *resultService) SubmitTest(result *model.TestResult) error {
@@ -75,6 +85,17 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 	}
 
 	return s.repo.CreateResult(result)
+}
+
+func (s *resultService) GetStudentHistory(studentID string, teacherID string) ([]struct{
+	ID string `json:"id"`
+	QuizTitle string `json:"quiz_title"`
+	Score float64 `json:"score"`
+	Status string `json:"status"`
+	CreatedAt string `json:"created_at"`
+	TimeTakenSeconds int `json:"time_taken_seconds"`
+}, error) {
+	return s.repo.GetStudentHistory(studentID, teacherID)
 }
 
 func (s *resultService) GetQuizResults(teacherID, quizID string) ([]model.TestResult, error) {
@@ -194,4 +215,47 @@ func (s *resultService) GradeSubmission(teacherID, compositeID string, score flo
 	}
 
 	return s.repo.UpdateResult(res)
+}
+
+func (s *resultService) GetClassGradebook(teacherID, classID string) (map[string]interface{}, error) {
+	// 1. Verify class ownership and get students
+	cls, err := s.classRepo.GetClassByID(classID, teacherID)
+	if err != nil {
+		return nil, errors.New("unauthorized or class not found")
+	}
+
+	// 2. Extract student IDs
+	var studentIDs []string
+	for _, st := range cls.Students {
+		studentIDs = append(studentIDs, st.ID)
+	}
+
+	// 3. Get results for these students
+	results, err := s.repo.GetResultsByStudentIDs(studentIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// 4. Extract unique QuizIDs
+	quizIDMap := make(map[string]bool)
+	for _, res := range results {
+		quizIDMap[res.QuizID] = true
+	}
+
+	// 5. Get Quiz details (only basic info)
+	var quizzes []map[string]interface{}
+	for qID := range quizIDMap {
+		if q, err := s.quizRepo.GetPublicQuizByID(qID); err == nil {
+			quizzes = append(quizzes, map[string]interface{}{
+				"id":    q.ID,
+				"title": q.Title,
+			})
+		}
+	}
+
+	return map[string]interface{}{
+		"students": cls.Students,
+		"quizzes":  quizzes,
+		"results":  results,
+	}, nil
 }

@@ -8,6 +8,7 @@ import (
 
 type StudentRepository interface {
 	GetStudentsByTeacherID(teacherID string) ([]StudentWithMetrics, error)
+	GetStudentByID(id string) (*model.Student, error)
 	CreateStudent(student *model.Student) error
 	UpdateStudent(id string, student *model.Student) error
 	DeleteStudent(id string) error
@@ -54,6 +55,14 @@ func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentW
 		Scan(&results).Error
 
 	return results, err
+}
+
+func (r *studentRepository) GetStudentByID(id string) (*model.Student, error) {
+	var student model.Student
+	if err := r.db.First(&student, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &student, nil
 }
 
 func (r *studentRepository) CreateStudent(student *model.Student) error {

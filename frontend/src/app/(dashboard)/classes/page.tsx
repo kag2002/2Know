@@ -8,6 +8,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ClassItem {
   id: string;
@@ -37,6 +39,7 @@ interface ClassItem {
 
 export default function ClassesPage() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -202,8 +205,28 @@ export default function ClassesPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex flex-col bg-card border rounded-xl overflow-hidden">
+              <div className="p-5 flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <Skeleton className="w-12 h-12 rounded-lg" />
+                  <div>
+                    <Skeleton className="h-3 w-24 mb-2" />
+                    <Skeleton className="h-5 w-32" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-6">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </div>
+              <div className="bg-muted/30 border-t p-3 px-5 flex items-center justify-between">
+                <Skeleton className="h-3 w-28" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -219,7 +242,13 @@ export default function ClassesPage() {
                       <DropdownMenuItem onClick={() => { setEditingClass(cls); setIsEditDialogOpen(true); }}>{t("classes.editInfo")}</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => window.location.href = `/reports`}>{t("classes.benchmarkReport")}</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive" onClick={async () => {
-                        if (!confirm(t("classes.confirmDelete"))) return;
+                        const ok = await confirm({
+                          title: "Xóa lớp học",
+                          description: "Bạn có chắc muốn xóa lớp học này? Tất cả học sinh trong lớp sẽ bị gỡ liên kết.",
+                          confirmLabel: "Xóa lớp",
+                          variant: "danger"
+                        });
+                        if (!ok) return;
                         try {
                           await apiFetch(`/classes/${cls.id}`, { method: 'DELETE' });
                           setClasses(prev => prev.filter(c => c.id !== cls.id));

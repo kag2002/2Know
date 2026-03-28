@@ -13,6 +13,7 @@ type ActivityItem struct {
 	Action      string `json:"action"`
 	Time        string `json:"time"`
 	Date        string `json:"date"`
+	DateISO     string `json:"dateIso"`
 	Status      string `json:"status"`
 	StatusColor string `json:"statusColor"`
 }
@@ -115,6 +116,7 @@ func (r *statsRepository) GetDashboardStats(teacherID string) (*DashboardStats, 
 			Action:      "nộp bài " + res.QuizTitle,
 			Time:        res.CreatedAt.Format("15:04"),
 			Date:        res.CreatedAt.Format("02/01"),
+			DateISO:     res.CreatedAt.Format(time.RFC3339),
 			Status:      statusStr,
 			StatusColor: statusColor,
 		})

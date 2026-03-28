@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Users, TrendingUp, Award, AlertTriangle, ShieldAlert, Loader2 } from "lucide-react";
+import { ArrowLeft, Users, TrendingUp, Award, AlertTriangle, ShieldAlert, Loader2, Download, FileSpreadsheet } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import {
@@ -36,6 +36,36 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
   const [results, setResults] = useState<ResultItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    await new Promise(res => setTimeout(res, 800)); // Simulate premium loading
+    
+    const headers = ["Họ và Tên", "Email", "Điểm", "Số câu đúng", "Thời gian (giây)", "Vi phạm tab", "Thời gian nộp"];
+    const csvContent = [
+      headers.join(","),
+      ...results.map(r => [
+        `"${r.student_name || 'Guest'}"`,
+        `"${r.student_email || ''}"`,
+        r.score,
+        r.total_correct,
+        r.time_taken_seconds,
+        r.tab_switch_count,
+        `"${new Date(r.created_at).toLocaleString('vi-VN')}"`
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Report_Quiz_${id}_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setIsExporting(false);
+  };
 
   useEffect(() => {
     const loadResults = async () => {
@@ -115,6 +145,16 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
             {t("reportDetail.title") !== "reportDetail.title" ? t("reportDetail.title") : "Chi tiết Báo cáo"}
           </h1>
           <p className="text-muted-foreground mt-1">Mã đề: {id} • {totalSubmissions} bài nộp</p>
+        </div>
+        <div className="ml-auto">
+          <Button 
+            onClick={handleExport} 
+            disabled={isExporting || results.length === 0}
+            className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-shadow-indigo-600/20 shadow-md transition-all"
+          >
+            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+            {isExporting ? "Đang xuất..." : "Xuất CSV"}
+          </Button>
         </div>
       </div>
 

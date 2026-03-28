@@ -27,15 +27,25 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("account");
   const [saving, setSaving] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("indigo");
   const [fullName, setFullName] = useState(user?.name || "");
+  const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
 
   const tabs = [
-    { id: "account", label: "account", icon: User },
-    { id: "appearance", label: "appearance", icon: Palette },
-    { id: "security", label: "security", icon: Shield },
-    { id: "notifications", label: "notifications", icon: Bell },
+    { id: "account", label: t("settings.tabs.account"), icon: User },
+    { id: "appearance", label: t("settings.tabs.appearance"), icon: Palette },
+    { id: "security", label: t("settings.tabs.security"), icon: Shield },
+    { id: "notifications", label: t("settings.tabs.notifications"), icon: Bell },
   ];
+
+  // Interactive notification toggles
+  const [notifPrefs, setNotifPrefs] = useState({
+    emailSubmission: true,
+    dailySummary: false,
+    cheatAlert: true,
+    weeklyReport: false,
+  });
 
   const handleSave = async () => {
     setSaving(true);
@@ -50,6 +60,32 @@ export default function SettingsPage() {
       toast.error("Lỗi: " + err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (passwords.new !== passwords.confirm) {
+      return toast.warning("Mật khẩu xác nhận không khớp!");
+    }
+    if (passwords.new.length < 6) {
+      return toast.warning("Mật khẩu mới phải có ít nhất 6 ký tự!");
+    }
+    
+    setPasswordSaving(true);
+    try {
+      await apiFetch("/users/me/password", {
+        method: "PATCH",
+        body: JSON.stringify({ 
+          current_password: passwords.current, 
+          new_password: passwords.new 
+        }),
+      });
+      toast.success("Đổi mật khẩu thành công!");
+      setPasswords({ current: "", new: "", confirm: "" });
+    } catch (err: any) {
+      toast.error("Đổi mật khẩu thất bại: Sai mật khẩu cũ");
+    } finally {
+      setPasswordSaving(false);
     }
   };
 
@@ -225,15 +261,30 @@ export default function SettingsPage() {
                 <div className="grid gap-4">
                   <div className="space-y-2">
                     <Label>{t("settings.security.currentPassword")}</Label>
-                    <Input type="password" className="h-10 max-w-md" />
+                    <Input 
+                      type="password" 
+                      className="h-10 max-w-md" 
+                      value={passwords.current}
+                      onChange={(e) => setPasswords({...passwords, current: e.target.value})}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>{t("settings.security.newPassword")}</Label>
-                    <Input type="password" className="h-10 max-w-md" />
+                    <Input 
+                      type="password" 
+                      className="h-10 max-w-md" 
+                      value={passwords.new}
+                      onChange={(e) => setPasswords({...passwords, new: e.target.value})}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>{t("settings.security.confirmPassword")}</Label>
-                    <Input type="password" className="h-10 max-w-md" />
+                    <Input 
+                      type="password" 
+                      className="h-10 max-w-md" 
+                      value={passwords.confirm}
+                      onChange={(e) => setPasswords({...passwords, confirm: e.target.value})}
+                    />
                   </div>
                 </div>
 
@@ -253,8 +304,12 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="pt-4 border-t flex justify-end">
-                  <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2" onClick={handleSave} disabled={saving}>
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  <Button 
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2" 
+                    onClick={handleChangePassword} 
+                    disabled={passwordSaving || !passwords.current || !passwords.new}
+                  >
+                    {passwordSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     {t("settings.security.changePassword")}
                   </Button>
                 </div>
@@ -272,19 +327,22 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
-                  { label: "Email khi có bài nộp mới", desc: "Nhận email mỗi khi học sinh hoàn thành bài kiểm tra", on: true },
-                  { label: "Thông báo tóm tắt hàng ngày", desc: "Nhận tổng kết hoạt động lớp học mỗi ngày qua email", on: false },
-                  { label: "Cảnh báo gian lận", desc: "Thông báo ngay lập tức khi phát hiện hành vi đáng ngờ", on: true },
-                  { label: "Nhắc nhở báo cáo đánh giá", desc: "Nhắc bạn xem báo cáo phân tích phổ điểm hàng tuần", on: false },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted transition-colors">
+                  { key: "emailSubmission" as const, label: t("settings.notifications.emailSubmission"), desc: t("settings.notifications.emailSubmissionDesc") },
+                  { key: "dailySummary" as const, label: t("settings.notifications.dailySummary"), desc: t("settings.notifications.dailySummaryDesc") },
+                  { key: "cheatAlert" as const, label: t("settings.notifications.cheatAlert"), desc: t("settings.notifications.cheatAlertDesc") },
+                  { key: "weeklyReport" as const, label: t("settings.notifications.weeklyReport"), desc: t("settings.notifications.weeklyReportDesc") },
+                ].map((item) => (
+                  <div key={item.key} className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted transition-colors">
                     <div>
                       <h4 className="text-sm font-medium text-card-foreground">{item.label}</h4>
                       <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
                     </div>
-                    <div className={`w-10 h-5 rounded-full relative cursor-pointer transition-colors ${item.on ? "bg-indigo-500" : "bg-slate-200"}`}>
-                      <div className={`w-4 h-4 bg-background rounded-full absolute top-0.5 shadow-sm transition-all ${item.on ? "right-0.5" : "left-0.5"}`}></div>
-                    </div>
+                    <button 
+                      onClick={() => setNotifPrefs(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
+                      className={`w-10 h-[22px] rounded-full relative cursor-pointer transition-colors duration-200 ${notifPrefs[item.key] ? "bg-indigo-500" : "bg-slate-200 dark:bg-slate-700"}`}
+                    >
+                      <div className={`w-4 h-4 bg-white rounded-full absolute top-[3px] shadow-sm transition-all duration-200 ${notifPrefs[item.key] ? "right-[3px]" : "left-[3px]"}`}></div>
+                    </button>
                   </div>
                 ))}
               </CardContent>

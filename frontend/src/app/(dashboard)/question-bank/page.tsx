@@ -6,6 +6,7 @@ import { Plus, Search, Filter, MoreHorizontal, FolderCode, Tags } from "lucide-r
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   Table,
   TableBody,
@@ -43,8 +44,14 @@ interface Question {
 
 export default function QuestionBankPage() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
@@ -87,6 +94,18 @@ export default function QuestionBankPage() {
     }
   };
 
+  // Dynamic Sets
+  const folders = Array.from(new Set(questions.filter(q => q.folder).map(q => q.folder)));
+  const tags = Array.from(new Set(questions.flatMap(q => q.tags || [])));
+
+  // Filtered Data
+  const filteredQuestions = questions.filter(q => {
+    const matchesSearch = q.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFolder = selectedFolder ? q.folder === selectedFolder : true;
+    const matchesTag = selectedTag ? q.tags?.includes(selectedTag) : true;
+    return matchesSearch && matchesFolder && matchesTag;
+  });
+
   return (
     <div className="flex h-[calc(100vh-6rem)] gap-6">
       
@@ -106,20 +125,40 @@ export default function QuestionBankPage() {
         {/* Navigations/Folders */}
         <div className="space-y-1 overflow-y-auto flex-1 pr-2">
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-2">{t("questionBank.folders")}</div>
-          {['Toán Đại Số 12', 'Hình Học Không Gian', 'Vật Lý Nâng Cao', 'Tiếng Anh B1'].map(folder => (
-            <button key={folder} className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors text-left">
+          <button 
+            className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors text-left ${!selectedFolder ? 'text-indigo-600 bg-indigo-50' : 'text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50/50'}`}
+            onClick={() => setSelectedFolder(null)}
+          >
+            <FolderCode className="w-4 h-4 text-slate-400" />
+            Tất cả thư mục
+          </button>
+          
+          {folders.map(folder => (
+            <button 
+              key={folder} 
+              className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors text-left ${selectedFolder === folder ? 'text-indigo-600 bg-indigo-50' : 'text-muted-foreground hover:text-indigo-600 hover:bg-indigo-50/50'}`}
+              onClick={() => setSelectedFolder(folder)}
+            >
               <FolderCode className="w-4 h-4 text-slate-400" />
               {folder}
             </button>
           ))}
           
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-6 mb-3 px-2">{t("questionBank.tagFilter")}</div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-8 mb-3 px-2 flex items-center justify-between">
+            {t("questionBank.tagFilter")}
+            {selectedTag && <span className="text-[10px] text-rose-500 cursor-pointer hover:underline" onClick={() => setSelectedTag(null)}>Xóa lọc</span>}
+          </div>
           <div className="flex flex-wrap gap-2 px-2">
-            {['#kho', '#trung-binh', '#de', '#thi-thu', '#chuong1'].map(tag => (
-              <span key={tag} className="inline-flex items-center px-2 py-1 bg-slate-100 hover:bg-accent text-muted-foreground text-[11px] font-semibold rounded-md cursor-pointer transition-colors">
+            {tags.map(tag => (
+              <span 
+                key={tag} 
+                onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                className={`inline-flex items-center px-2 py-1 text-[11px] font-semibold rounded-md cursor-pointer transition-colors ${selectedTag === tag ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-300' : 'bg-slate-100 hover:bg-slate-200 text-muted-foreground'}`}
+              >
                 {tag}
               </span>
             ))}
+            {tags.length === 0 && <span className="text-xs text-muted-foreground px-1">Chưa có thẻ</span>}
           </div>
         </div>
       </div>
@@ -132,6 +171,8 @@ export default function QuestionBankPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input 
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("questionBank.searchPlaceholder")} 
               className="w-full pl-9 h-10 border border-input rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             />
@@ -158,6 +199,32 @@ export default function QuestionBankPage() {
                 </div>
               ))}
             </div>
+          ) : filteredQuestions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center mb-4">
+                <Search className="w-7 h-7 text-slate-300" />
+              </div>
+              <h3 className="text-base font-bold text-card-foreground mb-1">
+                {(searchQuery || selectedFolder || selectedTag) ? "Không tìm thấy kết quả" : t("questionBank.noResults")}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-5 max-w-xs">
+                {(searchQuery || selectedFolder || selectedTag)
+                  ? "Không có câu hỏi nào khớp với bộ lọc hiện tại."
+                  : "Bắt đầu bằng cách thêm câu hỏi đầu tiên vào Ngân hàng."}
+              </p>
+              {(searchQuery || selectedFolder || selectedTag) ? (
+                <button
+                  onClick={() => { setSearchQuery(""); setSelectedFolder(null); setSelectedTag(null); }}
+                  className="px-4 py-2 rounded-lg text-sm font-medium border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors"
+                >
+                  Xóa bộ lọc
+                </button>
+              ) : (
+                <a href="/question-bank/create" className="px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+                  Thêm câu hỏi mới
+                </a>
+              )}
+            </div>
           ) : questions.length === 0 ? (
              <div className="p-12 text-center text-muted-foreground">{t("questionBank.noResults")}</div>
           ) : (
@@ -175,7 +242,7 @@ export default function QuestionBankPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {questions.map((q) => (
+                {filteredQuestions.map((q) => (
                   <TableRow key={q.id} className="hover:bg-muted/50 group cursor-pointer transition-colors">
                     <TableCell className="text-center">
                       <input type="checkbox" className="rounded border-border" />
@@ -217,7 +284,13 @@ export default function QuestionBankPage() {
                             } catch { toast.error(t("questionBank.cloneError")); }
                           }}>{t("questionBank.clone")}</DropdownMenuItem>
                           <DropdownMenuItem className="text-rose-600" onClick={async () => {
-                            if (!confirm(t("questionBank.confirmDelete"))) return;
+                            const ok = await confirm({
+                              title: "Xóa câu hỏi",
+                              description: "Bạn có chắc muốn xóa vĩnh viễn câu hỏi này khỏi Ngân hàng?",
+                              confirmLabel: "Xóa vĩnh viễn",
+                              variant: "danger"
+                            });
+                            if (!ok) return;
                             try {
                               await apiFetch(`/questions/${q.id}`, { method: 'DELETE' });
                               setQuestions(prev => prev.filter(x => x.id !== q.id));

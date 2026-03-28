@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Share2, Copy, QrCode, Link2, Users, Check, ExternalLink, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { apiFetch } from "@/lib/api";
 import {
   Dialog,
@@ -32,6 +33,7 @@ export interface ShareData {
 
 export default function SharingPage() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [search, setSearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sharedQuizzes, setSharedQuizzes] = useState<ShareData[]>([]);
@@ -86,7 +88,13 @@ export default function SharingPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Bạn có chắc muốn xóa link chia sẻ này?")) return;
+    const ok = await confirm({
+      title: "Xóa link chia sẻ",
+      description: "Học sinh sẽ không thể truy cập bài thi qua link này nữa.",
+      confirmLabel: "Xóa link",
+      variant: "warning"
+    });
+    if (!ok) return;
     try {
       await apiFetch(`/shares/${id}`, { method: 'DELETE' });
       setSharedQuizzes(prev => prev.filter(q => q.id !== id));

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Search, Filter, Scan, Printer, FileText, CheckCircle2, History, Trash2, Smartphone, Edit2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +39,7 @@ export interface OmrBatch {
 
 export default function OmrPage() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [search, setSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newBatch, setNewBatch] = useState({ title: `Đợt chấm điểm ${new Date().toLocaleDateString('vi-VN')}`, template: "Mẫu 50 câu (A4)", quiz_id: "" });
@@ -88,7 +90,13 @@ export default function OmrPage() {
   );
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Bạn có chắc muốn xóa đợt quét OMR này?")) return;
+    const ok = await confirm({
+      title: "Xóa đợt quét OMR",
+      description: "Bạn có chắc muốn xóa đợt quét này? Dữ liệu chấm điểm đã lưu sẽ bị xóa.",
+      confirmLabel: "Xóa đợt quét",
+      variant: "danger"
+    });
+    if (!ok) return;
     try {
       await apiFetch(`/omr/batches/${id}`, { method: 'DELETE' });
       setBatches(batches.filter(b => b.id !== id));

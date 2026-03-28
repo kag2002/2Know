@@ -68,11 +68,11 @@ func (s *authService) Login(email, password string) (*model.User, string, error)
 		return nil, "", ErrInvalidCreds
 	}
 
-	// Create JWT
+	// Create JWT (Extended to 30 days for Frictionless UX)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  user.ID,
 		"role": user.Role,
-		"exp":  time.Now().Add(time.Hour * 72).Unix(),
+		"exp":  time.Now().Add(time.Hour * 720).Unix(),
 	})
 
 	t, err := token.SignedString([]byte(s.jwtSecret))

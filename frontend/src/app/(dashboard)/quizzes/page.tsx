@@ -7,6 +7,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 interface Quiz {
@@ -34,6 +36,7 @@ interface Quiz {
 
 export default function QuizzesPage() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -43,6 +46,9 @@ export default function QuizzesPage() {
 
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [shareConfig, setShareConfig] = useState({ title: "", type: "public", quiz_id: "" });
+
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     loadQuizzes();
@@ -130,20 +136,55 @@ export default function QuizzesPage() {
             <Input 
               placeholder={t("quizzes.searchPlaceholder")} 
               className="pl-9 h-10 w-full bg-background"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <Button variant="outline" className="gap-2 bg-background flex-1 sm:flex-none">
-              <Filter className="w-4 h-4 text-muted-foreground" /> {t("quizzes.status")}
-            </Button>
-            <Button variant="outline" className="gap-2 bg-background flex-1 sm:flex-none">
-              <Filter className="w-4 h-4 text-muted-foreground" /> {t("quizzes.subject")}
-            </Button>
+          <div className="flex gap-1 w-full sm:w-auto bg-muted p-1 rounded-lg">
+            {[
+              { value: "all", label: t("common.filter") || "Tất cả" },
+              { value: "published", label: t("quizzes.statusPublished") },
+              { value: "draft", label: t("quizzes.statusDraft") },
+              { value: "closed", label: t("quizzes.statusClosed") },
+            ].map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => setStatusFilter(tab.value)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  statusFilter === tab.value
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Loading State */}
-        {loading && <div className="p-8 text-center text-muted-foreground">{t("loading")}</div>}
+        {loading && (
+          <div className="divide-y divide-slate-100 px-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="py-5 flex flex-col sm:flex-row gap-6 items-start sm:items-center px-2 -mx-2">
+                <div className="flex-1 space-y-3 w-full">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-6 w-3/4 max-w-sm" />
+                    <Skeleton className="h-5 w-20 rounded-md" />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto mt-4 sm:mt-0 opacity-50">
+                  <Skeleton className="h-9 w-28 rounded-md" />
+                  <Skeleton className="h-9 w-9 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         {error && <div className="p-8 text-center text-rose-500">{error}</div>}
 
         {/* Quiz List */}
@@ -160,9 +201,21 @@ export default function QuizzesPage() {
           </div>
         )}
 
-        {!loading && !error && quizzes.length > 0 && (
-          <div className="divide-y divide-slate-100 px-4">
-            {quizzes.map((quiz) => (
+        {!loading && !error && quizzes.length > 0 && (() => {
+          const filtered = quizzes
+            .filter(q => statusFilter === "all" || q.status === statusFilter)
+            .filter(q => !search || q.title.toLowerCase().includes(search.toLowerCase()) || (q.subject && q.subject.toLowerCase().includes(search.toLowerCase())));
+          
+          if (filtered.length === 0) return (
+            <div className="p-12 text-center" key="no-filter-results">
+              <p className="text-muted-foreground text-sm">Không tìm thấy bài kiểm tra phù hợp.</p>
+              <button onClick={() => { setSearch(""); setStatusFilter("all"); }} className="mt-3 text-sm text-indigo-600 hover:underline">Xóa bộ lọc</button>
+            </div>
+          );
+
+          return (
+          <div className="divide-y divide-slate-100 px-4" key="quiz-list">
+            {filtered.map((quiz) => (
               <div key={quiz.id} className="py-5 flex flex-col sm:flex-row gap-6 items-start sm:items-center hover:bg-muted group transition-colors rounded-lg px-2 -mx-2">
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-3">
@@ -221,7 +274,13 @@ export default function QuizzesPage() {
                       }}><Copy className="w-4 h-4 text-slate-400"/> {t("quizzes.duplicate")}</DropdownMenuItem>
                       <DropdownMenuItem className="gap-2" onClick={() => window.location.href = '/classes'}><Users className="w-4 h-4 text-slate-400"/> {t("quizzes.assignClass")}</DropdownMenuItem>
                       <DropdownMenuItem className="gap-2 text-rose-600 focus:text-rose-600" onClick={async () => {
-                        if (!confirm(t("quizzes.confirmDelete"))) return;
+                          const ok = await confirm({
+                            title: "Xóa bài kiểm tra",
+                            description: `Bạn có chắc muốn xóa bài kiểm tra này? Tất cả dữ liệu bài nộp liên quan cũng sẽ bị mất.`,
+                            confirmLabel: "Xóa",
+                            variant: "danger"
+                          });
+                          if (!ok) return;
                         try {
                           await apiFetch(`/quizzes/${quiz.id}`, { method: 'DELETE' });
                           setQuizzes(prev => prev.filter(q => q.id !== quiz.id));
@@ -234,7 +293,8 @@ export default function QuizzesPage() {
               </div>
             ))}
           </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Edit Quiz Dialog */}

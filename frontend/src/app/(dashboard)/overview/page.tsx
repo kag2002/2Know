@@ -2,9 +2,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Layers, CheckSquare, BarChart, Settings2, TrendingUp, TrendingDown } from "lucide-react";
+import { Layers, CheckSquare, BarChart, Settings2, TrendingUp, TrendingDown, Clock, Plus } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
+import { vi, enUS, it } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -55,6 +60,7 @@ interface ActivityItem {
   date: string;
   status: string;
   statusColor: string;
+  dateIso?: string;
 }
 
 interface ScoreDist {
@@ -75,15 +81,30 @@ interface DashboardStats {
 
 export default function OverviewPage() {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
+  const getDateLocale = () => {
+    switch(language) {
+      case 'en': return enUS;
+      case 'it': return it;
+      default: return vi;
+    }
+  };
+
+  const loadDashboardData = async () => {
+    try {
+      setMounted(true);
+      const data = await apiFetch("/stats/dashboard");
+      setStats(data);
+    } catch {
+      // Handle gracefully
+    }
+  };
+
   useEffect(() => {
-    setMounted(true);
-    apiFetch("/stats/dashboard")
-      .then((data) => setStats(data))
-      .catch(() => {});
+    loadDashboardData();
   }, []);
 
   const statCards = [
@@ -113,6 +134,35 @@ export default function OverviewPage() {
   const dateStr = now.toLocaleDateString("vi-VN", { day: "numeric", month: "short", year: "numeric" });
   const timeStr = now.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
 
+  if (!stats) {
+    return (
+      <div className="space-y-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-6 w-32 mb-2" />
+            <Skeleton className="h-8 w-64" />
+          </div>
+          <Skeleton className="h-10 w-28" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 rounded-xl" />)}
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <Skeleton className="col-span-4 h-96 rounded-xl" />
+          <Skeleton className="col-span-3 h-96 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
+  const pieData = [
+    { name: t("overview.excellent"), value: stats.score_distribution?.excellent || 0, color: "#34d399" },
+    { name: t("overview.good"), value: stats.score_distribution?.good || 0, color: "#60a5fa" },
+    { name: t("overview.average"), value: stats.score_distribution?.average || 0, color: "#fbbf24" },
+    { name: t("overview.poor"), value: stats.score_distribution?.poor || 0, color: "#f43f5e" },
+  ];
+  const totalGraded = pieData.reduce((acc, curr) => acc + curr.value, 0);
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
@@ -129,9 +179,16 @@ export default function OverviewPage() {
             {t("overview.subtitle")}
           </p>
         </div>
-        <Button variant="outline" className="gap-2 bg-background">
-          <Settings2 className="w-4 h-4" /> {t("overview.reload")}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" className="gap-2 bg-background" onClick={loadDashboardData}>
+            <Settings2 className="w-4 h-4" /> {t("overview.reload") || "Tải lại"}
+          </Button>
+          <Link href="/quizzes/create">
+            <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+              <Plus className="w-4 h-4" /> Tạo bài mới
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -208,7 +265,10 @@ export default function OverviewPage() {
                       <span className={`text-xs px-1.5 py-0.5 rounded ${item.statusColor} shrink-0 ml-2`}>{item.status}</span>
                     </div>
                     <div className="flex justify-between items-center text-xs text-muted-foreground mt-2">
-                      <span>{item.time} {item.date}</span>
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        {item.dateIso ? formatDistanceToNow(new Date(item.dateIso), { addSuffix: true, locale: getDateLocale() }) : `${item.time} ${item.date}`}
+                      </span>
                     </div>
                   </div>
                 ))
@@ -230,31 +290,50 @@ export default function OverviewPage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="flex flex-col items-center justify-center p-6">
-              {/* Doughnut Chart Mock using real sum */}
-              <div className="w-48 h-48 rounded-full border-[16px] border-emerald-400 border-t-amber-400 border-r-rose-500 border-b-blue-400 flex items-center justify-center relative shadow-inner">
-                <div className="text-center">
-                  <div className="text-3xl font-bold">
-                    {stats?.score_distribution ? 
-                      (stats.score_distribution.excellent + stats.score_distribution.good + stats.score_distribution.average + stats.score_distribution.poor) 
-                      : 0}
+          <CardContent className="flex flex-col items-center justify-center p-6 h-full min-h-[300px]">
+              {totalGraded > 0 ? (
+                <div className="w-full h-56 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={65}
+                        outerRadius={85}
+                        paddingAngle={5}
+                        dataKey="value"
+                        className="outline-none"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        itemStyle={{ fontSize: '14px', fontWeight: 500 }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Central Label */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-3xl font-bold text-foreground">{totalGraded}</span>
+                    <span className="text-xs text-muted-foreground">{t("overview.graded")}</span>
                   </div>
-                  <div className="text-xs text-muted-foreground">{t("overview.graded")}</div>
                 </div>
-              </div>
-              <div className="flex gap-4 mt-6">
-                {[
-                  { label: t("overview.excellent"), color: "bg-emerald-400", count: stats?.score_distribution?.excellent || 0 },
-                  { label: t("overview.good"), color: "bg-blue-400", count: stats?.score_distribution?.good || 0 },
-                  { label: t("overview.average"), color: "bg-amber-400", count: stats?.score_distribution?.average || 0 },
-                  { label: t("overview.poor"), color: "bg-rose-500", count: stats?.score_distribution?.poor || 0 },
-                ].map((item) => {
-                  const total = stats?.score_distribution ? (stats.score_distribution.excellent + stats.score_distribution.good + stats.score_distribution.average + stats.score_distribution.poor) : 0;
-                  const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+              ) : (
+                <div className="h-56 flex flex-col items-center justify-center">
+                  <span className="text-sm font-medium text-muted-foreground">Chưa có bài chấm</span>
+                </div>
+              )}
+              
+              <div className="flex gap-4 mt-6 flex-wrap justify-center">
+                {pieData.map((item, i) => {
+                  const pct = totalGraded > 0 ? Math.round((item.value / totalGraded) * 100) : 0;
                   return (
-                    <div key={item.label} className="flex items-center gap-1.5 text-xs">
-                      <div className={`w-2.5 h-2.5 rounded-full ${item.color}`}></div>
-                      <span className="text-muted-foreground">{item.label} ({pct}%)</span>
+                    <div key={i} className="flex items-center gap-1.5 opacity-90 hover:opacity-100 transition-opacity">
+                      <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }}></div>
+                      <span className="text-xs font-semibold text-muted-foreground">{item.name} ({pct}%)</span>
                     </div>
                   );
                 })}

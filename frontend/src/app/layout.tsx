@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ConfirmProvider } from "@/components/ui/confirm-dialog";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -34,7 +35,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <LanguageProvider>
           <ThemeProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              <ConfirmProvider>{children}</ConfirmProvider>
+            </AuthProvider>
           </ThemeProvider>
         </LanguageProvider>
         <Toaster richColors position="top-right" />

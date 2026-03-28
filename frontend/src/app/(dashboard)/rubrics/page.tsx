@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/context/LanguageContext";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 import { apiFetch } from "@/lib/api";
 
 export interface RubricData {
@@ -37,6 +38,7 @@ export interface RubricData {
 
 export default function RubricsPage() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [search, setSearch] = useState("");
   const [rubrics, setRubrics] = useState<RubricData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +71,13 @@ export default function RubricsPage() {
   );
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Bạn có chắc muốn xóa Rubric này?")) return;
+    const ok = await confirm({
+      title: "Xóa Rubric",
+      description: "Bạn có chắc muốn xóa tiêu chí AI này? Hành động không thể hoàn tác.",
+      confirmLabel: "Xóa Rubric",
+      variant: "danger"
+    });
+    if (!ok) return;
     try {
       await apiFetch(`/rubrics/${id}`, { method: 'DELETE' });
       setRubrics(rubrics.filter(r => r.id !== id));

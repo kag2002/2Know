@@ -170,15 +170,15 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
             {!scanResult && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                 {/* Bounding Box Guide */}
-                <div className={`w-[85vw] max-w-[600px] aspect-[1/1.4] border-2 border-dashed transition-all duration-300 relative ${isScanning ? 'border-indigo-500 bg-indigo-500/10 scale-95' : 'border-emerald-500/70 bg-emerald-500/5'}`}>
-                  {/* Corner brackets */}
-                  <div className={`absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 transition-colors ${isScanning ? 'border-indigo-400' : 'border-emerald-400'}`}></div>
-                  <div className={`absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 transition-colors ${isScanning ? 'border-indigo-400' : 'border-emerald-400'}`}></div>
-                  <div className={`absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 transition-colors ${isScanning ? 'border-indigo-400' : 'border-emerald-400'}`}></div>
-                  <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 transition-colors ${isScanning ? 'border-indigo-400' : 'border-emerald-400'}`}></div>
+                <div className={`w-[85vw] max-w-[600px] aspect-[1/1.4] border transition-all duration-300 relative backdrop-blur-[2px] ${isScanning ? 'border-indigo-500/50 bg-indigo-900/10 scale-95 shadow-[0_0_50px_rgba(99,102,241,0.2)]' : 'border-emerald-500/30 bg-emerald-900/10 shadow-[0_0_30px_rgba(16,185,129,0.1)]'}`}>
+                  {/* Corner brackets - Thicker and Glowy */}
+                  <div className={`absolute -top-1 -left-1 w-12 h-12 border-t-4 border-l-4 transition-colors ${isScanning ? 'border-indigo-400 shadow-[inset_4px_4px_10px_rgba(99,102,241,0.3)]' : 'border-emerald-400 shadow-[inset_4px_4px_10px_rgba(16,185,129,0.3)]'}`}></div>
+                  <div className={`absolute -top-1 -right-1 w-12 h-12 border-t-4 border-r-4 transition-colors ${isScanning ? 'border-indigo-400' : 'border-emerald-400'}`}></div>
+                  <div className={`absolute -bottom-1 -left-1 w-12 h-12 border-b-4 border-l-4 transition-colors ${isScanning ? 'border-indigo-400' : 'border-emerald-400'}`}></div>
+                  <div className={`absolute -bottom-1 -right-1 w-12 h-12 border-b-4 border-r-4 transition-colors ${isScanning ? 'border-indigo-400' : 'border-emerald-400'}`}></div>
                   
-                  {/* Scanning Animation Line */}
-                  <div className={`absolute top-0 left-0 w-full h-[2px] shadow-[0_0_15px_rgba(74,222,128,0.8)] ${isScanning ? 'animate-[scan_1.5s_ease-in-out_infinite] bg-indigo-500 block' : 'hidden'}`}></div>
+                  {/* Scanning Animation Thick Beam */}
+                  <div className={`absolute left-0 w-full h-32 bg-gradient-to-b from-transparent via-indigo-500/10 to-indigo-500/60 border-b-[3px] border-indigo-400 shadow-[0_10px_30px_rgba(99,102,241,0.6)] ${isScanning ? 'animate-[scan_1.5s_ease-in-out_infinite] block' : 'hidden'}`}></div>
                   
                   {isScanning && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center">

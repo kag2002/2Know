@@ -14,6 +14,15 @@ type ResultRepository interface {
 	VerifyQuizOwnership(quizID, teacherID string) error
 	VerifyQuizExists(quizID string) error
 	GetPendingResults(teacherID string) ([]model.TestResult, error)
+	GetResultsByStudentIDs(studentIDs []string) ([]model.TestResult, error)
+	GetStudentHistory(studentID string, teacherID string) ([]struct{
+		ID string `json:"id"`
+		QuizTitle string `json:"quiz_title"`
+		Score float64 `json:"score"`
+		Status string `json:"status"`
+		CreatedAt string `json:"created_at"`
+		TimeTakenSeconds int `json:"time_taken_seconds"`
+	}, error)
 }
 
 type resultRepository struct {
@@ -61,4 +70,40 @@ func (r *resultRepository) GetPendingResults(teacherID string) ([]model.TestResu
 		Where("quizzes.teacher_id = ? AND test_results.status = ?", teacherID, "pending").
 		Find(&results).Error
 	return results, err
+}
+
+func (r *resultRepository) GetResultsByStudentIDs(studentIDs []string) ([]model.TestResult, error) {
+	var results []model.TestResult
+	if len(studentIDs) == 0 {
+		return results, nil
+	}
+	err := r.db.Where("student_id IN ?", studentIDs).Find(&results).Error
+	return results, err
+}
+
+func (r *resultRepository) GetStudentHistory(studentID string, teacherID string) ([]struct{
+	ID string `json:"id"`
+	QuizTitle string `json:"quiz_title"`
+	Score float64 `json:"score"`
+	Status string `json:"status"`
+	CreatedAt string `json:"created_at"`
+	TimeTakenSeconds int `json:"time_taken_seconds"`
+}, error) {
+	var history []struct{
+		ID string `json:"id"`
+		QuizTitle string `json:"quiz_title"`
+		Score float64 `json:"score"`
+		Status string `json:"status"`
+		CreatedAt string `json:"created_at"`
+		TimeTakenSeconds int `json:"time_taken_seconds"`
+	}
+
+	err := r.db.Table("test_results").
+		Select("test_results.id, quizzes.title as quiz_title, test_results.score, test_results.status, test_results.created_at, test_results.time_taken_seconds").
+		Joins("JOIN quizzes ON quizzes.id = test_results.quiz_id").
+		Where("test_results.student_id = ? AND quizzes.teacher_id = ?", studentID, teacherID).
+		Order("test_results.created_at DESC").
+		Scan(&history).Error
+
+	return history, err
 }

@@ -23,6 +23,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { useTranslation } from "@/context/LanguageContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 interface StudentMetrics {
   id: string;
@@ -37,6 +39,7 @@ interface StudentMetrics {
 
 export default function StudentsPage() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [allStudents, setAllStudents] = useState<StudentMetrics[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -44,23 +47,28 @@ export default function StudentsPage() {
   const [filterClass, setFilterClass] = useState("all");
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newStudent, setNewStudent] = useState({ name: "", email: "" });
+  const [newStudent, setNewStudent] = useState({ name: "", email: "", student_id: "", class_id: "" });
+  const [availableClasses, setAvailableClasses] = useState<{id: string, name: string}[]>([]);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<StudentMetrics | null>(null);
 
   useEffect(() => {
-    const loadStudents = async () => {
+    const loadData = async () => {
       try {
-        const data = await apiFetch("/students");
-        setAllStudents(data || []);
+        const [studentsData, classesData] = await Promise.all([
+          apiFetch("/students"),
+          apiFetch("/classes")
+        ]);
+        setAllStudents(studentsData || []);
+        setAvailableClasses(classesData || []);
       } catch (err: any) {
-        toast.error("Không thể tải danh sách học sinh: " + err.message);
+        toast.error("Không thể tải dữ liệu: " + err.message);
       } finally {
         setLoading(false);
       }
     };
-    loadStudents();
+    loadData();
   }, []);
 
   const filtered = allStudents.filter(s => {
@@ -89,8 +97,8 @@ export default function StudentsPage() {
   };
 
   const handleAddStudent = async () => {
-    if (!newStudent.name || !newStudent.email) {
-      toast.warning("Vui lòng điền đầy đủ tên và email!");
+    if (!newStudent.name || !newStudent.student_id || !newStudent.class_id) {
+      toast.warning("Vui lòng điền họ tên, mã học sinh và chọn lớp!");
       return;
     }
     
@@ -98,12 +106,19 @@ export default function StudentsPage() {
     try {
       const created = await apiFetch("/students", {
         method: "POST",
-        body: JSON.stringify({ name: newStudent.name, email: newStudent.email, student_id: `HS${Date.now()}`, class: "Chưa phân lớp" }),
+        body: JSON.stringify({ 
+          full_name: newStudent.name, 
+          email: newStudent.email, 
+          student_id: newStudent.student_id, 
+          class_id: newStudent.class_id 
+        }),
       });
-      setAllStudents(prev => [...prev, created]);
-      toast.success(`Đã thêm học sinh "${created.name}" thành công!`);
+      // Try to re-fetch to get correct aggregations
+      const studentsData = await apiFetch("/students");
+      setAllStudents(studentsData || []);
+      toast.success(`Đã thêm học sinh "${created.full_name || newStudent.name}" thành công!`);
       setIsDialogOpen(false);
-      setNewStudent({ name: "", email: "" });
+      setNewStudent({ name: "", email: "", student_id: "", class_id: "" });
     } catch (err: any) {
       toast.error("Lỗi: " + err.message);
     } finally {
@@ -136,8 +151,18 @@ export default function StudentsPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className="space-y-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-8 w-48 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}
+        </div>
+        <Skeleton className="h-96 w-full rounded-xl" />
       </div>
     );
   }
@@ -164,13 +189,36 @@ export default function StudentsPage() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="s_name">Họ và tên</Label>
+                <Label htmlFor="s_name">Họ và tên <span className="text-rose-500">*</span></Label>
                 <Input 
                   id="s_name" 
                   placeholder="VD: Nguyễn Văn A" 
                   value={newStudent.name} 
                   onChange={(e) => setNewStudent({...newStudent, name: e.target.value})} 
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="s_sbd">Mã Học Sinh (SBD) <span className="text-rose-500">*</span></Label>
+                <Input 
+                  id="s_sbd" 
+                  placeholder="VD: HS001" 
+                  value={newStudent.student_id} 
+                  onChange={(e) => setNewStudent({...newStudent, student_id: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="s_class">Chọn Lớp Học <span className="text-rose-500">*</span></Label>
+                <select
+                  id="s_class"
+                  value={newStudent.class_id}
+                  onChange={(e) => setNewStudent({...newStudent, class_id: e.target.value})}
+                  className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background cursor-pointer"
+                >
+                  <option value="" disabled>-- Vui lòng chọn lớp --</option>
+                  {availableClasses.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="s_email">Địa chỉ Email</Label>
@@ -292,7 +340,22 @@ export default function StudentsPage() {
                           <DropdownMenuItem className="gap-2" onClick={() => window.location.href = `/students/${student.id}`}>
                             <GraduationCap className="w-4 h-4 text-slate-400" /> Xem hồ sơ
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="gap-2" onClick={() => apiFetch(`/students/${student.id}`, { method: 'DELETE' }).then(() => setAllStudents(prev => prev.filter(x => x.id !== student.id))).catch(e => toast.error('Lỗi khi xóa'))}>
+                          <DropdownMenuItem className="text-rose-600 focus:text-rose-600 gap-2" onClick={async () => {
+                            const ok = await confirm({
+                              title: "Xóa học sinh",
+                              description: `Bạn có chắc muốn xóa "${student.name}" khỏi hệ thống? Hành động này không thể hoàn tác.`,
+                              confirmLabel: "Xóa vĩnh viễn",
+                              variant: "danger"
+                            });
+                            if (!ok) return;
+                            try {
+                              await apiFetch(`/students/${student.id}`, { method: 'DELETE' });
+                              setAllStudents(prev => prev.filter(s => s.id !== student.id));
+                              toast.success("Đã xóa học sinh thành công!");
+                            } catch (err: any) {
+                              toast.error("Lỗi xóa: " + err.message);
+                            }
+                          }}>
                             <Trash2 className="w-4 h-4 text-rose-500" /> <span className="text-rose-600">Xóa học sinh</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>

@@ -222,11 +222,18 @@ export default function GradingPage() {
         ))}
 
         {filtered.length === 0 && (
-          <Card className="shadow-sm">
+          <Card className="shadow-sm border-dashed">
             <CardContent className="py-16 text-center">
-              <CheckCircle2 className="w-16 h-16 text-emerald-300 mx-auto mb-4" />
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-teal-50 mx-auto mb-5 flex items-center justify-center">
+                <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+              </div>
               <h3 className="text-xl font-bold text-card-foreground mb-2">{t("grading.noMore")}</h3>
-              <p className="text-muted-foreground text-sm">{t("grading.allGraded")}</p>
+              <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">{t("grading.allGraded")}</p>
+              <a href="/reports">
+                <Button variant="outline" className="gap-2 border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+                  <Star className="w-4 h-4" /> Xem báo cáo điểm
+                </Button>
+              </a>
             </CardContent>
           </Card>
         )}

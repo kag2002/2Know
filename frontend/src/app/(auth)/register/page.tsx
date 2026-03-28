@@ -16,6 +16,28 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
 
+  const getPasswordStrength = (pass: string) => {
+    let score = 0;
+    if (!pass) return 0;
+    if (pass.length >= 6) score += 1;
+    if (pass.length >= 8) score += 1;
+    if (/[A-Z]/.test(pass)) score += 1;
+    if (/[0-9]/.test(pass) && /[^A-Za-z0-9]/.test(pass)) score += 1;
+    return Math.min(score, 4);
+  };
+
+  const strengthScore = getPasswordStrength(formData.password);
+  const strengthMeta = (() => {
+    switch(strengthScore) {
+      case 0: return { label: "", color: "bg-slate-200 dark:bg-slate-800", width: "w-0" };
+      case 1: return { label: "Yếu", color: "bg-rose-500", width: "w-1/4" };
+      case 2: return { label: "Trung bình", color: "bg-amber-500", width: "w-2/4" };
+      case 3: return { label: "Khá", color: "bg-indigo-500", width: "w-3/4" };
+      case 4: return { label: "Mạnh", color: "bg-emerald-500", width: "w-full" };
+      default: return { label: "", color: "bg-slate-200", width: "w-0" };
+    }
+  })();
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -143,6 +165,22 @@ export default function RegisterPage() {
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            {/* Password Strength Meter */}
+            {formData.password.length > 0 && (
+              <div className="pt-1 animate-in fade-in duration-300">
+                <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  <div className={`h-full transition-all duration-500 ${strengthMeta.color} ${strengthMeta.width}`}></div>
+                </div>
+                <div className="flex justify-between items-center mt-1.5">
+                  <span className={`text-[10px] uppercase font-bold tracking-wider ${strengthScore <= 1 ? "text-rose-500" : strengthScore === 2 ? "text-amber-500" : strengthScore === 3 ? "text-indigo-500" : "text-emerald-500"}`}>
+                    {strengthMeta.label}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {formData.password.length}/6 ký tự tối thiểu
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

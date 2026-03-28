@@ -33,19 +33,23 @@ export function Header() {
   };
 
   return (
-    <header className="h-16 border-b bg-background/80 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20">
+    <header className="h-16 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-slate-950/60 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 transition-all duration-300 shadow-sm">
       <div className="flex items-center gap-4 flex-1">
-        <Button variant="outline" size="icon" className="h-8 w-8 hidden md:flex">
-          <PanelLeftClose className="h-4 w-4" />
+        <Button variant="outline" size="icon" className="h-8 w-8 hidden md:flex border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <PanelLeftClose className="h-4 w-4 text-slate-600 dark:text-slate-400" />
         </Button>
         
         <div className="max-w-xl w-full relative hidden sm:block">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            type="search" 
-            placeholder={t("header.search")} 
-            className="w-full pl-9 bg-muted/50 h-9 transition-all duration-200 focus:bg-background focus:shadow-sm"
-          />
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+          <button
+            onClick={() => document.getElementById('command-palette-trigger')?.click()}
+            className="w-full pl-9 pr-16 bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-800/50 h-9 rounded-md text-sm text-muted-foreground text-left transition-all duration-200 hover:bg-white dark:hover:bg-slate-900 hover:shadow-md hover:ring-2 hover:ring-indigo-500/20"
+          >
+            {t("header.search")}
+          </button>
+          <kbd className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none hidden md:inline-flex h-5 items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+            ⌘K
+          </kbd>
         </div>
       </div>
 
