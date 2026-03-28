@@ -14,6 +14,7 @@ type ClassRepository interface {
 	UpdateClass(class *model.Class, teacherID string) error
 	CreateStudent(student *model.Student) error
 	DeleteClass(id, teacherID string) error
+	IsStudentInClasses(studentIdentifier string, classIDs []string) (bool, error)
 }
 
 type classRepository struct {
@@ -64,4 +65,13 @@ func (r *classRepository) DeleteClass(id, teacherID string) error {
 
 func (r *classRepository) UpdateClass(class *model.Class, teacherID string) error {
 	return r.db.Where("id = ? AND teacher_id = ?", class.ID, teacherID).Updates(class).Error
+}
+
+// IsStudentInClasses checks if a student_id (SBD/MSSV) belongs to any of the given classes
+func (r *classRepository) IsStudentInClasses(studentIdentifier string, classIDs []string) (bool, error) {
+	var count int64
+	err := r.db.Model(&model.Student{}).
+		Where("student_id = ? AND class_id IN ?", studentIdentifier, classIDs).
+		Count(&count).Error
+	return count > 0, err
 }

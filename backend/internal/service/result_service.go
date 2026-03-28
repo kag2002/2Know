@@ -51,6 +51,20 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		return errors.New("quiz has already closed")
 	}
 
+	// SECURITY: Enforce assigned class access control
+	if quiz.AccessType == "assigned" && len(quiz.AssignedClasses) > 0 {
+		allowed := false
+		if result.StudentIdentifier != "" {
+			found, err := s.classRepo.IsStudentInClasses(result.StudentIdentifier, quiz.AssignedClasses)
+			if err == nil && found {
+				allowed = true
+			}
+		}
+		if !allowed {
+			return errors.New("you are not authorized to submit this quiz")
+		}
+	}
+
 	// SECURITY: Max Attempts Validation
 	if quiz.MaxAttempts > 0 && result.StudentIdentifier != "" {
 		attempts, err := s.repo.GetAttemptCount(quiz.ID, result.StudentIdentifier)

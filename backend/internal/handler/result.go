@@ -42,7 +42,12 @@ func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Hệ thống không thể xử lý bài nộp. Vui lòng thử lại sau."})
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(result)
+	// SECURITY: Minimize response — only return essential fields, not full model with answers
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"id":     result.ID,
+		"score":  result.Score,
+		"status": result.Status,
+	})
 }
 
 func (h *ResultHandler) GetQuizResults(c fiber.Ctx) error {
@@ -86,7 +91,17 @@ func (h *ResultHandler) GradeSubmission(c fiber.Ctx) error {
 	}
 
 	if err := h.svc.GradeSubmission(userId, id, req.Score); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		log.Printf("Error grading submission: %v", err)
+
+		// SECURITY: Classify Business Logic errors vs System errors
+		errMsg := err.Error()
+		if errMsg == "score exceeds max points" ||
+			errMsg == "score cannot be negative" ||
+			errMsg == "essay question not found" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errMsg})
+		}
+
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể chấm bài. Vui lòng thử lại sau."})
 	}
 
 	return c.JSON(fiber.Map{"message": "Graded successfully"})
@@ -102,7 +117,8 @@ func (h *ResultHandler) GetClassGradebook(c fiber.Ctx) error {
 
 	gradebook, err := h.svc.GetClassGradebook(userId, classId)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		log.Printf("Error fetching gradebook: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể tải bảng điểm. Vui lòng thử lại sau."})
 	}
 
 	return c.JSON(gradebook)
