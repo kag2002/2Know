@@ -19,7 +19,7 @@ type Question struct {
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
-	Options []Option `gorm:"foreignKey:QuestionID" json:"options,omitempty"`
+	Options []Option `gorm:"foreignKey:QuestionID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"options,omitempty"`
 }
 
 type Option struct {

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
@@ -46,7 +47,10 @@ func main() {
 	}
 
 	app := fiber.New(fiber.Config{
-		BodyLimit: 5 * 1024 * 1024, // Limit request body to 5MB to prevent spam/OOM
+		BodyLimit:    5 * 1024 * 1024, // Limit request body to 5MB to prevent spam/OOM
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 		ErrorHandler: func(c fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
 			if e, ok := err.(*fiber.Error); ok {
