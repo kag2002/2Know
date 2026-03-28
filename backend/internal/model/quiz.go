@@ -16,8 +16,8 @@ type Quiz struct {
 	GradeLevel  string `gorm:"type:varchar(50)" json:"grade_level" validate:"max=50"`
 
 	// Settings
-	TimeLimitMinutes int        `json:"time_limit_minutes"`
-	MaxAttempts      int        `gorm:"default:1" json:"max_attempts"`
+	TimeLimitMinutes int        `json:"time_limit_minutes" validate:"min=0"`
+	MaxAttempts      int        `gorm:"default:1" json:"max_attempts" validate:"min=1"`
 	OpenTime         *time.Time `json:"open_time"`
 	CloseTime        *time.Time `json:"close_time"`
 	ShowAnswersAfter bool       `gorm:"default:true" json:"show_answers_after"`

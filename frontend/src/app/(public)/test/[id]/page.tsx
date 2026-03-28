@@ -161,6 +161,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("testIntro.fullName")} <span className="text-rose-500">*</span></label>
               <input 
                 type="text" 
+                maxLength={250}
                 placeholder={t("testIntro.fullNamePlaceholder") || "Nhập Họ Tên của bạn..."}
                 value={studentInfo.name}
                 onChange={e => { setStudentInfo({...studentInfo, name: e.target.value}); setError(""); }}
@@ -171,6 +172,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t("testIntro.studentId")} <span className="text-rose-500">*</span></label>
               <input 
                 type="text" 
+                maxLength={90}
                 placeholder={t("testIntro.studentIdPlaceholder") || "Nhập Mã học sinh..."}
                 value={studentInfo.sbd}
                 onChange={e => { setStudentInfo({...studentInfo, sbd: e.target.value}); setError(""); }}
