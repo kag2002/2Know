@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"strings"
+	"sync"
 	"time"
 
 	"backend/internal/model"
@@ -29,10 +30,22 @@ type resultService struct {
 	repo      repository.ResultRepository
 	quizRepo  repository.QuizRepository
 	classRepo repository.ClassRepository
+	// In-memory locks mapped by quizID_studentIdentifier to prevent TOCTOU race conditions
+	locks     sync.Map
 }
 
 func NewResultService(repo repository.ResultRepository, quizRepo repository.QuizRepository, classRepo repository.ClassRepository) ResultService {
-	return &resultService{repo: repo, quizRepo: quizRepo, classRepo: classRepo}
+	return &resultService{
+		repo:      repo, 
+		quizRepo:  quizRepo, 
+		classRepo: classRepo,
+	}
+}
+
+// getLock retrieves an existing Mutex for the composite key, or allocates a new one thread-safely
+func (s *resultService) getLock(key string) *sync.Mutex {
+	lock, _ := s.locks.LoadOrStore(key, &sync.Mutex{})
+	return lock.(*sync.Mutex)
 }
 
 func (s *resultService) SubmitTest(result *model.TestResult) error {
@@ -65,8 +78,17 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		}
 	}
 
-	// SECURITY: Max Attempts Validation
+	// SECURITY: Max Attempts Validation & TOCTOU Race Condition Prevention
 	if quiz.MaxAttempts > 0 && result.StudentIdentifier != "" {
+		// Create a purely deterministic lock key based on who is taking what quiz
+		lockKey := result.QuizID + "_" + result.StudentIdentifier
+		mu := s.getLock(lockKey)
+		
+		// Wait forcefully if another identical request is currently grading/saving
+		mu.Lock()
+		// Ensure the lock remains strictly held until CreateResult is safely committed to the Postgres DB at the bottom of the handler
+		defer mu.Unlock()
+
 		attempts, err := s.repo.GetAttemptCount(quiz.ID, result.StudentIdentifier)
 		if err == nil && attempts >= int64(quiz.MaxAttempts) {
 			return errors.New("maximum attempts reached for this student")
