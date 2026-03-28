@@ -9,9 +9,9 @@ import (
 type Class struct {
 	ID          string         `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	TeacherID   string         `gorm:"type:uuid;not null;index" json:"teacher_id"`
-	Name        string         `gorm:"type:varchar(255);not null" json:"name"`
-	Grade       string         `gorm:"type:varchar(50)" json:"grade"`
-	Subject     string         `gorm:"type:varchar(100)" json:"subject"`
+	Name        string         `gorm:"type:varchar(255);not null" json:"name" validate:"required,min=2,max=255"`
+	Grade       string         `gorm:"type:varchar(50)" json:"grade" validate:"max=50"`
+	Subject     string         `gorm:"type:varchar(100)" json:"subject" validate:"max=100"`
 	Description string         `gorm:"type:text" json:"description"`
 	SchoolYear  string         `gorm:"type:varchar(20)" json:"school_year"`
 	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
@@ -25,10 +25,10 @@ type Class struct {
 type Student struct {
 	ID          string     `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	ClassID     string     `gorm:"type:uuid;not null;index" json:"class_id"`
-	FullName    string     `gorm:"type:varchar(255);not null" json:"full_name"`
-	StudentID   string     `gorm:"type:varchar(50);not null;index" json:"student_id"` // E.g: SBD, MSSV
-	Email       string     `gorm:"type:varchar(255)" json:"email"`
-	Phone       string     `gorm:"type:varchar(20)" json:"phone"`
+	FullName    string     `gorm:"type:varchar(255);not null" json:"full_name" validate:"required,max=255"`
+	StudentID   string     `gorm:"type:varchar(50);not null;index" json:"student_id" validate:"required,max=50"` // E.g: SBD, MSSV
+	Email       string     `gorm:"type:varchar(255)" json:"email" validate:"omitempty,email"`
+	Phone       string     `gorm:"type:varchar(20)" json:"phone" validate:"max=20"`
 	DateOfBirth *time.Time `json:"date_of_birth"`
 	CreatedAt   time.Time  `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt   time.Time  `gorm:"autoUpdateTime" json:"updated_at"`

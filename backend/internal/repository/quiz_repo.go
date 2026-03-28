@@ -40,6 +40,7 @@ func (r *quizRepository) GetQuizzes(teacherID string) ([]model.Quiz, error) {
 		Where("quizzes.teacher_id = ?", teacherID).
 		Group("quizzes.id").
 		Order("quizzes.created_at desc").
+		Limit(200).
 		Find(&quizzes).Error
 	return quizzes, err
 }

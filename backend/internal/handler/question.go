@@ -7,6 +7,7 @@ import (
 
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 type QuestionHandler struct {
@@ -29,6 +30,10 @@ func (h *QuestionHandler) CreateQuestion(c fiber.Ctx) error {
 	var question model.Question
 	if err := c.Bind().JSON(&question); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := utils.ValidateStruct(&question); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
 	userId := getUserIdFromToken(c)

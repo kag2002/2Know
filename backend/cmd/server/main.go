@@ -45,9 +45,13 @@ func main() {
 		log.Fatalf("Failed to auto-migrate: %v", err)
 	}
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		BodyLimit: 5 * 1024 * 1024, // Limit request body to 5MB to prevent spam/OOM
+	})
 
 	app.Use(logger.New())
+	app.Use(middleware.SecurityHeaders())
+	app.Use(middleware.GlobalLimiter())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:3000"},
 		AllowHeaders: []string{"Origin, Content-Type, Accept, Authorization"},
@@ -113,8 +117,8 @@ func main() {
 	shareLinkHandler := handler.NewShareLinkHandler(shareLinkSvc)
 
 	// Auth routes (public)
-	app.Post("/api/auth/register", authHandler.Register)
-	app.Post("/api/auth/login", authHandler.Login)
+	app.Post("/api/auth/register", middleware.AuthLimiter(), authHandler.Register)
+	app.Post("/api/auth/login", middleware.AuthLimiter(), authHandler.Login)
 
 	// Public test routes (Guest)
 	app.Get("/api/test/quiz/:id", quizHandler.GetPublicQuizByID)

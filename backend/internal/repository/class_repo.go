@@ -33,6 +33,7 @@ func (r *classRepository) GetClasses(teacherID string) ([]model.Class, error) {
 	err := r.db.Preload("Students").
 		Where("teacher_id = ?", teacherID).
 		Order("created_at desc").
+		Limit(200).
 		Find(&classes).Error
 	return classes, err
 }

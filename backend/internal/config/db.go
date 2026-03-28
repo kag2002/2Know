@@ -9,6 +9,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"time"
 )
 
 var DB *gorm.DB
@@ -54,6 +55,14 @@ func ConnectDB() {
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
+	}
+
+	sqlDB, err := db.DB()
+	if err == nil {
+		sqlDB.SetMaxIdleConns(10)
+		sqlDB.SetMaxOpenConns(100)
+		sqlDB.SetConnMaxLifetime(time.Hour)
+		log.Println("Database connection pool configured: MaxOpen=100, MaxIdle=10")
 	}
 
 	DB = db

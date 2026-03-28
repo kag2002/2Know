@@ -10,10 +10,10 @@ import (
 type Quiz struct {
 	ID          string `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
 	TeacherID   string `gorm:"type:uuid;not null;index" json:"teacher_id"`
-	Title       string `gorm:"type:varchar(255);not null" json:"title"`
-	Description string `gorm:"type:text" json:"description"`
-	Subject     string `gorm:"type:varchar(100)" json:"subject"`
-	GradeLevel  string `gorm:"type:varchar(50)" json:"grade_level"`
+	Title       string `gorm:"type:varchar(255);not null" json:"title" validate:"required,min=3,max=255"`
+	Description string `gorm:"type:text" json:"description" validate:"max=2000"`
+	Subject     string `gorm:"type:varchar(100)" json:"subject" validate:"max=100"`
+	GradeLevel  string `gorm:"type:varchar(50)" json:"grade_level" validate:"max=50"`
 
 	// Settings
 	TimeLimitMinutes int        `json:"time_limit_minutes"`
@@ -24,7 +24,7 @@ type Quiz struct {
 	PenaltyOnWrong   bool       `gorm:"default:false" json:"penalty_on_wrong"`
 
 	// OMR / Format specific
-	QuizType    string `gorm:"type:varchar(50);default:'online'" json:"quiz_type"` // online, omr
+	QuizType    string `gorm:"type:varchar(50);default:'online'" json:"quiz_type" validate:"oneof=online omr"` // online, omr
 	OMRTemplate string `gorm:"type:varchar(50)" json:"omr_template"`
 
 	// Security

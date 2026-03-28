@@ -7,6 +7,7 @@ import (
 
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 type ClassHandler struct {
@@ -22,6 +23,10 @@ func (h *ClassHandler) CreateClass(c fiber.Ctx) error {
 	var class model.Class
 	if err := c.Bind().JSON(&class); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := utils.ValidateStruct(&class); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
 	userId := getUserIdFromToken(c)
@@ -75,6 +80,10 @@ func (h *ClassHandler) AddStudent(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
+	if err := utils.ValidateStruct(&student); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
 	if err := h.svc.AddStudent(classId, userId, &student); err != nil {
 		log.Printf("Error adding student: %v", err)
 		// Usually a 403 or 404 from verify ownership, sending 400 for simplicity here
@@ -108,6 +117,10 @@ func (h *ClassHandler) UpdateClass(c fiber.Ctx) error {
 	var class model.Class
 	if err := c.Bind().JSON(&class); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if err := utils.ValidateStruct(&class); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 	class.ID = id
 	if err := h.svc.UpdateClass(userId, &class); err != nil {
