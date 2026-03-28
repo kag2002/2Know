@@ -45,6 +45,9 @@ func (h *NoteHandler) CreateNote(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	// SECURITY: Strip Stored XSS payloads from Note Content
+	utils.SanitizeNote(note)
+
 	note.UserID = userId
 
 	if err := h.svc.CreateNote(note); err != nil {
@@ -84,6 +87,9 @@ func (h *NoteHandler) UpdateNote(c fiber.Ctx) error {
 	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking & Relocation)
 	delete(params, "id")
 	delete(params, "user_id")
+
+	// SECURITY: Strip Stored XSS payloads from arbitrary map fields
+	utils.SanitizeMap(params)
 
 	if err := h.svc.UpdateNoteContent(id, userId, params); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update note"})

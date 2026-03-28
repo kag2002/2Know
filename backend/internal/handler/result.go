@@ -28,6 +28,9 @@ func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	// SECURITY: Strip Stored XSS payloads from Student Answers (Crucial for Essay grading)
+	utils.SanitizeResult(&result)
+
 	if err := h.svc.SubmitTest(&result); err != nil {
 		log.Printf("Error submitting test: %v", err)
 

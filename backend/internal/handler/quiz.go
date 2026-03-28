@@ -28,6 +28,9 @@ func (h *QuizHandler) CreateQuiz(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	// SECURITY: Strip Stored XSS payloads from Quiz Title & Description
+	utils.SanitizeQuiz(&quiz)
+
 	userId := getUserIdFromToken(c)
 	if userId == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
@@ -109,6 +112,9 @@ func (h *QuizHandler) UpdateQuiz(c fiber.Ctx) error {
 	delete(params, "id")
 	delete(params, "teacher_id")
 	delete(params, "created_at")
+
+	// SECURITY: Strip Stored XSS payloads from arbitrary map fields
+	utils.SanitizeMap(params)
 
 	if err := h.svc.UpdateQuiz(id, userId, params); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update quiz"})

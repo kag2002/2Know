@@ -41,6 +41,9 @@ func (h *QuestionHandler) CreateQuestion(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	// SECURITY: Strip Stored XSS payloads from Rich Text Content
+	utils.SanitizeQuestion(&question)
+
 	userId := getUserIdFromToken(c)
 	if userId == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
@@ -93,6 +96,9 @@ func (h *QuestionHandler) UpdateQuestion(c fiber.Ctx) error {
 	delete(params, "id")
 	delete(params, "quiz_id")
 	delete(params, "created_at")
+
+	// SECURITY: Strip Stored XSS payloads from arbitrary map fields
+	utils.SanitizeMap(params)
 
 	if err := h.svc.UpdateQuestion(userId, questionId, params); err != nil {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Failed to update question or unauthorized"})
