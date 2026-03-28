@@ -8,7 +8,7 @@ import (
 
 type TestResult struct {
 	ID                string `gorm:"type:uuid;default:gen_random_uuid();primaryKey" json:"id"`
-	QuizID            string `gorm:"type:uuid;not null;index" json:"quiz_id"`
+	QuizID            string `gorm:"type:uuid;not null;index;index:idx_quiz_deleted,priority:1" json:"quiz_id"`
 	StudentID         string `gorm:"type:uuid;index" json:"student_id"` // Can be nullable if guest
 	StudentName       string `gorm:"type:varchar(255);not null" json:"student_name" validate:"required,max=255"`
 	StudentIdentifier string `gorm:"type:varchar(100);not null" json:"student_identifier" validate:"required,max=100"` // E.g: SBD
@@ -31,5 +31,6 @@ type TestResult struct {
 
 	CreatedAt time.Time      `gorm:"autoCreateTime;index" json:"created_at"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	// PERFORMANCE: Composite Index for LEFT JOIN quiz listing queries
+	DeletedAt gorm.DeletedAt `gorm:"index;index:idx_quiz_deleted,priority:2" json:"-"`
 }

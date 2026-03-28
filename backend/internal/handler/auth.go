@@ -19,13 +19,13 @@ func NewAuthHandler(svc service.AuthService) *AuthHandler {
 
 type RegisterRequest struct {
 	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6,max=100"`
+	Password string `json:"password" validate:"required,min=6,max=72"`
 	FullName string `json:"full_name" validate:"required,min=2,max=255"`
 }
 
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,max=100"`
+	Password string `json:"password" validate:"required,max=72"`
 }
 
 func (h *AuthHandler) Register(c fiber.Ctx) error {

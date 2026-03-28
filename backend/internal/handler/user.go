@@ -113,8 +113,8 @@ func (h *UserHandler) ChangePassword(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
-	if len(req.NewPassword) < 6 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "New password must be at least 6 characters"})
+	if len(req.NewPassword) < 6 || len(req.NewPassword) > 72 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Mật khẩu mới phải từ 6 đến 72 ký tự"})
 	}
 
 	user, err := h.repo.FindByID(uid)

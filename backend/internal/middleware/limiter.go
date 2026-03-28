@@ -54,3 +54,19 @@ func AILimiter() fiber.Handler {
 		},
 	})
 }
+
+// SubmitLimiter apply 10 requests per 1 minute limit for public test submission to prevent spam DDoS
+func SubmitLimiter() fiber.Handler {
+	return limiter.New(limiter.Config{
+		Max:        10,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: func(c fiber.Ctx) string {
+			return c.IP()
+		},
+		LimitReached: func(c fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error": "Bạn đã gửi quá nhiều bài nộp. Vui lòng đợi 1 phút trước khi thử lại.",
+			})
+		},
+	})
+}
