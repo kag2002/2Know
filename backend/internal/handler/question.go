@@ -84,6 +84,11 @@ func (h *QuestionHandler) UpdateQuestion(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
+	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking & Relocation)
+	delete(params, "id")
+	delete(params, "quiz_id")
+	delete(params, "created_at")
+
 	if err := h.svc.UpdateQuestion(userId, questionId, params); err != nil {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Failed to update question or unauthorized"})
 	}

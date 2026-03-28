@@ -104,6 +104,12 @@ func (h *QuizHandler) UpdateQuiz(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
+	// SECURITY: Prevent Mass Assignment Vulnerability (Entity Relocation)
+	// Never allow the user to modify primary keys or ownership links
+	delete(params, "id")
+	delete(params, "teacher_id")
+	delete(params, "created_at")
+
 	if err := h.svc.UpdateQuiz(id, userId, params); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update quiz"})
 	}

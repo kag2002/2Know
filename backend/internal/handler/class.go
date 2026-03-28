@@ -122,7 +122,11 @@ func (h *ClassHandler) UpdateClass(c fiber.Ctx) error {
 	if err := utils.ValidateStruct(&class); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
+	
+	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking)
 	class.ID = id
+	class.TeacherID = userId
+
 	if err := h.svc.UpdateClass(userId, &class); err != nil {
 		log.Printf("Error updating class: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update class"})
