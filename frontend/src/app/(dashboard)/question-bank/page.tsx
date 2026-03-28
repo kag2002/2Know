@@ -77,6 +77,7 @@ export default function QuestionBankPage() {
       toast.warning("Nội dung câu hỏi không được để trống!");
       return;
     }
+    setLoading(true);
     try {
       await apiFetch(`/questions/${editingQuestion.id}`, {
         method: 'PATCH',
@@ -91,6 +92,7 @@ export default function QuestionBankPage() {
       loadQuestions();
     } catch {
       toast.error("Lỗi khi cập nhật câu hỏi");
+      setLoading(false);
     }
   };
 
@@ -356,8 +358,10 @@ export default function QuestionBankPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleEditQuestion} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={loading}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditQuestion} disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {t("common.save")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -93,6 +93,7 @@ export default function ClassesPage() {
       toast.warning("Vui lòng điền đủ thông tin!");
       return;
     }
+    setLoading(true);
     try {
       await apiFetch(`/classes/${editingClass.id}`, {
         method: "PATCH",
@@ -107,6 +108,7 @@ export default function ClassesPage() {
       loadClasses();
     } catch (err: any) {
       toast.error("Lỗi cập nhật: " + err.message);
+      setLoading(false);
     }
   };
 
@@ -173,8 +175,11 @@ export default function ClassesPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
-                <Button onClick={handleCreateClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.confirmCreate")}</Button>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={loading}>{t("common.cancel")}</Button>
+                <Button onClick={handleCreateClass} disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {t("common.confirmCreate")}
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -301,7 +306,7 @@ export default function ClassesPage() {
           {/* Create New Card */}
           <div 
             className="flex flex-col items-center justify-center min-h-[220px] bg-muted/30 border-2 border-dashed rounded-xl hover:bg-muted/50 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all cursor-pointer group"
-            onClick={handleCreateClass}
+            onClick={() => setIsDialogOpen(true)}
           >
             <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-transform">
               <Plus className="w-6 h-6 text-indigo-500" />
@@ -348,8 +353,11 @@ export default function ClassesPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleEditClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={loading}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditClass} disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {t("common.save")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

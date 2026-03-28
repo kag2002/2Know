@@ -91,20 +91,25 @@ export default function AIGeneratorPage() {
   const handleSaveToBank = async () => {
     if (generatedQuestions.length === 0) return;
     try {
-      for (const q of generatedQuestions) {
-        await apiFetch("/questions", {
-          method: "POST",
-          body: JSON.stringify({
-            type: "multiple_choice",
-            content: q.question,
-            options: q.options,
-            correct_index: q.correctIndex,
-            explanation: q.explanation,
-            difficulty: config.difficulty === "auto" ? "medium" : config.difficulty,
-            folder: "AI Generated",
-          })
-        });
-      }
+      const payload = generatedQuestions.map(q => ({
+        type: "multiple_choice",
+        content: q.question,
+        options: q.options.map((opt: string, index: number) => ({
+          label: String.fromCharCode(65 + index),
+          content: opt,
+          is_correct: index === q.correctIndex
+        })),
+        explanation: q.explanation,
+        difficulty: config.difficulty === "auto" ? "medium" : config.difficulty,
+        folder: "AI Generated",
+        points: 10
+      }));
+
+      await apiFetch("/questions/batch", {
+        method: "POST",
+        body: JSON.stringify({ questions: payload })
+      });
+
       toast.success(t("quizGenerate.alertAddSuccess", { count: generatedQuestions.length }));
       router.push("/question-bank");
     } catch (err: any) {

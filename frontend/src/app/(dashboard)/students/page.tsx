@@ -132,6 +132,7 @@ export default function StudentsPage() {
       return;
     }
     
+    setLoading(true);
     try {
       await apiFetch(`/students/${editingStudent.id}`, {
         method: "PATCH",
@@ -146,6 +147,8 @@ export default function StudentsPage() {
       ));
     } catch (err: any) {
       toast.error("Lỗi cập nhật: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -232,8 +235,11 @@ export default function StudentsPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
-              <Button onClick={handleAddStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.confirmAdd")}</Button>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={loading}>{t("common.cancel")}</Button>
+              <Button onClick={handleAddStudent} disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {t("common.confirmAdd")}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -407,8 +413,11 @@ export default function StudentsPage() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleEditStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.save")}</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={loading}>{t("common.cancel")}</Button>
+            <Button onClick={handleEditStudent} disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white">
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {t("common.save")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
