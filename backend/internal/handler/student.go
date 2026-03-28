@@ -106,6 +106,11 @@ func (h *StudentHandler) UpdateStudent(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input data"})
 	}
 
+	// SECURITY: Prevent Student Robbery (Mass Assignment)
+	// Force GORM to ignore structural reassignment by zeroing out ID and ClassID
+	req.ID = studentID
+	req.ClassID = "" 
+
 	if err := h.studentService.UpdateStudent(studentID, &req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update student"})
 	}

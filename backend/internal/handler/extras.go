@@ -51,6 +51,10 @@ func (h *OmrBatchHandler) UpdateBatch(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 	
+	// SECURITY: Mass Assignment Object Hijacking
+	batch.ID = id
+	batch.UserID = userID
+
 	if err := h.svc.UpdateBatch(id, userID, &batch); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to update batch"})
 	}
@@ -106,6 +110,10 @@ func (h *RubricHandler) UpdateRubric(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 	
+	// SECURITY: Mass Assignment Object Hijacking
+	rubric.ID = id
+	rubric.UserID = userID
+
 	if err := h.svc.UpdateRubric(id, userID, &rubric); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to update rubric"})
 	}
@@ -167,6 +175,10 @@ func (h *ShareLinkHandler) UpdateLink(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
 	
+	// SECURITY: Mass Assignment Object Hijacking
+	link.ID = id
+	link.UserID = userID
+
 	if err := h.svc.UpdateLink(id, userID, &link); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to update share link"})
 	}

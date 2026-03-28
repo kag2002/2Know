@@ -81,6 +81,10 @@ func (h *NoteHandler) UpdateNote(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
+	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking & Relocation)
+	delete(params, "id")
+	delete(params, "user_id")
+
 	if err := h.svc.UpdateNoteContent(id, userId, params); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update note"})
 	}
