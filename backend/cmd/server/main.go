@@ -47,6 +47,20 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		BodyLimit: 5 * 1024 * 1024, // Limit request body to 5MB to prevent spam/OOM
+		ErrorHandler: func(c fiber.Ctx, err error) error {
+			code := fiber.StatusInternalServerError
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+			if code == fiber.StatusRequestEntityTooLarge {
+				return c.Status(code).JSON(fiber.Map{
+					"error": "Dữ liệu tải lên quá lớn (Vượt mức 5MB). Vui lòng kiểm tra lại.",
+				})
+			}
+			return c.Status(code).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		},
 	})
 
 	app.Use(logger.New())
