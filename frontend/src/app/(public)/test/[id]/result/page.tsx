@@ -8,8 +8,8 @@ import { useTranslation } from "@/context/LanguageContext";
 
 interface TestResultData {
   score: number;
-  total_correct: number;
-  total_incorrect: number;
+  total_correct: number | string;
+  total_incorrect: number | string;
   time_taken_seconds: number;
   student_name: string;
   student_identifier: string;

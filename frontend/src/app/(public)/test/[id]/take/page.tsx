@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/context/LanguageContext";
+import { toast } from "sonner";
 
 const MAX_TAB_SWITCHES = 3;
 
@@ -134,36 +135,55 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   const handleAutoSubmit = async (switches: number) => {
     sessionStorage.setItem("tabSwitchCount", String(switches));
-    await submitPayload(switches);
-    router.push(`/test/${id}/result`);
+    const success = await submitPayload(switches);
+    if (success) router.push(`/test/${id}/result`);
   };
 
   const handleSubmit = async () => {
     if (confirm(t("testRoom.confirmSubmit") || "Bạn có chắc chắn muốn nộp bài không? Thời gian vẫn còn dư.")) {
       sessionStorage.setItem("tabSwitchCount", String(tabSwitchCount));
-      await submitPayload(tabSwitchCount);
-      router.push(`/test/${id}/result`);
+      const success = await submitPayload(tabSwitchCount);
+      if (success) router.push(`/test/${id}/result`);
     }
   };
 
-  const submitPayload = async (switches: number) => {
+  const submitPayload = async (switches: number): Promise<boolean> => {
     try {
+      const timeTaken = ((quiz?.time_limit_minutes || 0) * 60) - timeLeft;
+      const studentName = "Guest Student";
+      const studentId = "GUEST-" + Math.floor(Math.random() * 10000);
+
       const resultObj = await apiFetch("/test/submit", {
         method: "POST",
         requireAuth: false,
         body: JSON.stringify({
           quiz_id: id,
-          student_name: "Guest Student",
-          student_identifier: "GUEST-" + Math.floor(Math.random() * 10000),
-          time_taken_seconds: ((quiz?.time_limit_minutes || 0) * 60) - timeLeft,
+          student_name: studentName,
+          student_identifier: studentId,
+          time_taken_seconds: timeTaken,
           answers: answers, // Map of QuestionID -> AnswerString/OptionID
           tab_switch_count: switches
         })
       });
-      // Save backend computed result into session storage so the result page can render it safely
-      sessionStorage.setItem("2know_latest_result", JSON.stringify(resultObj));
-    } catch(err) {
+
+      // SECURITY TIE-IN: Backend no longer returns total_correct/time_taken for anti-cheat minimization.
+      // We must self-assemble the state we already know to display on the Result Page.
+      const finalResult = {
+        ...resultObj,
+        student_name: studentName,
+        student_identifier: studentId,
+        time_taken_seconds: timeTaken,
+        tab_switch_count: switches,
+        total_correct: resultObj.total_correct ?? "-", 
+        total_incorrect: resultObj.total_incorrect ?? "-"
+      };
+      
+      sessionStorage.setItem("2know_latest_result", JSON.stringify(finalResult));
+      return true;
+    } catch(err: any) {
       console.error("Failed to submit", err);
+      toast.error(err.message || t("testRoom.submitError") || "Không thể nộp bài. Vui lòng thử lại.");
+      return false;
     }
   };
 
