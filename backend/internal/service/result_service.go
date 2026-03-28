@@ -341,20 +341,24 @@ func (s *resultService) GetClassGradebook(teacherID, classID string) (map[string
 		quizIDMap[res.QuizID] = true
 	}
 
-	// 5. Get Quiz details (only basic info)
-	var quizzes []map[string]interface{}
+	// 5. Get Quiz details (PERFORMANCE: Batch query instead of toxic N+1 loops)
+	quizIDs := make([]string, 0, len(quizIDMap))
 	for qID := range quizIDMap {
-		if q, err := s.quizRepo.GetPublicQuizByID(qID); err == nil {
-			quizzes = append(quizzes, map[string]interface{}{
-				"id":    q.ID,
-				"title": q.Title,
-			})
-		}
+		quizIDs = append(quizIDs, qID)
+	}
+
+	quizzes, _ := s.quizRepo.GetQuizzesByIDs(quizIDs)
+	var quizList []map[string]interface{}
+	for _, q := range quizzes {
+		quizList = append(quizList, map[string]interface{}{
+			"id":    q.ID,
+			"title": q.Title,
+		})
 	}
 
 	return map[string]interface{}{
 		"students": cls.Students,
-		"quizzes":  quizzes,
+		"quizzes":  quizList,
 		"results":  results,
 	}, nil
 }

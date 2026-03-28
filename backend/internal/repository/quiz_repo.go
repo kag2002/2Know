@@ -13,6 +13,7 @@ type QuizRepository interface {
 	GetPublicQuizByID(id string) (*model.Quiz, error)
 	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
 	DeleteQuiz(id, teacherID string) error
+	GetQuizzesByIDs(ids []string) ([]model.Quiz, error)
 }
 
 type quizRepository struct {
@@ -74,4 +75,13 @@ func (r *quizRepository) DeleteQuiz(id, teacherID string) error {
 
 func (r *quizRepository) UpdateQuiz(id string, teacherID string, params map[string]interface{}) error {
 	return r.db.Model(&model.Quiz{}).Where("id = ? AND teacher_id = ?", id, teacherID).Updates(params).Error
+}
+
+func (r *quizRepository) GetQuizzesByIDs(ids []string) ([]model.Quiz, error) {
+	var quizzes []model.Quiz
+	if len(ids) == 0 {
+		return quizzes, nil
+	}
+	err := r.db.Select("id", "title").Where("id IN ?", ids).Find(&quizzes).Error
+	return quizzes, err
 }

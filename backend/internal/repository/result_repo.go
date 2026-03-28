@@ -79,7 +79,8 @@ func (r *resultRepository) GetResultsByStudentIDs(studentIDs []string) ([]model.
 	if len(studentIDs) == 0 {
 		return results, nil
 	}
-	err := r.db.Where("student_id IN ?", studentIDs).Find(&results).Error
+	err := r.db.Select("id", "quiz_id", "student_id", "score", "total_correct", "total_incorrect", "status", "created_at").
+		Where("student_id IN ?", studentIDs).Find(&results).Error
 	return results, err
 }
 
