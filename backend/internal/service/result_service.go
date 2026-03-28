@@ -71,6 +71,7 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 	correctOptionMap := make(map[string]bool)
 	hasEssay := false
 
+	// Map correctly answered questions to their point values
 	for _, q := range quiz.Questions {
 		if q.Type == "essay" {
 			hasEssay = true
@@ -83,24 +84,32 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 	}
 
 	totalCorrect := 0
-	for _, answerValue := range result.Answers {
-		// answerValue is either an OptionUUID or raw essay text
-		if correctOptionMap[answerValue] {
-			totalCorrect++
+	totalIncorrect := 0
+	earnedPoints := 0.0
+
+	// We evaluate answer entries against the Quiz's official structural data
+	for _, q := range quiz.Questions {
+		if q.Type == "essay" {
+			continue // Automated scoring completely ignores Essays
 		}
-	}
 
-	totalQuestions := len(quiz.Questions)
-	totalIncorrect := totalQuestions - totalCorrect
+		studentAnswerValue := result.Answers[q.ID]
 
-	score := 0.0
-	if totalQuestions > 0 {
-		score = (float64(totalCorrect) / float64(totalQuestions)) * 10.0
+		// If student provided an answer and it's flagged as correct
+		if studentAnswerValue != "" && correctOptionMap[studentAnswerValue] {
+			totalCorrect++
+			earnedPoints += q.Points
+		} else if studentAnswerValue != "" {
+			totalIncorrect++
+		} else {
+			// Unanswered counts as incorrect
+			totalIncorrect++
+		}
 	}
 
 	result.TotalCorrect = totalCorrect
 	result.TotalIncorrect = totalIncorrect
-	result.Score = score
+	result.Score = earnedPoints
 
 	if result.TabSwitchCount >= 3 {
 		result.Status = "cheating_flagged"
