@@ -1,8 +1,8 @@
 "use client";
 
-import { Copy, GripVertical, MoreVertical, Plus, Sparkles, Trash2, BookOpen, Database, Search, CheckCircle2, Expand, Shrink, Save } from "lucide-react";
+import { Plus, Sparkles, Trash2, BookOpen, Database, Search, CheckCircle2, Expand, Shrink, Save, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -29,7 +29,7 @@ interface QuestionBuilderProps {
   setQuestions: React.Dispatch<React.SetStateAction<QuestionPayload[]>>;
 }
 
-function SortableQuestionItem({ q, index, updateQuestion, updateOption, setCorrectOption, removeQuestion, addOption, removeOption }: any) {
+const SortableQuestionItem = memo(function SortableQuestionItem({ q, index, updateQuestion, updateOption, setCorrectOption, removeQuestion, addOption, removeOption }: any) {
   const sortableId = q.id ? q.id.toString() : `temp-${index}`;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortableId });
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -138,7 +138,9 @@ function SortableQuestionItem({ q, index, updateQuestion, updateOption, setCorre
             )}
           </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return prevProps.q === nextProps.q && prevProps.index === nextProps.index;
+});
 
 export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProps) {
   const [isBankOpen, setIsBankOpen] = useState(false);
@@ -205,53 +207,72 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
     }
   };
 
-  const updateQuestion = (index: number, field: string, value: any) => {
-    const updated = [...questions];
-    updated[index] = { ...updated[index], [field]: value };
-    setQuestions(updated);
-  };
+  const updateQuestion = useCallback((index: number, field: string, value: any) => {
+    setQuestions(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  }, [setQuestions]);
 
-  const updateOption = (qIndex: number, optIndex: number, text: string) => {
-    const updated = [...questions];
-    updated[qIndex].options[optIndex].text = text;
-    setQuestions(updated);
-  };
+  const updateOption = useCallback((qIndex: number, optIndex: number, text: string) => {
+    setQuestions(prev => {
+      const updated = [...prev];
+      const updatedQ = { ...updated[qIndex], options: [...updated[qIndex].options] };
+      updatedQ.options[optIndex] = { ...updatedQ.options[optIndex], text };
+      updated[qIndex] = updatedQ;
+      return updated;
+    });
+  }, [setQuestions]);
 
-  const setCorrectOption = (qIndex: number, optIndex: number) => {
-    const updated = [...questions];
-    updated[qIndex].options = updated[qIndex].options.map((opt, i) => ({
-      ...opt,
-      isCorrect: i === optIndex
-    }));
-    setQuestions(updated);
-  };
+  const setCorrectOption = useCallback((qIndex: number, optIndex: number) => {
+    setQuestions(prev => {
+      const updated = [...prev];
+      const updatedQ = { 
+        ...updated[qIndex], 
+        options: updated[qIndex].options.map((opt, i) => ({
+          ...opt,
+          isCorrect: i === optIndex
+        }))
+      };
+      updated[qIndex] = updatedQ;
+      return updated;
+    });
+  }, [setQuestions]);
 
-  const removeQuestion = (index: number) => {
-    setQuestions(questions.filter((_, i) => i !== index));
-  };
+  const removeQuestion = useCallback((index: number) => {
+    setQuestions(prev => prev.filter((_, i) => i !== index));
+  }, [setQuestions]);
 
-  const addOption = (qIndex: number) => {
-    const updated = [...questions];
-    if (updated[qIndex].options.length >= 8) {
-      toast.warning("Tối đa 8 đáp án cho mỗi câu hỏi");
-      return;
-    }
-    updated[qIndex].options.push({ text: "", isCorrect: false });
-    setQuestions(updated);
-  };
+  const addOption = useCallback((qIndex: number) => {
+    setQuestions(prev => {
+      const updated = [...prev];
+      if (updated[qIndex].options.length >= 8) {
+        toast.warning("Tối đa 8 đáp án cho mỗi câu hỏi");
+        return prev;
+      }
+      const updatedQ = { ...updated[qIndex], options: [...updated[qIndex].options, { text: "", isCorrect: false }] };
+      updated[qIndex] = updatedQ;
+      return updated;
+    });
+  }, [setQuestions]);
 
-  const removeOption = (qIndex: number, optIndex: number) => {
-    const updated = [...questions];
-    if (updated[qIndex].options.length <= 2) {
-      toast.warning("Phải có ít nhất 2 đáp án");
-      return;
-    }
-    updated[qIndex].options = updated[qIndex].options.filter((_, i) => i !== optIndex);
-    if (!updated[qIndex].options.some(o => o.isCorrect)) {
-       updated[qIndex].options[0].isCorrect = true;
-    }
-    setQuestions(updated);
-  };
+  const removeOption = useCallback((qIndex: number, optIndex: number) => {
+    setQuestions(prev => {
+      const updated = [...prev];
+      if (updated[qIndex].options.length <= 2) {
+        toast.warning("Phải có ít nhất 2 đáp án");
+        return prev;
+      }
+      const remainingOptions = updated[qIndex].options.filter((_, i) => i !== optIndex);
+      if (!remainingOptions.some(o => o.isCorrect)) {
+         remainingOptions[0].isCorrect = true;
+      }
+      const updatedQ = { ...updated[qIndex], options: remainingOptions };
+      updated[qIndex] = updatedQ;
+      return updated;
+    });
+  }, [setQuestions]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
