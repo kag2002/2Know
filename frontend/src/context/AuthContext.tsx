@@ -38,8 +38,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = (token: string, userData: User) => {
     localStorage.setItem("2know_token", token);
     localStorage.setItem("2know_user", JSON.stringify(userData));
-    // Set cookie so Next.js middleware can detect auth state (Extended to 30 Days / 720 Hours)
-    document.cookie = `2know_token=${token}; path=/; max-age=${60 * 60 * 720}; SameSite=Lax`;
+    // Set cookie so Next.js middleware can detect auth state (Synchronized with Backend 24 Hours)
+    document.cookie = `2know_token=${token}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
     setUser(userData);
     router.push("/overview");
   };

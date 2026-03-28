@@ -168,6 +168,10 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
   };
 
   const addQuestion = () => {
+    if (questions.length >= 200) {
+      toast.warning("Một bài kiểm tra tối đa 200 câu hỏi");
+      return;
+    }
     setQuestions([
       ...questions,
       {
@@ -228,6 +232,10 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
 
   const addOption = (qIndex: number) => {
     const updated = [...questions];
+    if (updated[qIndex].options.length >= 8) {
+      toast.warning("Tối đa 8 đáp án cho mỗi câu hỏi");
+      return;
+    }
     updated[qIndex].options.push({ text: "", isCorrect: false });
     setQuestions(updated);
   };
