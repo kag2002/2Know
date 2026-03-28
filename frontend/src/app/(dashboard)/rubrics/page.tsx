@@ -144,12 +144,12 @@ export default function RubricsPage() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Tạo Rubric mới</DialogTitle>
+            <DialogTitle>{t("rubrics.createDialogTitle")}</DialogTitle>
             <DialogDescription>Nhập thông tin cho bộ tiêu chí chấm điểm.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="c_title">Tên Rubric</Label>
+              <Label htmlFor="c_title">{t("rubrics.labelTitle")}</Label>
               <Input 
                 id="c_title" 
                 placeholder="VD: Tiêu chí chấm văn tự luận"
@@ -158,7 +158,7 @@ export default function RubricsPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="c_subject">Môn học</Label>
+              <Label htmlFor="c_subject">{t("rubrics.labelSubject")}</Label>
               <Input 
                 id="c_subject" 
                 placeholder="VD: Ngữ văn, Lịch sử..."
@@ -167,7 +167,7 @@ export default function RubricsPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="c_target">Đối tượng</Label>
+              <Label htmlFor="c_target">{t("rubrics.labelTarget")}</Label>
               <Input 
                 id="c_target" 
                 placeholder="VD: Lớp 10 Chung"
@@ -178,7 +178,7 @@ export default function RubricsPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
+            <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.confirmCreate")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -277,7 +277,7 @@ export default function RubricsPage() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <PlayCircle className="w-4 h-4" />
-                  <span>Đã dùng {rubric.usage_count} lần</span>
+                  <span>{t("rubrics.usedCount", { count: rubric.usage_count })}</span>
                 </div>
                 {rubric.active ? (
                   <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-[10px] font-bold uppercase ml-auto">{t("rubrics.statusActive")}</span>
@@ -327,7 +327,7 @@ export default function RubricsPage() {
           {editingRubric && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-r-title">Tên Rubric</Label>
+                <Label htmlFor="edit-r-title">{t("rubrics.labelTitle")}</Label>
                 <Input 
                   id="edit-r-title" 
                   value={editingRubric.title} 
@@ -335,7 +335,7 @@ export default function RubricsPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-r-subject">Môn học</Label>
+                <Label htmlFor="edit-r-subject">{t("rubrics.labelSubject")}</Label>
                 <Input 
                   id="edit-r-subject" 
                   value={editingRubric.subject} 
@@ -343,7 +343,7 @@ export default function RubricsPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-r-target">Đối tượng áp dụng</Label>
+                <Label htmlFor="edit-r-target">{t("rubrics.editLabelTarget")}</Label>
                 <Input 
                   id="edit-r-target" 
                   value={editingRubric.target} 

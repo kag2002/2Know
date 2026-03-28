@@ -189,7 +189,7 @@ export default function StudentsPage() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="s_name">Họ và tên <span className="text-rose-500">*</span></Label>
+                <Label htmlFor="s_name">{t("students.labelFullName")} <span className="text-rose-500">*</span></Label>
                 <Input 
                   id="s_name" 
                   placeholder="VD: Nguyễn Văn A" 
@@ -198,7 +198,7 @@ export default function StudentsPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="s_sbd">Mã Học Sinh (SBD) <span className="text-rose-500">*</span></Label>
+                <Label htmlFor="s_sbd">{t("students.labelSBD")} <span className="text-rose-500">*</span></Label>
                 <Input 
                   id="s_sbd" 
                   placeholder="VD: HS001" 
@@ -221,7 +221,7 @@ export default function StudentsPage() {
                 </select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="s_email">Địa chỉ Email</Label>
+                <Label htmlFor="s_email">{t("students.labelEmail")}</Label>
                 <Input 
                   id="s_email" 
                   type="email"
@@ -233,7 +233,7 @@ export default function StudentsPage() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
-              <Button onClick={handleAddStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận thêm</Button>
+              <Button onClick={handleAddStudent} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.confirmAdd")}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -282,7 +282,7 @@ export default function StudentsPage() {
               onChange={e => setFilterClass(e.target.value)}
               className="h-9 px-3 rounded-md border bg-muted text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="all">Tất cả lớp</option>
+              <option value="all">{t("students.filterAllClasses")}</option>
               {classes.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -293,12 +293,12 @@ export default function StudentsPage() {
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
                   <th className="pb-3 font-semibold w-8">#</th>
-                  <th className="pb-3 font-semibold">Họ và Tên</th>
-                  <th className="pb-3 font-semibold">Mã HS</th>
-                  <th className="pb-3 font-semibold">Lớp</th>
+                  <th className="pb-3 font-semibold">{t("students.colName")}</th>
+                  <th className="pb-3 font-semibold">{t("students.colSBD")}</th>
+                  <th className="pb-3 font-semibold">{t("students.colClass")}</th>
                   <th className="pb-3 font-semibold text-center">Điểm TB</th>
-                  <th className="pb-3 font-semibold text-center">Bài thi</th>
-                  <th className="pb-3 font-semibold text-center">Xếp loại</th>
+                  <th className="pb-3 font-semibold text-center">{t("students.colExams")}</th>
+                  <th className="pb-3 font-semibold text-center">{t("students.colRank")}</th>
                   <th className="pb-3 font-semibold w-10"></th>
                 </tr>
               </thead>
@@ -356,7 +356,7 @@ export default function StudentsPage() {
                               toast.error("Lỗi xóa: " + err.message);
                             }
                           }}>
-                            <Trash2 className="w-4 h-4 text-rose-500" /> <span className="text-rose-600">Xóa học sinh</span>
+                            <Trash2 className="w-4 h-4 text-rose-500" /> <span className="text-rose-600">{t("students.deleteBtn")}</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -380,7 +380,7 @@ export default function StudentsPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Sửa thông tin học sinh</DialogTitle>
+            <DialogTitle>{t("students.editDialogTitle")}</DialogTitle>
             <DialogDescription>
               Cập nhật họ tên hoặc email của học sinh này.
             </DialogDescription>
@@ -388,7 +388,7 @@ export default function StudentsPage() {
           {editingStudent && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-s-name">Họ và tên</Label>
+                <Label htmlFor="edit-s-name">{t("students.labelFullName")}</Label>
                 <Input 
                   id="edit-s-name" 
                   value={editingStudent.name} 
@@ -396,7 +396,7 @@ export default function StudentsPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-s-email">Địa chỉ Email</Label>
+                <Label htmlFor="edit-s-email">{t("students.labelEmail")}</Label>
                 <Input 
                   id="edit-s-email" 
                   type="email"

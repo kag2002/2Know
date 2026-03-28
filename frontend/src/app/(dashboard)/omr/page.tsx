@@ -166,14 +166,14 @@ export default function OmrPage() {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Tạo đợt chấm OMR</DialogTitle>
+                <DialogTitle>{t("omr.createDialogTitle")}</DialogTitle>
                 <DialogDescription>
                   Khởi tạo một đợt chấm điểm mới để nhóm các phiếu thi (Scanner) chung với nhau. 
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="b_title">Tên đợt chấm</Label>
+                  <Label htmlFor="b_title">{t("omr.labelBatchName")}</Label>
                   <Input 
                     id="b_title" 
                     placeholder="VD: Kiểm tra 15p Toán đại" 
@@ -182,7 +182,7 @@ export default function OmrPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="b_template">Mẫu phiếu (Template)</Label>
+                  <Label htmlFor="b_template">{t("omr.labelTemplate")}</Label>
                   <select 
                     id="b_template" 
                     className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -194,7 +194,7 @@ export default function OmrPage() {
                   </select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="b_quiz">Bài kiểm tra (Đáp án gốc)</Label>
+                  <Label htmlFor="b_quiz">{t("omr.labelQuiz")}</Label>
                   <select 
                     id="b_quiz" 
                     className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -210,7 +210,7 @@ export default function OmrPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
-                <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
+                <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.confirmCreate")}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -223,7 +223,7 @@ export default function OmrPage() {
           <CardContent className="pt-6 flex flex-col justify-center relative overflow-hidden">
             <Scan className="w-5 h-5 text-indigo-500 mb-2 relative z-10" />
             <p className="text-3xl font-bold relative z-10">{batches.length}</p>
-            <p className="text-xs font-medium text-muted-foreground uppercase mt-1 relative z-10">Đợt chấm điểm</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase mt-1 relative z-10">{t("omr.statBatches")}</p>
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-50 dark:bg-indigo-900/20 rounded-full blur-xl z-0"></div>
           </CardContent>
         </Card>
@@ -239,14 +239,14 @@ export default function OmrPage() {
           <CardContent className="pt-6 flex flex-col justify-center relative overflow-hidden">
             <CheckCircle2 className="w-5 h-5 text-amber-500 mb-2 relative z-10" />
             <p className="text-3xl font-bold relative z-10">99.8%</p>
-            <p className="text-xs font-medium text-muted-foreground uppercase mt-1 relative z-10">Độ chính xác AI</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase mt-1 relative z-10">{t("omr.statAccuracy")}</p>
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-50 dark:bg-amber-900/20 rounded-full blur-xl z-0"></div>
           </CardContent>
         </Card>
         <Card className="shadow-sm bg-indigo-600 text-white border-0 shadow-lg shadow-indigo-600/20">
           <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full">
             <Smartphone className="w-8 h-8 mb-3 opacity-90" />
-            <p className="text-sm font-semibold mb-1">Mở app điện thoại</p>
+            <p className="text-sm font-semibold mb-1">{t("omr.openMobileApp")}</p>
             <p className="text-xs text-indigo-200">Quét OMR siêu tốc bằng ứng dụng 2Know Scanner</p>
           </CardContent>
         </Card>
@@ -286,7 +286,7 @@ export default function OmrPage() {
                     </div>
                     <div className="flex items-center gap-1.5">
                       <FileText className="w-4 h-4" />
-                      <span>Mẫu: {batch.template}</span>
+                      <span>{t("omr.templateLabel")}: {batch.template}</span>
                     </div>
                   </div>
                 </div>
@@ -355,7 +355,7 @@ export default function OmrPage() {
           {editingBatch && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-b-title">Tên đợt chấm</Label>
+                <Label htmlFor="edit-b-title">{t("omr.editLabelBatchName")}</Label>
                 <Input 
                   id="edit-b-title" 
                   value={editingBatch.title} 
@@ -363,7 +363,7 @@ export default function OmrPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-b-template">Mẫu phiếu (Template)</Label>
+                <Label htmlFor="edit-b-template">{t("omr.editLabelTemplate")}</Label>
                 <select 
                   id="edit-b-template" 
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -375,7 +375,7 @@ export default function OmrPage() {
                 </select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-b-quiz">Bài kiểm tra (Đáp án gốc)</Label>
+                <Label htmlFor="edit-b-quiz">{t("omr.editLabelQuiz")}</Label>
                 <select 
                   id="edit-b-quiz" 
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"

@@ -209,7 +209,7 @@ export default function QuizzesPage() {
           if (filtered.length === 0) return (
             <div className="p-12 text-center" key="no-filter-results">
               <p className="text-muted-foreground text-sm">Không tìm thấy bài kiểm tra phù hợp.</p>
-              <button onClick={() => { setSearch(""); setStatusFilter("all"); }} className="mt-3 text-sm text-indigo-600 hover:underline">Xóa bộ lọc</button>
+              <button onClick={() => { setSearch(""); setStatusFilter("all"); }} className="mt-3 text-sm text-indigo-600 hover:underline">{t("common.clearFilter")}</button>
             </div>
           );
 
@@ -304,13 +304,13 @@ export default function QuizzesPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Cài đặt bài kiểm tra</DialogTitle>
+            <DialogTitle>{t("quizzes.editDialogTitle")}</DialogTitle>
             <DialogDescription>Thay đổi thông tin cơ bản của bài kiểm tra.</DialogDescription>
           </DialogHeader>
           {editingQuiz && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-q-title">Tên bài kiểm tra</Label>
+                <Label htmlFor="edit-q-title">{t("quizzes.labelTitle")}</Label>
                 <Input 
                   id="edit-q-title" 
                   value={editingQuiz.title} 
@@ -318,7 +318,7 @@ export default function QuizzesPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-q-subject">Môn học</Label>
+                <Label htmlFor="edit-q-subject">{t("quizzes.labelSubject")}</Label>
                 <Input 
                   id="edit-q-subject" 
                   value={editingQuiz.subject} 
@@ -338,12 +338,12 @@ export default function QuizzesPage() {
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Tạo link chia sẻ bài test</DialogTitle>
+            <DialogTitle>{t("quizzes.shareDialogTitle")}</DialogTitle>
             <DialogDescription>Chia sẻ bài kiểm tra này cho học sinh hoặc lớp học.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="s_title">Tên chiến dịch chia sẻ</Label>
+              <Label htmlFor="s_title">{t("quizzes.shareCampaignLabel")}</Label>
               <Input 
                 id="s_title" 
                 value={shareConfig.title} 
@@ -358,14 +358,14 @@ export default function QuizzesPage() {
                 value={shareConfig.type} 
                 onChange={(e) => setShareConfig({...shareConfig, type: e.target.value})}
               >
-                <option value="public">Công khai (Bất kỳ ai có link)</option>
-                <option value="class">Nội bộ (Chỉ lớp được chỉ định)</option>
+                <option value="public">{t("quizzes.sharePublicOption")}</option>
+                <option value="class">{t("quizzes.shareClassOption")}</option>
               </select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsShareDialogOpen(false)}>{t("common.cancel")}</Button>
-            <Button onClick={handleCreateShare} className="bg-indigo-600 hover:bg-indigo-700 text-white">Tạo link chia sẻ</Button>
+            <Button onClick={handleCreateShare} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("quizzes.shareCreateBtn")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

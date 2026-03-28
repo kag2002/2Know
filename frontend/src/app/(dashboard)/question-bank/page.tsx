@@ -146,7 +146,7 @@ export default function QuestionBankPage() {
           
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mt-8 mb-3 px-2 flex items-center justify-between">
             {t("questionBank.tagFilter")}
-            {selectedTag && <span className="text-[10px] text-rose-500 cursor-pointer hover:underline" onClick={() => setSelectedTag(null)}>Xóa lọc</span>}
+            {selectedTag && <span className="text-[10px] text-rose-500 cursor-pointer hover:underline" onClick={() => setSelectedTag(null)}>{t("common.clearFilterSmall")}</span>}
           </div>
           <div className="flex flex-wrap gap-2 px-2">
             {tags.map(tag => (
@@ -323,7 +323,7 @@ export default function QuestionBankPage() {
           {editingQuestion && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-q-content">Nội dung câu hỏi</Label>
+                <Label htmlFor="edit-q-content">{t("questionBank.labelContent")}</Label>
                 <textarea 
                   id="edit-q-content" 
                   value={editingQuestion.content} 
@@ -332,7 +332,7 @@ export default function QuestionBankPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-q-difficulty">Độ khó</Label>
+                <Label htmlFor="edit-q-difficulty">{t("questionBank.labelDifficulty")}</Label>
                 <select 
                   id="edit-q-difficulty" 
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"

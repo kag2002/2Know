@@ -210,7 +210,7 @@ export default function NotesPage() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Chỉnh sửa ghi chú</DialogTitle>
-            <DialogDescription>Cập nhật nội dung ghi chú cá nhân của bạn.</DialogDescription>
+            <DialogDescription>{t("notes.editDesc")}</DialogDescription>
           </DialogHeader>
           {editingNote && (
             <div className="grid gap-4 py-4">
@@ -224,7 +224,7 @@ export default function NotesPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-note-content">Nội dung</Label>
+                <Label htmlFor="edit-note-content">{t("notes.labelContent")}</Label>
                 <textarea 
                   id="edit-note-content"
                   className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"

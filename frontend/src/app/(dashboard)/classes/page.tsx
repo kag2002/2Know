@@ -138,14 +138,14 @@ export default function ClassesPage() {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Tạo lớp học mới</DialogTitle>
+                <DialogTitle>{t("classes.createDialogTitle")}</DialogTitle>
                 <DialogDescription>
                   Điền các thông tin cơ bản để khởi tạo một lớp học mới trên hệ thống.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Tên lớp học</Label>
+                  <Label htmlFor="name">{t("classes.labelClassName")}</Label>
                   <Input 
                     id="name" 
                     placeholder="VD: 12A1" 
@@ -163,7 +163,7 @@ export default function ClassesPage() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="subject">Môn học phụ trách</Label>
+                  <Label htmlFor="subject">{t("classes.labelSubject")}</Label>
                   <Input 
                     id="subject" 
                     placeholder="VD: Toán đại số" 
@@ -174,7 +174,7 @@ export default function ClassesPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("common.cancel")}</Button>
-                <Button onClick={handleCreateClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">Xác nhận tạo</Button>
+                <Button onClick={handleCreateClass} className="bg-indigo-600 hover:bg-indigo-700 text-white">{t("common.confirmCreate")}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -198,7 +198,7 @@ export default function ClassesPage() {
             <span className="font-bold text-lg">{classes.length}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-muted-foreground text-xs uppercase font-semibold">Học sinh</span>
+            <span className="text-muted-foreground text-xs uppercase font-semibold">{t("classes.labelStudentCount")}</span>
             <span className="font-bold text-indigo-600 dark:text-indigo-400 text-lg">{totalStudents}</span>
           </div>
         </div>
@@ -275,7 +275,7 @@ export default function ClassesPage() {
                     <span><strong>{cls.students?.length || 0}</strong> học sinh</span>
                   </div>
                   <div>
-                    <span>Năm học: {cls.school_year}</span>
+                    <span>{t("classes.labelSchoolYear")}: {cls.school_year}</span>
                   </div>
                 </div>
 
@@ -290,7 +290,7 @@ export default function ClassesPage() {
               </div>
               
               <div className="bg-muted/30 border-t p-3 px-5 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Tạo ngày {new Date(cls.created_at).toLocaleDateString("vi-VN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                <span className="text-xs text-muted-foreground">{t("classes.labelCreatedAt")} {new Date(cls.created_at).toLocaleDateString("vi-VN", { day: "numeric", month: "short", year: "numeric" })}</span>
                 <Link href={`/classes/${cls.id}`} className="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:text-indigo-700 flex items-center gap-1 transition-colors">
                   Xem danh sách <ChevronRight className="w-4 h-4" />
                 </Link>
@@ -322,7 +322,7 @@ export default function ClassesPage() {
           {editingClass && (
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="edit-name">Tên lớp học</Label>
+                <Label htmlFor="edit-name">{t("classes.labelClassName")}</Label>
                 <Input 
                   id="edit-name" 
                   value={editingClass.name} 
@@ -338,7 +338,7 @@ export default function ClassesPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-subject">Môn học phụ trách</Label>
+                <Label htmlFor="edit-subject">{t("classes.labelSubject")}</Label>
                 <Input 
                   id="edit-subject" 
                   value={editingClass.subject} 
