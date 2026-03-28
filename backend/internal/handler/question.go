@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"log"
 
 	"github.com/gofiber/fiber/v3"
@@ -41,6 +42,10 @@ func (h *QuestionHandler) CreateQuestion(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	if err := validateQuestionLogic(&question); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Logic validation failed: " + err.Error()})
+	}
+
 	// SECURITY: Strip Stored XSS payloads from Rich Text Content
 	utils.SanitizeQuestion(&question)
 
@@ -74,6 +79,11 @@ func (h *QuestionHandler) BatchCreateQuestions(c fiber.Ctx) error {
 		if err := utils.ValidateStruct(&body.Questions[i]); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed on a question: " + err.Error()})
 		}
+
+		if err := validateQuestionLogic(&body.Questions[i]); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Logic validation failed on a question: " + err.Error()})
+		}
+
 		// SECURITY: Strip Stored XSS payloads from every question in the batch
 		utils.SanitizeQuestion(&body.Questions[i])
 	}
@@ -142,4 +152,28 @@ func (h *QuestionHandler) UpdateQuestion(c fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"message": "Question updated successfully"})
+}
+
+// SECURITY: Structural Integrity bounds to prevent Next.js UI mapping failures
+func validateQuestionLogic(q *model.Question) error {
+	if q.Type == "multiple_choice" {
+		if len(q.Options) < 2 {
+			return errors.New("multiple choice questions must have at least 2 options")
+		}
+		hasCorrect := false
+		for _, opt := range q.Options {
+			if opt.IsCorrect {
+				hasCorrect = true
+				break
+			}
+		}
+		if !hasCorrect {
+			return errors.New("multiple choice questions must have at least 1 correct option")
+		}
+	} else if q.Type == "true_false" {
+		if len(q.Options) != 2 {
+			return errors.New("true/false questions must have exactly 2 options")
+		}
+	}
+	return nil
 }
