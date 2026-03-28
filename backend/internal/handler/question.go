@@ -57,6 +57,43 @@ func (h *QuestionHandler) CreateQuestion(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(question)
 }
 
+func (h *QuestionHandler) BatchCreateQuestions(c fiber.Ctx) error {
+	var body struct {
+		Questions []model.Question `json:"questions"`
+	}
+	
+	if err := c.Bind().JSON(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body format"})
+	}
+	
+	if len(body.Questions) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Questions array cannot be empty"})
+	}
+
+	for i := range body.Questions {
+		if err := utils.ValidateStruct(&body.Questions[i]); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed on a question: " + err.Error()})
+		}
+		// SECURITY: Strip Stored XSS payloads from every question in the batch
+		utils.SanitizeQuestion(&body.Questions[i])
+	}
+
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	if err := h.svc.CreateBatchQuestions(userId, body.Questions); err != nil {
+		log.Printf("Error creating batch questions: %v", err)
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Not authorized or failed to create batch"})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Successfully created batch questions",
+		"count": len(body.Questions),
+	})
+}
+
 func (h *QuestionHandler) GetQuizQuestions(c fiber.Ctx) error {
 	quizId := c.Params("quizId")
 	userId := getUserIdFromToken(c)

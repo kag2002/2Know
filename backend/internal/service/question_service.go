@@ -8,6 +8,7 @@ import (
 type QuestionService interface {
 	GetQuestions(teacherID string) ([]model.Question, error)
 	CreateQuestion(teacherID string, question *model.Question) error
+	CreateBatchQuestions(teacherID string, questions []model.Question) error
 	GetQuizQuestions(teacherID, quizID string) ([]model.Question, error)
 	UpdateQuestion(teacherID, questionID string, params map[string]interface{}) error
 	DeleteQuestion(teacherID, questionID string) error
@@ -33,6 +34,25 @@ func (s *questionService) CreateQuestion(teacherID string, question *model.Quest
 		}
 	}
 	return s.repo.CreateQuestion(question)
+}
+
+func (s *questionService) CreateBatchQuestions(teacherID string, questions []model.Question) error {
+	if len(questions) == 0 {
+		return nil
+	}
+	
+	// If the batch belongs to a quiz, verify ownership logic
+	// But in the AI generate context, they usually go straight to Question Bank (QuizID = "")
+	// We'll trust the caller to enforce ownership if QuizID is present.
+	for _, q := range questions {
+		if q.QuizID != "" {
+			if err := s.repo.VerifyQuizOwnership(q.QuizID, teacherID); err != nil {
+				return err
+			}
+		}
+	}
+	
+	return s.repo.CreateBatchQuestions(questions)
 }
 
 func (s *questionService) GetQuizQuestions(teacherID, quizID string) ([]model.Question, error) {

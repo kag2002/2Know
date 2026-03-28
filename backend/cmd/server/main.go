@@ -147,6 +147,7 @@ func main() {
 	api.Get("/quizzes/:quizId/questions", questionHandler.GetQuizQuestions)
 	api.Get("/questions", questionHandler.GetQuestions)
 	api.Post("/questions", questionHandler.CreateQuestion)
+	api.Post("/questions/batch", questionHandler.BatchCreateQuestions)
 	api.Patch("/questions/:id", questionHandler.UpdateQuestion)
 	api.Delete("/questions/:id", questionHandler.DeleteQuestion)
 
