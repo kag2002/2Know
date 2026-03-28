@@ -26,7 +26,7 @@ func (r *materialRepository) Create(material *model.Material) error {
 
 func (r *materialRepository) GetByClass(classID string) ([]*model.Material, error) {
 	var materials []*model.Material
-	err := r.db.Where("class_id = ?", classID).Order("created_at desc").Find(&materials).Error
+	err := r.db.Where("class_id = ?", classID).Order("created_at desc").Limit(200).Find(&materials).Error
 	return materials, err
 }
 

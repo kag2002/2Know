@@ -35,7 +35,8 @@ func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
 		errMsg := err.Error()
 		if errMsg == "quiz has not started yet" ||
 			errMsg == "quiz has already closed" ||
-			errMsg == "maximum attempts reached for this student" {
+			errMsg == "maximum attempts reached for this student" ||
+			errMsg == "you are not authorized to submit this quiz" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errMsg})
 		}
 

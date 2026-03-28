@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -29,8 +30,9 @@ type authService struct {
 }
 
 func NewAuthService(repo repository.UserRepository, secret string) AuthService {
+	// SECURITY: Server MUST NOT start without a proper JWT secret
 	if secret == "" {
-		secret = "super_secret_jwt_key_please_change_in_prod" // fallback
+		log.Fatal("FATAL: JWT_SECRET environment variable is required. Server cannot start without it.")
 	}
 	return &authService{
 		repo:      repo,
@@ -68,11 +70,11 @@ func (s *authService) Login(email, password string) (*model.User, string, error)
 		return nil, "", ErrInvalidCreds
 	}
 
-	// Create JWT (Extended to 30 days for Frictionless UX)
+	// Create JWT (24h expiry for security/UX balance)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub":  user.ID,
 		"role": user.Role,
-		"exp":  time.Now().Add(time.Hour * 720).Unix(),
+		"exp":  time.Now().Add(24 * time.Hour).Unix(),
 	})
 
 	t, err := token.SignedString([]byte(s.jwtSecret))
