@@ -42,17 +42,25 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
     setIsExporting(true);
     await new Promise(res => setTimeout(res, 800)); // Simulate premium loading
     
+    const sanitizeCsvCell = (val: string | number) => {
+      const str = String(val);
+      if (/^[=+\-@]/.test(str)) {
+        return `"'${str.replace(/"/g, '""')}"`;
+      }
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
     const headers = ["Họ và Tên", "Email", "Điểm", "Số câu đúng", "Thời gian (giây)", "Vi phạm tab", "Thời gian nộp"];
     const csvContent = [
       headers.join(","),
       ...results.map(r => [
-        `"${r.student_name || 'Guest'}"`,
-        `"${r.student_email || ''}"`,
+        sanitizeCsvCell(r.student_name || 'Guest'),
+        sanitizeCsvCell(r.student_email || ''),
         r.score,
         r.total_correct,
         r.time_taken_seconds,
         r.tab_switch_count,
-        `"${new Date(r.created_at).toLocaleString('vi-VN')}"`
+        sanitizeCsvCell(new Date(r.created_at).toLocaleString('vi-VN'))
       ].join(","))
     ].join("\n");
 

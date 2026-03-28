@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, MoreHorizontal, FolderCode, Tags } from "lucide-react";
 import Link from "next/link";
@@ -97,16 +97,18 @@ export default function QuestionBankPage() {
   };
 
   // Dynamic Sets
-  const folders = Array.from(new Set(questions.filter(q => q.folder).map(q => q.folder)));
-  const tags = Array.from(new Set(questions.flatMap(q => q.tags || [])));
+  const folders = useMemo(() => Array.from(new Set(questions.filter(q => q.folder).map(q => q.folder))), [questions]);
+  const tags = useMemo(() => Array.from(new Set(questions.flatMap(q => q.tags || []))), [questions]);
 
   // Filtered Data
-  const filteredQuestions = questions.filter(q => {
-    const matchesSearch = q.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFolder = selectedFolder ? q.folder === selectedFolder : true;
-    const matchesTag = selectedTag ? q.tags?.includes(selectedTag) : true;
-    return matchesSearch && matchesFolder && matchesTag;
-  });
+  const filteredQuestions = useMemo(() => {
+    return questions.filter(q => {
+      const matchesSearch = q.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesFolder = selectedFolder ? q.folder === selectedFolder : true;
+      const matchesTag = selectedTag ? q.tags?.includes(selectedTag) : true;
+      return matchesSearch && matchesFolder && matchesTag;
+    });
+  }, [questions, searchQuery, selectedFolder, selectedTag]);
 
   return (
     <div className="flex h-[calc(100vh-6rem)] gap-6">
