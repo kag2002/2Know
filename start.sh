@@ -32,7 +32,7 @@ echo "=========================================="
 # 1. Start Docker Database
 echo "📦 1. Đang bật Cơ sở dữ liệu (PostgreSQL & Redis)..."
 cd "$PROJECT_ROOT/backend/docker"
-docker-compose up -d
+docker-compose -p 2know up -d
 cd "$PROJECT_ROOT"
 
 # Wait a couple of seconds for the DB to be ready
