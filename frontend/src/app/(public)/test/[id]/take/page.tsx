@@ -42,6 +42,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   const [timeLeft, setTimeLeft] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({}); // QuestionID -> OptionID
   const [flagged, setFlagged] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
 
   // === PROCTORING STATE ===
@@ -141,17 +142,19 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   const handleSubmit = async () => {
     if (confirm(t("testRoom.confirmSubmit") || "Bạn có chắc chắn muốn nộp bài không? Thời gian vẫn còn dư.")) {
+      setIsSubmitting(true);
       sessionStorage.setItem("tabSwitchCount", String(tabSwitchCount));
       const success = await submitPayload(tabSwitchCount);
       if (success) router.push(`/test/${id}/result`);
+      else setIsSubmitting(false);
     }
   };
 
   const submitPayload = async (switches: number): Promise<boolean> => {
     try {
       const timeTaken = ((quiz?.time_limit_minutes || 0) * 60) - timeLeft;
-      const studentName = "Guest Student";
-      const studentId = "GUEST-" + Math.floor(Math.random() * 10000);
+      const studentName = sessionStorage.getItem("student_name") || "Guest Student";
+      const studentId = sessionStorage.getItem("student_sbd") || ("GUEST-" + Math.floor(Math.random() * 10000));
 
       const resultObj = await apiFetch("/test/submit", {
         method: "POST",
@@ -440,8 +443,8 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
         </div>
 
         <div className="p-4 bg-background border-t">
-          <Button variant="destructive" className="w-full text-base font-bold shadow-sm" onClick={handleSubmit} disabled={Object.keys(answers).length === 0}>
-            {t("testRoom.submitNow")}
+          <Button variant="destructive" className="w-full text-base font-bold shadow-sm" onClick={handleSubmit} disabled={Object.keys(answers).length === 0 || isSubmitting}>
+            {isSubmitting ? "Đang xử lý..." : t("testRoom.submitNow")}
           </Button>
         </div>
 
