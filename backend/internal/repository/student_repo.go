@@ -8,10 +8,10 @@ import (
 
 type StudentRepository interface {
 	GetStudentsByTeacherID(teacherID string) ([]StudentWithMetrics, error)
-	GetStudentByID(id string) (*model.Student, error)
+	GetStudentByID(id string, teacherID string) (*model.Student, error)
 	CreateStudent(student *model.Student) error
-	UpdateStudent(id string, student *model.Student) error
-	DeleteStudent(id string) error
+	UpdateStudent(id string, teacherID string, student *model.Student) error
+	DeleteStudent(id string, teacherID string) error
 }
 
 type studentRepository struct {
@@ -58,9 +58,13 @@ func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentW
 	return results, err
 }
 
-func (r *studentRepository) GetStudentByID(id string) (*model.Student, error) {
+func (r *studentRepository) GetStudentByID(id string, teacherID string) (*model.Student, error) {
 	var student model.Student
-	if err := r.db.First(&student, "id = ?", id).Error; err != nil {
+	err := r.db.
+		Joins("JOIN classes ON classes.id = students.class_id").
+		Where("students.id = ? AND classes.teacher_id = ?", id, teacherID).
+		First(&student).Error
+	if err != nil {
 		return nil, err
 	}
 	return &student, nil
@@ -70,10 +74,13 @@ func (r *studentRepository) CreateStudent(student *model.Student) error {
 	return r.db.Create(student).Error
 }
 
-func (r *studentRepository) DeleteStudent(id string) error {
-	return r.db.Delete(&model.Student{}, "id = ?", id).Error
+func (r *studentRepository) DeleteStudent(id string, teacherID string) error {
+	return r.db.Where("id = ? AND class_id IN (SELECT id FROM classes WHERE teacher_id = ?)", id, teacherID).
+		Delete(&model.Student{}).Error
 }
 
-func (r *studentRepository) UpdateStudent(id string, student *model.Student) error {
-	return r.db.Model(&model.Student{}).Where("id = ?", id).Updates(student).Error
+func (r *studentRepository) UpdateStudent(id string, teacherID string, student *model.Student) error {
+	return r.db.Model(&model.Student{}).
+		Where("id = ? AND class_id IN (SELECT id FROM classes WHERE teacher_id = ?)", id, teacherID).
+		Updates(student).Error
 }

@@ -41,10 +41,11 @@ func (h *StudentHandler) GetStudentByID(c fiber.Ctx) error {
 	}
 
 	id := c.Params("id")
-	student, err := h.studentService.GetStudentByID(id)
+	// SECURITY: IDOR Protection (Only allow access if the student belongs to a class owned by the teacher)
+	student, err := h.studentService.GetStudentByID(id, teacherID)
 	if err != nil {
 		log.Printf("GetStudentByID Error: %v", err)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Student not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Student not found or unauthorized"})
 	}
 
 	return c.JSON(student)
@@ -82,8 +83,9 @@ func (h *StudentHandler) DeleteStudent(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Student ID is required"})
 	}
 
-	if err := h.studentService.DeleteStudent(studentID); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete student"})
+	// SECURITY: IDOR Protection
+	if err := h.studentService.DeleteStudent(studentID, teacherID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete student or unauthorized"})
 	}
 
 	return c.JSON(fiber.Map{"message": "Student successfully deleted"})
@@ -111,8 +113,9 @@ func (h *StudentHandler) UpdateStudent(c fiber.Ctx) error {
 	req.ID = studentID
 	req.ClassID = "" 
 
-	if err := h.studentService.UpdateStudent(studentID, &req); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update student"})
+	// SECURITY: IDOR Protection
+	if err := h.studentService.UpdateStudent(studentID, teacherID, &req); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update student or unauthorized"})
 	}
 
 	return c.JSON(req)

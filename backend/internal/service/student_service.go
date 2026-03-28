@@ -7,10 +7,10 @@ import (
 
 type StudentService interface {
 	GetStudentsByTeacherID(teacherID string) ([]repository.StudentWithMetrics, error)
-	GetStudentByID(id string) (*model.Student, error)
+	GetStudentByID(id string, teacherID string) (*model.Student, error)
 	CreateStudent(student *model.Student) error
-	UpdateStudent(id string, student *model.Student) error
-	DeleteStudent(id string) error
+	UpdateStudent(id string, teacherID string, student *model.Student) error
+	DeleteStudent(id string, teacherID string) error
 }
 
 type studentService struct {
@@ -53,18 +53,18 @@ func (s *studentService) GetStudentsByTeacherID(teacherID string) ([]repository.
 	return students, nil
 }
 
-func (s *studentService) GetStudentByID(id string) (*model.Student, error) {
-	return s.repo.GetStudentByID(id)
+func (s *studentService) GetStudentByID(id string, teacherID string) (*model.Student, error) {
+	return s.repo.GetStudentByID(id, teacherID)
 }
 
 func (s *studentService) CreateStudent(student *model.Student) error {
 	return s.repo.CreateStudent(student)
 }
 
-func (s *studentService) DeleteStudent(id string) error {
-	return s.repo.DeleteStudent(id)
+func (s *studentService) DeleteStudent(id string, teacherID string) error {
+	return s.repo.DeleteStudent(id, teacherID)
 }
 
-func (s *studentService) UpdateStudent(id string, student *model.Student) error {
-	return s.repo.UpdateStudent(id, student)
+func (s *studentService) UpdateStudent(id string, teacherID string, student *model.Student) error {
+	return s.repo.UpdateStudent(id, teacherID, student)
 }
