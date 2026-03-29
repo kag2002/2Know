@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AuthLayout({
   children,
 }: {
@@ -12,9 +14,7 @@ export default function AuthLayout({
         
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white text-xl shadow-lg">
-              Q
-            </div>
+            <Image src="/logo.png" alt="2Know" width={40} height={40} className="rounded-full shadow-lg" />
             <span className="text-2xl font-bold tracking-tight">2Know Plus</span>
           </div>
           <p className="max-w-md mt-6 text-lg text-slate-300 leading-relaxed">
@@ -48,7 +48,7 @@ export default function AuthLayout({
       <div className="flex-1 flex flex-col items-center justify-center p-8 bg-background relative">
         {/* Mobile Header */}
         <div className="lg:hidden absolute top-8 left-8 flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white">Q</div>
+          <Image src="/logo.png" alt="2Know" width={32} height={32} className="rounded-full" />
           <span className="font-bold text-foreground tracking-tight">2Know</span>
         </div>
         

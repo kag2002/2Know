@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -155,9 +156,7 @@ export function AppSidebar() {
     <aside className="w-64 border-r bg-background min-h-screen flex flex-col">
       <div className="h-16 flex items-center px-6 border-b">
         <Link href="/" className="flex items-center gap-2.5 font-bold text-xl text-primary">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-sm shadow-sm">
-            Q
-          </div>
+          <Image src="/logo.png" alt="2Know" width={32} height={32} className="rounded-lg shadow-sm" />
           2Know
         </Link>
       </div>
