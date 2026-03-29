@@ -13,7 +13,7 @@ import (
 )
 
 type AIService interface {
-	GenerateQuestions(prompt string) ([]AIQuestion, error)
+	GenerateQuestions(prompt string, count int, difficulty, format, language string) ([]AIQuestion, error)
 }
 
 type aiService struct{}
@@ -29,8 +29,18 @@ type AIQuestion struct {
 	Explanation  string   `json:"explanation"`
 }
 
-func (s *aiService) GenerateQuestions(prompt string) ([]AIQuestion, error) {
+func (s *aiService) GenerateQuestions(prompt string, count int, difficulty, format, language string) ([]AIQuestion, error) {
 	apiKey := os.Getenv("OPENAI_API_KEY")
+
+	if count <= 0 {
+		count = 10
+	}
+	if language == "" {
+		language = "vi"
+	}
+	if difficulty == "auto" || difficulty == "" {
+		difficulty = "bất kỳ"
+	}
 
 	// If no API Key is provided, fallback to standard mock responses
 	if apiKey == "" {
@@ -51,8 +61,10 @@ func (s *aiService) GenerateQuestions(prompt string) ([]AIQuestion, error) {
 	}
 
 	// 1. Construct the LLM Request
-	sysPrompt := `Bạn là chuyên gia giáo dục của nền tảng 2Know. 
-Nhiệm vụ của bạn: Tạo câu hỏi trắc nghiệm từ văn bản/chủ đề người dùng cung cấp.
+	sysPrompt := fmt.Sprintf(`Bạn là chuyên gia giáo dục của nền tảng 2Know. 
+Nhiệm vụ của bạn: Tạo %d câu hỏi trắc nghiệm (%s) từ văn bản/chủ đề người dùng cung cấp.
+Độ khó: %s.
+Ngôn ngữ: %s.
 RẤT QUAN TRỌNG: Bạn CHỈ ĐƯỢC PHÉP trả về MỘT mảng JSON nguyên gốc. KHÔNG BAO GỒM markdown.
 Định dạng bắt buộc:
 [
@@ -62,7 +74,7 @@ RẤT QUAN TRỌNG: Bạn CHỈ ĐƯỢC PHÉP trả về MỘT mảng JSON nguy
     "correctIndex": 1,
     "explanation": "Giải thích vì sao đúng."
   }
-]`
+]`, count, format, difficulty, language)
 
 	reqBody := map[string]interface{}{
 		"model": "gpt-4o-mini", // Cost efficient fallback

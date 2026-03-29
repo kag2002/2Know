@@ -25,6 +25,12 @@ func (h *AIHandler) GenerateQuiz(c fiber.Ctx) error {
 
 	var req struct {
 		Prompt string `json:"prompt" validate:"required,max=1000"`
+		Config struct {
+			Count      int    `json:"count"`
+			Difficulty string `json:"difficulty"`
+			Format     string `json:"format"`
+			Language   string `json:"language"`
+		} `json:"config"`
 	}
 
 	if err := c.Bind().JSON(&req); err != nil {
@@ -39,7 +45,7 @@ func (h *AIHandler) GenerateQuiz(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Prompt cannot be empty"})
 	}
 
-	questions, err := h.svc.GenerateQuestions(req.Prompt)
+	questions, err := h.svc.GenerateQuestions(req.Prompt, req.Config.Count, req.Config.Difficulty, req.Config.Format, req.Config.Language)
 	if err != nil {
 		// SECURITY: Never expose internal AI provider errors to the client (may contain API key fragments or billing details)
 		log.Printf("AI GenerateQuestions error: %v", err)
