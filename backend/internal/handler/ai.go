@@ -46,6 +46,16 @@ func (h *AIHandler) GenerateQuiz(c fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Hệ thống AI không thể tạo câu hỏi lúc này. Vui lòng thử lại sau."})
 	}
 
+	// SECURITY: AI Reflection XSS Protection. 
+	// Strip any malicious HTML payloads embedded by the LLM (Prompt Injection defense).
+	for i := range questions {
+		questions[i].Question = utils.SanitizeString(questions[i].Question)
+		questions[i].Explanation = utils.SanitizeString(questions[i].Explanation)
+		for j := range questions[i].Options {
+			questions[i].Options[j] = utils.SanitizeString(questions[i].Options[j])
+		}
+	}
+
 	return c.JSON(fiber.Map{
 		"questions": questions,
 	})

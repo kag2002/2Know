@@ -49,7 +49,19 @@ export default function NotesPage() {
   };
 
   useEffect(() => {
-    loadNotes();
+    let isMounted = true;
+    const fetchNotes = async () => {
+      try {
+        const data = await apiFetch("/notes");
+        if (isMounted && data && Array.isArray(data)) setNotes(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchNotes();
+    return () => { isMounted = false; };
   }, []);
 
   const handleCreate = async () => {

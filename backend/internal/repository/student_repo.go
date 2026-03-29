@@ -45,13 +45,12 @@ func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentW
 			students.student_id as student_id,
 			students.email as email,
 			classes.name as class,
-			COALESCE(AVG(test_results.score), 0) as avg_score,
-			COUNT(test_results.id) as tests
+			COALESCE(tr.avg_score, 0) as avg_score,
+			COALESCE(tr.tests, 0) as tests
 		`).
 		Joins("JOIN classes ON students.class_id = classes.id AND classes.deleted_at IS NULL").
-		Joins("LEFT JOIN test_results ON test_results.student_id = students.id").
+		Joins("LEFT JOIN (SELECT student_id, AVG(score) as avg_score, COUNT(id) as tests FROM test_results GROUP BY student_id) tr ON tr.student_id = students.id").
 		Where("classes.teacher_id = ?", teacherID).
-		Group("students.id, students.full_name, students.student_id, students.email, classes.name").
 		Limit(500).
 		Scan(&results).Error
 

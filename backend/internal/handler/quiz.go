@@ -84,15 +84,15 @@ func (h *QuizHandler) GetPublicQuizByID(c fiber.Ctx) error {
 func (h *QuizHandler) GetPublicQuizMetadata(c fiber.Ctx) error {
 	id := c.Params("id")
 
-	quiz, err := h.svc.GetPublicQuizByID(id)
+	quiz, count, err := h.svc.GetPublicQuizMetadata(id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Quiz not found or not published"})
 	}
 
-	// SECURITY: Pre-fetch data leak prevention. 
+	// SECURITY & PERFORMANCE: Pre-fetch data leak prevention & RAM optimization.
 	// Return a Data Transfer Object (DTO) that absolutely omits Question Content and Options.
-	// Fill questions array with empty maps so frontend `quiz.questions.length` still works.
-	safeQuestions := make([]fiber.Map, len(quiz.Questions))
+	// Fill questions array with empty maps so frontend `quiz.questions.length` still works without transferring payload over HTTP.
+	safeQuestions := make([]fiber.Map, count)
 	
 	return c.JSON(fiber.Map{
 		"id":                 quiz.ID,

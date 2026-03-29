@@ -76,18 +76,22 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
   };
 
   useEffect(() => {
+    let isMounted = true;
     const loadResults = async () => {
       try {
         setLoading(true);
         const data = await apiFetch(`/quizzes/${id}/results`);
-        setResults(Array.isArray(data) ? data : []);
+        if (isMounted) setResults(Array.isArray(data) ? data : []);
       } catch (err: any) {
-        setError(err.message || "Failed to load results");
+        if (isMounted) setError(err.message || "Failed to load results");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     loadResults();
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   const { totalSubmissions, avgScore, maxScore, totalViolations, scoreDistribution, topStudents } = useMemo(() => {

@@ -10,6 +10,11 @@ import (
 // It allows basic layout tags (b, i, strong, p, img, br) but firmly strips dangerous tags (script, object, embed).
 var policy = bluemonday.UGCPolicy()
 
+// SanitizeString provides a primitive exposure of the bluemonday engine for dynamic string washing (like LLM Prompts).
+func SanitizeString(s string) string {
+	return policy.Sanitize(s)
+}
+
 // SanitizeQuestion recursively neutralizes Stored XSS vectors inside Question Content and Options.
 func SanitizeQuestion(q *model.Question) {
 	if q == nil {

@@ -35,6 +35,7 @@ function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string
     const duration = 1200;
     const start = performance.now();
     
+    let frameId: number;
     const animate = (now: number) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
@@ -47,10 +48,14 @@ function AnimatedNumber({ value, suffix = "" }: { value: string; suffix?: string
         setDisplay(Math.round(current).toString());
       }
       
-      if (progress < 1) requestAnimationFrame(animate);
+      if (progress < 1) frameId = requestAnimationFrame(animate);
     };
     
-    requestAnimationFrame(animate);
+    frameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId);
+    };
   }, [value]);
   
   return <>{display}{suffix}</>;
@@ -99,19 +104,32 @@ export default function OverviewPage() {
     }
   };
 
+  useEffect(() => {
+    let isMounted = true;
+    const loadDashboardData = async () => {
+      try {
+        const data = await apiFetch("/stats/dashboard");
+        if (isMounted) {
+          setStats(data);
+          setMounted(true);
+        }
+      } catch {
+        // Handle gracefully
+      }
+    };
+    loadDashboardData();
+    return () => { isMounted = false; };
+  }, []);
+
   const loadDashboardData = async () => {
     try {
-      setMounted(true);
       const data = await apiFetch("/stats/dashboard");
       setStats(data);
+      setMounted(true);
     } catch {
       // Handle gracefully
     }
   };
-
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
 
   const statCards = [
     {

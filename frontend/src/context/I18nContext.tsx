@@ -22,12 +22,14 @@ const dictionaries = {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("vi");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("2know_lang") as Language;
     if (savedLang && ["vi", "en"].includes(savedLang)) {
       setLanguageState(savedLang);
     }
+    setMounted(true);
   }, []);
 
   const setLanguage = useCallback((lang: Language) => {
@@ -47,7 +49,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   return (
     <I18nContext.Provider value={contextValue}>
-      {children}
+      {mounted ? children : <div className="min-h-screen bg-slate-50 dark:bg-slate-950" />}
     </I18nContext.Provider>
   );
 }

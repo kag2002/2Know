@@ -33,7 +33,9 @@ func (r *classRepository) CreateClass(class *model.Class) error {
 
 func (r *classRepository) GetClasses(teacherID string) ([]model.Class, error) {
 	var classes []model.Class
-	err := r.db.Preload("Students").
+	err := r.db.Preload("Students", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id", "class_id") // RAM Optimization: Only load UUIDs to fulfill frontend .length array counts
+	}).
 		Where("teacher_id = ?", teacherID).
 		Order("created_at desc").
 		Limit(200).

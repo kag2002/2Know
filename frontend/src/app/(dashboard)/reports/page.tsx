@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,30 +37,53 @@ interface Quiz {
   avg_score: number;
 }
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 function ReportsContent() {
   const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const debouncedSearch = useDebounce(search, 300);
   const [loading, setLoading] = useState(true);
 
+  // PERFORMANCE: Freeze Array logic via useMemo block to stop cascading un-debounced rendering
+  const filteredQuizzes = useMemo(() => {
+    if (!debouncedSearch) return quizzes;
+    const lowerSearch = debouncedSearch.toLowerCase();
+    return quizzes.filter(q => q.title.toLowerCase().includes(lowerSearch));
+  }, [quizzes, debouncedSearch]);
+
   useEffect(() => {
+    let isMounted = true;
     const fetchData = async () => {
       try {
         const [statsData, quizzesData] = await Promise.all([
           apiFetch("/stats/dashboard"),
           apiFetch("/quizzes")
         ]);
-        setStats(statsData);
-        setQuizzes(quizzesData);
+        if (isMounted) {
+          setStats(statsData);
+          setQuizzes(quizzesData);
+        }
       } catch (err) {
         console.error("Failed to load reports data:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     fetchData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleExportCSV = async () => {
@@ -201,14 +224,14 @@ function ReportsContent() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6 bg-slate-50/50 dark:bg-slate-900/20">
-          {quizzes.filter(q => q.title.toLowerCase().includes(search.toLowerCase())).length === 0 ? (
+          {filteredQuizzes.length === 0 ? (
             <div className="col-span-full p-16 text-center text-muted-foreground border-2 border-dashed rounded-2xl bg-muted/30">
               <BarChart3 className="w-12 h-12 text-slate-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground">{t("reports.noReports")}</h3>
               <p className="text-sm mt-1">{t("dashboard.reports.emptyState")}</p>
             </div>
           ) : (
-            quizzes.filter(q => q.title.toLowerCase().includes(search.toLowerCase())).map(quiz => (
+            filteredQuizzes.map(quiz => (
               <Card key={quiz.id} className="group overflow-hidden border bg-background hover:shadow-xl hover:border-indigo-300 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col">
                 <div className="p-6 flex flex-col h-full relative">
                   {/* Decorative Background Glow */}

@@ -25,6 +25,7 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
   const router = useRouter();
   
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
   const [cameraError, setCameraError] = useState("");
@@ -38,6 +39,7 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
         video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } } 
       });
       setStream(mediaStream);
+      streamRef.current = mediaStream;
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
@@ -49,9 +51,9 @@ export default function OMRScannerPage({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     startCamera();
     return () => {
-      // Cleanup stream on unmount
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      // Cleanup stream on unmount reliably using the stable Ref!
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
   }, [startCamera]);

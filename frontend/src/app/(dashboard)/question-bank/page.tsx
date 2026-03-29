@@ -66,9 +66,26 @@ export default function QuestionBankPage() {
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadQuestions();
+    let isMounted = true;
+    const fetchIt = async () => {
+      try {
+        setLoading(true);
+        const data = await apiFetch("/questions");
+        if (isMounted) setQuestions(data || []);
+      } catch (err: any) {
+        if (isMounted) toast.error("Không thể tải danh sách câu hỏi", { description: err.message });
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchIt();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const loadQuestions = async () => {
@@ -77,7 +94,7 @@ export default function QuestionBankPage() {
       const data = await apiFetch("/questions");
       setQuestions(data || []);
     } catch (err: any) {
-      console.error(err);
+      toast.error("Không thể tải danh sách câu hỏi", { description: err.message });
     } finally {
       setLoading(false);
     }
@@ -98,12 +115,31 @@ export default function QuestionBankPage() {
           folder: editingQuestion.folder
         })
       });
+      // PERFORMANCE: Optimistic UI Update. Eliminate heavy O(N) database polling.
+      setQuestions(prev => prev.map(q => 
+        q.id === editingQuestion.id 
+          ? { ...q, content: editingQuestion.content, difficulty: editingQuestion.difficulty, folder: editingQuestion.folder }
+          : q
+      ));
+      
       toast.success("Cập nhật câu hỏi thành công!");
       setIsEditDialogOpen(false);
-      loadQuestions();
+      setLoading(false);
     } catch {
       toast.error("Lỗi khi cập nhật câu hỏi");
       setLoading(false);
+    }
+  };
+
+  const handleDeleteQuestion = async () => {
+    if (!deleteId) return;
+    try {
+      await apiFetch(`/questions/${deleteId}`, { method: 'DELETE' });
+      setQuestions(prev => prev.filter(q => q.id !== deleteId));
+      toast.success("Xóa câu hỏi thành công");
+      setIsDeleteDialogOpen(false);
+    } catch (err: any) {
+      toast.error("Lỗi khi xóa câu hỏi", { description: err.message });
     }
   };
 

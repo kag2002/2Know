@@ -113,19 +113,19 @@ export default function AIGeneratorPage() {
       toast.success(t("quizGenerate.alertAddSuccess", { count: generatedQuestions.length }));
       router.push("/question-bank");
     } catch (err: any) {
-      toast.error("Lỗi lưu câu hỏi: " + (err.message || ""));
+      toast.error(t("quizGenerate.alertSaveError") + (err.message || ""));
     }
   };
 
   const removeQuestion = (idx: number) => {
     setGeneratedQuestions(prev => prev.filter((_, i) => i !== idx));
-    toast.success("Đã xóa câu hỏi khỏi danh sách.");
+    toast.success(t("quizGenerate.alertDeleteSuccess") || "Đã xóa câu hỏi khỏi danh sách.");
   };
 
   const copyQuestion = (q: any) => {
     const text = `${q.question}\n${q.options.map((o: string, i: number) => `${String.fromCharCode(65 + i)}. ${o}`).join("\n")}\nĐáp án: ${String.fromCharCode(65 + q.correctIndex)}`;
     navigator.clipboard.writeText(text);
-    toast.success("Đã sao chép câu hỏi.");
+    toast.success(t("quizGenerate.alertCopySuccess") || "Đã sao chép câu hỏi.");
   };
 
   const difficultyOptions = [
@@ -172,7 +172,7 @@ export default function AIGeneratorPage() {
             />
 
             <div className="mt-4 flex flex-col sm:flex-row gap-3">
-              <Button variant="outline" className="flex-1 bg-background border-dashed border-border text-muted-foreground hover:text-blue-600 hover:border-blue-300 gap-2 h-11" disabled={isGenerating}>
+              <Button onClick={() => toast.info(t("quizGenerate.featureWip") || "Tính năng đang phát triển.")} variant="outline" className="flex-1 bg-background border-dashed border-border text-muted-foreground hover:text-blue-600 hover:border-blue-300 gap-2 h-11" disabled={isGenerating}>
                  <Upload className="w-4 h-4" /> {t("quizGenerate.uploadPDF") || "Tải lên PDF (Max 5MB)"}
               </Button>
               <Button onClick={generateQuiz} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold gap-2 shadow-md shadow-blue-500/20 h-11" disabled={isGenerating}>

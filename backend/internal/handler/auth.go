@@ -39,6 +39,7 @@ func (h *AuthHandler) Register(c fiber.Ctx) error {
 	}
 
 	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
+	req.FullName = utils.SanitizeString(req.FullName)
 
 	user, err := h.svc.Register(req.Email, req.Password, req.FullName)
 	if err != nil {

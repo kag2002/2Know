@@ -29,18 +29,22 @@ export default function GradingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchPending = async () => {
       try {
         const data = await apiFetch("/grading/pending");
-        if (data && Array.isArray(data)) setPendingSubmissions(data);
+        if (isMounted && data && Array.isArray(data)) setPendingSubmissions(data);
       } catch (err: any) {
         console.error("Failed to load pending gradings", err);
         // Fallback or just empty
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     fetchPending();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleGrade = async (id: string) => {

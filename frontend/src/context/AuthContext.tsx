@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 interface User {
@@ -35,33 +35,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = (token: string, userData: User) => {
+  const login = useCallback((token: string, userData: User) => {
     localStorage.setItem("2know_token", token);
     localStorage.setItem("2know_user", JSON.stringify(userData));
     // Set cookie so Next.js middleware can detect auth state (Synchronized with Backend 24 Hours)
     document.cookie = `2know_token=${token}; path=/; max-age=${60 * 60 * 24}; SameSite=Lax`;
     setUser(userData);
     router.push("/overview");
-  };
+  }, [router]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("2know_token");
     localStorage.removeItem("2know_user");
     // Clear the auth cookie
     document.cookie = "2know_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     setUser(null);
     router.push("/login");
-  };
+  }, [router]);
 
-  const updateUser = (updates: Partial<User>) => {
-    if (!user) return;
-    const updatedUser = { ...user, ...updates };
-    setUser(updatedUser);
-    localStorage.setItem("2know_user", JSON.stringify(updatedUser));
-  };
+  const updateUser = useCallback((updates: Partial<User>) => {
+    setUser(prevUser => {
+      if (!prevUser) return null;
+      const updatedUser = { ...prevUser, ...updates };
+      localStorage.setItem("2know_user", JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  }, []);
+
+  const value = useMemo(() => ({
+    user,
+    loading,
+    login,
+    logout,
+    updateUser
+  }), [user, loading, login, logout, updateUser]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

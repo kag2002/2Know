@@ -40,7 +40,19 @@ export default function TagsPage() {
   };
 
   useEffect(() => {
-    loadTags();
+    let isMounted = true;
+    const fetchTags = async () => {
+      try {
+        const data = await apiFetch("/tags");
+        if (isMounted && data && Array.isArray(data)) setTags(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchTags();
+    return () => { isMounted = false; };
   }, []);
 
   const filtered = tags.filter(t => t.name?.toLowerCase().includes(search.toLowerCase()));

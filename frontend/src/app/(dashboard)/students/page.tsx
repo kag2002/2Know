@@ -64,21 +64,32 @@ export default function StudentsPage() {
   const [editingStudent, setEditingStudent] = useState<StudentMetrics | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       try {
         const [studentsData, classesData] = await Promise.all([
           apiFetch("/students"),
           apiFetch("/classes")
         ]);
-        setAllStudents(studentsData || []);
-        setAvailableClasses(classesData || []);
+        if (isMounted) {
+          setAllStudents(studentsData || []);
+          setAvailableClasses(classesData || []);
+        }
       } catch (err: any) {
-        toast.error("Không thể tải dữ liệu: " + err.message);
+        if (isMounted) {
+          toast.error("Không thể tải dữ liệu: " + err.message);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Memoized and debounced filtering

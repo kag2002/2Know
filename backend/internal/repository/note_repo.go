@@ -25,7 +25,7 @@ func NewNoteRepository(db *gorm.DB) NoteRepository {
 
 func (r *noteRepository) GetNotes(userID string) ([]model.Note, error) {
 	var notes []model.Note
-	err := r.db.Where("user_id = ?", userID).Order("pinned desc, created_at desc").Limit(200).Find(&notes).Error
+	err := r.db.Where("user_id = ?", userID).Order("pinned desc, created_at desc").Find(&notes).Error
 	return notes, err
 }
 

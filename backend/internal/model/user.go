@@ -10,7 +10,7 @@ import (
 type User struct {
 	ID            uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Email         string    `gorm:"type:varchar(255);uniqueIndex;not null"`
-	PasswordHash  string    `gorm:"type:varchar(255);not null"`
+	PasswordHash  string    `gorm:"type:varchar(255);not null" json:"-"`
 	FullName      string    `gorm:"type:varchar(255);not null"`
 	AvatarURL     *string   `gorm:"type:varchar(500)"`
 	Role          string    `gorm:"type:varchar(20);default:'teacher'"`
@@ -21,7 +21,7 @@ type User struct {
 	LastLoginAt   *time.Time
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
-	DeletedAt     gorm.DeletedAt `gorm:"index"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships - GDPR Cascades
 	Quizzes   []Quiz      `gorm:"foreignKey:TeacherID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

@@ -23,7 +23,7 @@ func NewOmrBatchRepository(db *gorm.DB) OmrBatchRepository {
 
 func (r *omrBatchRepository) FindByUserID(userID string) ([]model.OmrBatch, error) {
 	var items []model.OmrBatch
-	err := r.db.Where("user_id = ?", userID).Order("created_at DESC").Limit(200).Find(&items).Error
+	err := r.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&items).Error
 	return items, err
 }
 
@@ -56,7 +56,7 @@ func NewRubricRepository(db *gorm.DB) RubricRepository {
 
 func (r *rubricRepository) FindByUserID(userID string) ([]model.Rubric, error) {
 	var items []model.Rubric
-	err := r.db.Where("user_id = ?", userID).Order("created_at DESC").Limit(200).Find(&items).Error
+	err := r.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&items).Error
 	return items, err
 }
 

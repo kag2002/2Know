@@ -43,7 +43,20 @@ export default function SharingPage() {
   const [editingLink, setEditingLink] = useState<ShareData | null>(null);
 
   useEffect(() => {
-    loadShares();
+    let isMounted = true;
+    const fetchShares = async () => {
+      try {
+        setLoading(true);
+        const data = await apiFetch("/shares");
+        if (isMounted) setSharedQuizzes(data || []);
+      } catch {
+        if (isMounted) toast.error(t("sharing.loadError"));
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchShares();
+    return () => { isMounted = false; };
   }, []);
 
   const loadShares = async () => {

@@ -96,7 +96,10 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		}()
 
 		attempts, err := s.repo.GetAttemptCount(quiz.ID, result.StudentIdentifier)
-		if err == nil && attempts >= int64(quiz.MaxAttempts) {
+		if err != nil {
+			return errors.New("system error checking attempt limits, access denied securely")
+		}
+		if attempts >= int64(quiz.MaxAttempts) {
 			return errors.New("maximum attempts reached for this student")
 		}
 	}
@@ -109,8 +112,13 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		}
 	}
 
+	// SECURITY: Impossible Speed Cheat Check (Sub-10 seconds for a full test indicates API manipulation)
+	if result.TimeTakenSeconds < 10 && len(quiz.Questions) >= 5 {
+		result.Status = "cheating_flagged"
+	}
+
 	// Calculate Score securely on the server
-	correctOptionMap := make(map[string]bool)
+	correctOptionMap := make(map[string]string) // Map QuestionID -> CorrectOptionID
 	hasEssay := false
 
 	// Map correctly answered questions to their point values
@@ -120,7 +128,7 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		}
 		for _, opt := range q.Options {
 			if opt.IsCorrect {
-				correctOptionMap[opt.ID] = true
+				correctOptionMap[q.ID] = opt.ID
 			}
 		}
 	}
@@ -137,8 +145,8 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 
 		studentAnswerValue := result.Answers[q.ID]
 
-		// If student provided an answer and it's flagged as correct
-		if studentAnswerValue != "" && correctOptionMap[studentAnswerValue] {
+		// If student provided an answer and it matches the explicitly mapped correct option for THIS question
+		if studentAnswerValue != "" && correctOptionMap[q.ID] == studentAnswerValue {
 			totalCorrect++
 			earnedPoints += q.Points
 		} else if studentAnswerValue != "" {

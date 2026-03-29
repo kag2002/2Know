@@ -15,9 +15,10 @@ type OmrBatch struct {
 	Template      string    `gorm:"type:varchar(100);default:'Mẫu 50 câu (A4)'" json:"template"`
 	SheetsScanned int       `gorm:"default:0" json:"sheets_scanned"`
 	TotalSheets   int       `gorm:"default:0" json:"total_sheets"`
-	Status        string    `gorm:"type:varchar(20);default:'ready'" json:"status"` // ready, scanning, completed
-	CreatedAt     time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt     time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	Status        string         `gorm:"type:varchar(20);default:'ready'" json:"status"` // ready, scanning, completed
+	CreatedAt     time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt     time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (o *OmrBatch) BeforeCreate(tx *gorm.DB) (err error) {
@@ -35,9 +36,10 @@ type Rubric struct {
 	Target        string    `gorm:"type:varchar(100)" json:"target"`
 	CriteriaCount int       `gorm:"default:0" json:"criteria_count"`
 	UsageCount    int       `gorm:"default:0" json:"usage_count"`
-	Active        bool      `gorm:"default:true" json:"active"`
-	CreatedAt     time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt     time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	Active        bool           `gorm:"default:true" json:"active"`
+	CreatedAt     time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt     time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (r *Rubric) BeforeCreate(tx *gorm.DB) (err error) {
@@ -56,9 +58,10 @@ type ShareLink struct {
 	URL         string    `gorm:"type:varchar(500)" json:"url"`
 	AccessCount int       `gorm:"default:0" json:"access_count"`
 	Status      string    `gorm:"type:varchar(20);default:'active'" json:"status"` // active, expired
-	Type        string    `gorm:"type:varchar(20);default:'public'" json:"type"`   // public, class
-	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt   time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	Type        string         `gorm:"type:varchar(20);default:'public'" json:"type"`   // public, class
+	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (s *ShareLink) BeforeCreate(tx *gorm.DB) (err error) {

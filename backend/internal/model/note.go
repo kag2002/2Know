@@ -14,8 +14,9 @@ type Note struct {
 	Content   string    `gorm:"type:text;not null" json:"content" validate:"required,max=5000"`
 	Color     string    `gorm:"type:varchar(50);default:'bg-amber-50 border-amber-200'" json:"color"`
 	Pinned    bool      `gorm:"default:false" json:"pinned"`
-	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (n *Note) BeforeCreate(tx *gorm.DB) (err error) {

@@ -66,7 +66,7 @@ func (s *statsService) GetDashboardOverview(teacherID string) (*repository.Dashb
 	s.mu.Lock()
 	s.cache[teacherID] = cacheEntry{
 		data:      stats,
-		expiresAt: time.Now().Add(60 * time.Second),
+		expiresAt: time.Now().Add(15 * time.Second),
 	}
 	s.mu.Unlock()
 

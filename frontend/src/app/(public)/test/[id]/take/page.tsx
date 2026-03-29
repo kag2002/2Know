@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use, useMemo, useCallback } from "react";
+import { useEffect, useState, use, useMemo, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Clock, Flag, ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, ShieldAlert, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -41,7 +41,15 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [startTime] = useState<number>(Date.now());
   const [answers, setAnswers] = useState<Record<string, string>>({}); // QuestionID -> OptionID
+  const answersRef = useRef(answers);
+  const timeElapsedRef = useRef(timeElapsed);
+
+  // Sync refs so handleAutoSubmit inside useEffect always sees latest truth without re-binding
+  useEffect(() => { answersRef.current = answers; }, [answers]);
+  useEffect(() => { timeElapsedRef.current = timeElapsed; }, [timeElapsed]);
+
   const [flagged, setFlagged] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -75,13 +83,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden && !loading && quiz) {
-        setTabSwitchCount(prev => {
-          const newCount = prev + 1;
-          if (newCount >= MAX_TAB_SWITCHES) {
-            handleAutoSubmit(newCount);
-          }
-          return newCount;
-        });
+        setTabSwitchCount(prev => prev + 1);
         setTimerPaused(true);
         setShowWarning(true);
       }
@@ -90,6 +92,13 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [loading, quiz]);
+
+  // Tab limit watcher (Moves API side-effects safely OUT of setState closures)
+  useEffect(() => {
+    if (tabSwitchCount >= MAX_TAB_SWITCHES && !isSubmitting) {
+       handleAutoSubmit(tabSwitchCount);
+    }
+  }, [tabSwitchCount, isSubmitting]);
 
   // --- Copy/Paste Prevention ---
   useEffect(() => {
@@ -107,25 +116,27 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
     };
   }, []);
 
-  // Timer
+  // Secure System-Clock Timer
   useEffect(() => {
     if (timerPaused || loading || !quiz) return;
     const timer = setInterval(() => {
-      setTimeElapsed(prev => prev + 1);
+      const now = Date.now();
+      const trueElapsed = Math.floor((now - startTime) / 1000);
+      setTimeElapsed(trueElapsed);
       
       if (quiz.time_limit_minutes > 0) {
-        setTimeLeft(prev => {
-          if (prev === null) return null;
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
+        const totalSeconds = quiz.time_limit_minutes * 60;
+        const remaining = totalSeconds - trueElapsed;
+        if (remaining <= 0) {
+           setTimeLeft(0);
+           clearInterval(timer);
+        } else {
+           setTimeLeft(remaining);
+        }
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [timerPaused, loading, quiz]);
+  }, [timerPaused, loading, quiz, startTime]);
 
   // Auto-Submit Watcher
   useEffect(() => {

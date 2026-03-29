@@ -51,7 +51,20 @@ export default function ClassesPage() {
   const [editingClass, setEditingClass] = useState<ClassItem | null>(null);
 
   useEffect(() => {
-    loadClasses();
+    let isMounted = true;
+    const fetchClasses = async () => {
+      try {
+        setLoading(true);
+        const data = await apiFetch("/classes");
+        if (isMounted) setClasses(Array.isArray(data) ? data : []);
+      } catch {
+        if (isMounted) setClasses([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchClasses();
+    return () => { isMounted = false; };
   }, []);
 
   const loadClasses = async () => {

@@ -20,7 +20,7 @@ interface TestQuizData {
   description: string;
   require_fullscreen: boolean;
   disable_copy_paste: boolean;
-  questions: Question[];
+  questions_count?: number;
 }
 
 export default function TestIntroPage({ params }: { params: Promise<{ id: string }> }) {
@@ -38,7 +38,6 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
     const loadQuizInfo = async () => {
       try {
         const data = await apiFetch(`/test/quiz/${id}/metadata`, { requireAuth: false });
-        if (!data.questions) data.questions = [];
         setQuiz(data);
       } catch (err: any) {
         setError(t("testIntro.loadError") + (err.message || "Lỗi mạng"));

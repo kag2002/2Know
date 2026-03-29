@@ -118,11 +118,11 @@ func (h *UserHandler) ChangePassword(c fiber.Ctx) error {
 	}
 
 	if req.CurrentPassword == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Mật khẩu hiện tại không được để trống"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Current password cannot be empty"})
 	}
 
 	if len(req.NewPassword) < 6 || len(req.NewPassword) > 72 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Mật khẩu mới phải từ 6 đến 72 ký tự"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "New password must be between 6 and 72 characters"})
 	}
 
 	user, err := h.repo.FindByID(uid)

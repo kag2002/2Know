@@ -31,6 +31,7 @@ type Student struct {
 	Email       string     `gorm:"type:varchar(255)" json:"email" validate:"omitempty,email"`
 	Phone       string     `gorm:"type:varchar(20)" json:"phone" validate:"max=20"`
 	DateOfBirth *time.Time `json:"date_of_birth"`
-	CreatedAt   time.Time  `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt   time.Time  `gorm:"autoUpdateTime" json:"updated_at"`
+	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }

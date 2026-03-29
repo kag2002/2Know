@@ -12,6 +12,7 @@ type QuizService interface {
 	GetQuizzes(teacherID string) ([]model.Quiz, error)
 	GetQuizByID(id, teacherID string) (*model.Quiz, error)
 	GetPublicQuizByID(id string) (*model.Quiz, error)
+	GetPublicQuizMetadata(id string) (*model.Quiz, int64, error)
 	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
 	DeleteQuiz(id, teacherID string) error
 }
@@ -59,6 +60,10 @@ func (s *quizService) GetPublicQuizByID(id string) (*model.Quiz, error) {
 	}
 
 	return quiz, nil
+}
+
+func (s *quizService) GetPublicQuizMetadata(id string) (*model.Quiz, int64, error) {
+	return s.repo.GetPublicQuizMetadata(id)
 }
 
 func (s *quizService) DeleteQuiz(id, teacherID string) error {
