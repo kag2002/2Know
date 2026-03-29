@@ -13,6 +13,7 @@ export function Header() {
   const { user, logout } = useAuth();
   const { resolvedTheme, setTheme, theme } = useTheme();
   const { t, language, setLanguage } = useTranslation();
+  const [mounted, setMounted] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -23,6 +24,7 @@ export function Header() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
+    setMounted(true); // Hydration safe point
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -61,7 +63,11 @@ export function Header() {
           className="h-8 w-8"
           onClick={toggleDarkMode}
         >
-          {resolvedTheme === "dark" ? <Moon className="h-4 w-4" /> : resolvedTheme === "eye-care" ? <BookOpen className="h-4 w-4 text-amber-600" /> : <Sun className="h-4 w-4 text-amber-400" />}
+          {mounted ? (
+            resolvedTheme === "dark" ? <Moon className="h-4 w-4" /> : resolvedTheme === "eye-care" ? <BookOpen className="h-4 w-4 text-amber-600" /> : <Sun className="h-4 w-4 text-amber-400" />
+          ) : (
+            <Sun className="h-4 w-4 text-amber-400 opacity-50" />
+          )}
         </Button>
 
         <select 
@@ -86,10 +92,10 @@ export function Header() {
             className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-muted transition-all duration-200"
           >
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
-              {user?.name?.[0]?.toUpperCase() || "U"}
+              {user?.full_name?.[0]?.toUpperCase() || "U"}
             </div>
             <div className="hidden md:flex flex-col items-start">
-              <span className="text-sm font-medium leading-none">{user?.name || "User"}</span>
+              <span className="text-sm font-medium leading-none">{user?.full_name || "User"}</span>
               <span className="text-[10px] text-muted-foreground mt-0.5">{t("header.teacher")}</span>
             </div>
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground hidden md:block transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`} />
@@ -98,7 +104,7 @@ export function Header() {
           {showDropdown && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-popover rounded-xl shadow-lg border p-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
               <div className="px-3 py-2 border-b mb-1">
-                <p className="text-sm font-medium">{user?.name}</p>
+                <p className="text-sm font-medium">{user?.full_name}</p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <Link

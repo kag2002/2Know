@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { vi, enUS, it } from "date-fns/locale";
 import { useAuth } from "@/context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -95,43 +95,36 @@ export default function OverviewPage() {
   const { t, language } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  
+  const isMountedRef = useRef(true);
 
-  const getDateLocale = () => {
+  const getDateLocale = useCallback(() => {
     switch(language) {
       case 'en': return enUS;
       case 'it': return it;
       default: return vi;
     }
-  };
+  }, [language]);
 
-  useEffect(() => {
-    let isMounted = true;
-    const loadDashboardData = async () => {
-      try {
-        const data = await apiFetch("/stats/dashboard");
-        if (isMounted) {
-          setStats(data);
-          setMounted(true);
-        }
-      } catch {
-        // Handle gracefully
-      }
-    };
-    loadDashboardData();
-    return () => { isMounted = false; };
-  }, []);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       const data = await apiFetch("/stats/dashboard");
-      setStats(data);
-      setMounted(true);
+      if (isMountedRef.current) {
+        setStats(data);
+        setMounted(true);
+      }
     } catch {
       // Handle gracefully
     }
-  };
+  }, []);
 
-  const statCards = [
+  useEffect(() => {
+    isMountedRef.current = true;
+    loadDashboardData();
+    return () => { isMountedRef.current = false; };
+  }, [loadDashboardData]);
+
+  const statCards = useMemo(() => [
     {
       value: String(stats?.total_quizzes ?? "—"), label: t("overview.stat.active"), desc: t("overview.stat.quizzes"),
       icon: Layers, iconColor: "text-indigo-500", badgeColor: "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400",
@@ -152,7 +145,15 @@ export default function OverviewPage() {
       icon: null, iconColor: "text-orange-500", badgeColor: "bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
       badge: t("overview.badge.needsAttention"), change: null, changeLabel: t("overview.badge.noChange"),
     },
-  ];
+  ], [stats, t]);
+
+  const pieData = useMemo(() => [
+    { name: t("overview.excellent"), value: stats?.score_distribution?.excellent || 0, color: "#34d399" },
+    { name: t("overview.good"), value: stats?.score_distribution?.good || 0, color: "#60a5fa" },
+    { name: t("overview.average"), value: stats?.score_distribution?.average || 0, color: "#fbbf24" },
+    { name: t("overview.poor"), value: stats?.score_distribution?.poor || 0, color: "#f43f5e" },
+  ], [stats, t]);
+  const totalGraded = useMemo(() => pieData.reduce((acc, curr) => acc + curr.value, 0), [pieData]);
 
   const now = new Date();
   const dateStr = now.toLocaleDateString("vi-VN", { day: "numeric", month: "short", year: "numeric" });
@@ -179,13 +180,7 @@ export default function OverviewPage() {
     );
   }
 
-  const pieData = [
-    { name: t("overview.excellent"), value: stats.score_distribution?.excellent || 0, color: "#34d399" },
-    { name: t("overview.good"), value: stats.score_distribution?.good || 0, color: "#60a5fa" },
-    { name: t("overview.average"), value: stats.score_distribution?.average || 0, color: "#fbbf24" },
-    { name: t("overview.poor"), value: stats.score_distribution?.poor || 0, color: "#f43f5e" },
-  ];
-  const totalGraded = pieData.reduce((acc, curr) => acc + curr.value, 0);
+
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

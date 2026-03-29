@@ -7,10 +7,13 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
+	"gorm.io/gorm"
+
+	"backend/internal/model"
 )
 
-// Protected ensures that a valid JWT token is provided
-func Protected() fiber.Handler {
+// Protected ensures that a valid JWT token is provided and the user actually exists in the DB
+func Protected(db *gorm.DB) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		secret := os.Getenv("JWT_SECRET")
 		if secret == "" {
@@ -48,10 +51,21 @@ func Protected() fiber.Handler {
 		// Store user data (the claims) in locals for the next handlers
 		c.Locals("user", token)
 
-		// SECURITY: Extract and store userID directly for consistent access across all handlers
+		// SECURITY: Extract userID and firmly protect against Ghost Token Attacks
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			if sub, exists := claims["sub"].(string); exists {
+				// Query DB to ensure the account has not been deleted while the JWT is still active
+				var count int64
+				if err := db.Model(&model.User{}).Where("id = ?", sub).Count(&count).Error; err != nil || count == 0 {
+					return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+						"error": "User account no longer exists. Please relogin.",
+					})
+				}
 				c.Locals("userID", sub)
+			} else {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"error": "Invalid token signature subject.",
+				})
 			}
 		}
 

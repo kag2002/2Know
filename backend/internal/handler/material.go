@@ -3,6 +3,7 @@ package handler
 import (
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -27,6 +28,13 @@ func (h *MaterialHandler) CreateMaterial(c fiber.Ctx) error {
 	if err := c.Bind().Body(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
 	}
+
+	if err := utils.ValidateStruct(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
+	// SECURITY: Strip Stored XSS payloads from Material metadata
+	utils.SanitizeMaterial(&req)
 
 	if err := h.materialService.CreateMaterial(classID, userID, &req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể tạo tài liệu. Vui lòng thử lại sau."})

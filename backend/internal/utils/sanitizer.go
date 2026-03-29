@@ -135,3 +135,13 @@ func SanitizeShareLink(l *model.ShareLink) {
 	l.Title = policy.Sanitize(l.Title)
 }
 
+// SanitizeMaterial strips Stored XSS payloads from Material metadata
+func SanitizeMaterial(m *model.Material) {
+	if m == nil {
+		return
+	}
+	m.Title = policy.Sanitize(m.Title)
+	m.Description = policy.Sanitize(m.Description)
+	m.LinkURL = policy.Sanitize(m.LinkURL)
+}
+

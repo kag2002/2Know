@@ -274,6 +274,19 @@ func (s *resultService) GradeSubmission(teacherID, compositeID string, score flo
 	resultID := parts[0]
 	questionID := parts[1]
 
+	// SECURITY & DATA INTEGRITY: Lock this specific student's result sheet
+	// Forces simultaneous grading requests (Tabs) to serialize queue so JSONB state doesn't overwrite
+	lockKey := "grade_" + resultID
+	mu := s.getLock(lockKey)
+	mu.Lock()
+	defer func() {
+		mu.Unlock()
+		// PERFORMANCE: Evict lock from sync.Map memory eventually to avoid OOM
+		time.AfterFunc(2*time.Minute, func() {
+			s.locks.Delete(lockKey)
+		})
+	}()
+
 	res, err := s.repo.GetResultByID(resultID)
 	if err != nil {
 		return err

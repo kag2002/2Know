@@ -129,7 +129,7 @@ func main() {
 	app.Post("/api/test/submit", middleware.SubmitLimiter(), resultHandler.SubmitTest)
 
 	// Protected block
-	api := app.Group("/api", middleware.Protected())
+	api := app.Group("/api", middleware.Protected(config.DB))
 
 	// Quiz endpoints
 	api.Get("/quizzes", quizHandler.GetQuizzes)
