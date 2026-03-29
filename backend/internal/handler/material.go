@@ -16,8 +16,12 @@ func NewMaterialHandler(s service.MaterialService) *MaterialHandler {
 }
 
 func (h *MaterialHandler) CreateMaterial(c fiber.Ctx) error {
+	userID := getUserIdFromToken(c)
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
 	classID := c.Params("id")
-	userID := c.Locals("user_id").(string)
 
 	var req model.Material
 	if err := c.Bind().Body(&req); err != nil {
@@ -25,31 +29,39 @@ func (h *MaterialHandler) CreateMaterial(c fiber.Ctx) error {
 	}
 
 	if err := h.materialService.CreateMaterial(classID, userID, &req); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể tạo tài liệu. Vui lòng thử lại sau."})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(req)
 }
 
 func (h *MaterialHandler) GetMaterials(c fiber.Ctx) error {
+	userID := getUserIdFromToken(c)
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
 	classID := c.Params("id")
-	userID := c.Locals("user_id").(string)
 
 	materials, err := h.materialService.GetMaterialsByClass(classID, userID)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể tải tài liệu. Vui lòng thử lại sau."})
 	}
 
 	return c.JSON(materials)
 }
 
 func (h *MaterialHandler) DeleteMaterial(c fiber.Ctx) error {
+	userID := getUserIdFromToken(c)
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
 	classID := c.Params("id")
 	materialID := c.Params("materialId")
-	userID := c.Locals("user_id").(string)
 
 	if err := h.materialService.DeleteMaterial(materialID, classID, userID); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể xoá tài liệu. Vui lòng thử lại sau."})
 	}
 
 	return c.SendStatus(fiber.StatusNoContent)

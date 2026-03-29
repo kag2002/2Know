@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Users, TrendingUp, Award, AlertTriangle, ShieldAlert, Loader2, Download, FileSpreadsheet } from "lucide-react";
@@ -90,34 +90,45 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
     loadResults();
   }, [id]);
 
-  const totalSubmissions = results.length;
-  const avgScore = totalSubmissions > 0 ? (results.reduce((sum, r) => sum + r.score, 0) / totalSubmissions) : 0;
-  const maxScore = totalSubmissions > 0 ? Math.max(...results.map(r => r.score)) : 0;
-  const totalViolations = results.reduce((sum, r) => sum + (r.tab_switch_count || 0), 0);
+  const { totalSubmissions, avgScore, maxScore, totalViolations, scoreDistribution, topStudents } = useMemo(() => {
+    const totalSubs = results.length;
+    const avg = totalSubs > 0 ? (results.reduce((sum, r) => sum + r.score, 0) / totalSubs) : 0;
+    const max = totalSubs > 0 ? Math.max(...results.map(r => r.score)) : 0;
+    const violations = results.reduce((sum, r) => sum + (r.tab_switch_count || 0), 0);
 
-  // Build score distribution from real data
-  const ranges = ["0-10%","10-20%","20-30%","30-40%","40-50%","50-60%","60-70%","70-80%","80-90%","90-100%"];
-  const colors = ["#ef4444","#ef4444","#f97316","#f97316","#eab308","#eab308","#22c55e","#22c55e","#10b981","#10b981"];
-  const scoreDistribution = ranges.map((range, i) => {
-    const low = i * 10;
-    const high = (i + 1) * 10;
-    const count = results.filter(r => {
-      const pct = (r.score / 10) * 100;
-      return pct >= low && (i === 9 ? pct <= high : pct < high);
-    }).length;
-    return { range, count, color: colors[i] };
-  });
+    // Build score distribution from real data
+    const ranges = ["0-10%","10-20%","20-30%","30-40%","40-50%","50-60%","60-70%","70-80%","80-90%","90-100%"];
+    const colors = ["#ef4444","#ef4444","#f97316","#f97316","#eab308","#eab308","#22c55e","#22c55e","#10b981","#10b981"];
+    const distribution = ranges.map((range, i) => {
+      const low = i * 10;
+      const high = (i + 1) * 10;
+      const count = results.filter(r => {
+        const pct = (r.score / 10) * 100;
+        return pct >= low && (i === 9 ? pct <= high : pct < high);
+      }).length;
+      return { range, count, color: colors[i] };
+    });
 
-  // Top students sorted by score
-  const topStudents = [...results]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5)
-    .map(r => ({
-      name: r.student_name || r.student_email || "Guest",
-      score: r.score,
-      time: `${Math.floor(r.time_taken_seconds / 60)}:${String(r.time_taken_seconds % 60).padStart(2, "0")}`,
-      violations: r.tab_switch_count || 0,
-    }));
+    // Top students sorted by score
+    const top = [...results]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+      .map(r => ({
+        name: r.student_name || r.student_email || "Guest",
+        score: r.score,
+        time: `${Math.floor(r.time_taken_seconds / 60)}:${String(r.time_taken_seconds % 60).padStart(2, "0")}`,
+        violations: r.tab_switch_count || 0,
+      }));
+
+    return {
+      totalSubmissions: totalSubs,
+      avgScore: avg,
+      maxScore: max,
+      totalViolations: violations,
+      scoreDistribution: distribution,
+      topStudents: top
+    };
+  }, [results]);
 
   const formatTime = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 

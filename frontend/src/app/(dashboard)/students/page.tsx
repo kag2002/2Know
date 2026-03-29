@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Search, Plus, MoreVertical, GraduationCap, BarChart3, Mail, Trash2, Edit2, Loader2 } from "lucide-react";
@@ -26,6 +26,15 @@ import { useTranslation } from "@/context/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 interface StudentMetrics {
   id: string;
   name: string;
@@ -44,6 +53,7 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
   
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
   const [filterClass, setFilterClass] = useState("all");
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -71,11 +81,14 @@ export default function StudentsPage() {
     loadData();
   }, []);
 
-  const filtered = allStudents.filter(s => {
-    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.studentId.toLowerCase().includes(search.toLowerCase());
-    const matchClass = filterClass === "all" || s.class === filterClass;
-    return matchSearch && matchClass;
-  });
+  // Memoized and debounced filtering
+  const filtered = useMemo(() => {
+    return allStudents.filter(s => {
+      const matchSearch = s.name.toLowerCase().includes(debouncedSearch.toLowerCase()) || s.studentId.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const matchClass = filterClass === "all" || s.class === filterClass;
+      return matchSearch && matchClass;
+    }).slice(0, 100); // DOM constraint block
+  }, [allStudents, debouncedSearch, filterClass]);
 
   const classes = [...new Set(allStudents.map(s => s.class))];
 
@@ -309,7 +322,7 @@ export default function StudentsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((student, i) => (
+                {filtered.map((student: StudentMetrics, i: number) => (
                   <tr key={student.id} className="border-b last:border-0 hover:bg-muted transition-colors group">
                     <td className="py-3.5 text-slate-400">{i + 1}</td>
                     <td className="py-3.5">

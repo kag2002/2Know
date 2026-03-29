@@ -29,6 +29,9 @@ func (h *ClassHandler) CreateClass(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	// SECURITY: Strip Stored XSS payloads from Class metadata
+	utils.SanitizeClass(&class)
+
 	userId := getUserIdFromToken(c)
 	if userId == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
@@ -122,6 +125,9 @@ func (h *ClassHandler) UpdateClass(c fiber.Ctx) error {
 	if err := utils.ValidateStruct(&class); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
+
+	// SECURITY: Strip Stored XSS payloads from Class metadata
+	utils.SanitizeClass(&class)
 	
 	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking)
 	class.ID = id

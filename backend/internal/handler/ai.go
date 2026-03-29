@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"log"
+
 	"github.com/gofiber/fiber/v3"
 
 	"backend/internal/service"
@@ -39,7 +41,9 @@ func (h *AIHandler) GenerateQuiz(c fiber.Ctx) error {
 
 	questions, err := h.svc.GenerateQuestions(req.Prompt)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		// SECURITY: Never expose internal AI provider errors to the client (may contain API key fragments or billing details)
+		log.Printf("AI GenerateQuestions error: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Hệ thống AI không thể tạo câu hỏi lúc này. Vui lòng thử lại sau."})
 	}
 
 	return c.JSON(fiber.Map{

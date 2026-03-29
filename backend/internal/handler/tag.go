@@ -45,6 +45,9 @@ func (h *TagHandler) CreateTag(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	// SECURITY: Strip Stored XSS payloads from Tag strings
+	utils.SanitizeTag(tag)
+
 	tag.UserID = userId
 
 	if err := h.svc.CreateTag(tag); err != nil {
@@ -69,6 +72,9 @@ func (h *TagHandler) UpdateTag(c fiber.Ctx) error {
 	if err := utils.ValidateStruct(tag); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
+
+	// SECURITY: Strip Stored XSS payloads from Tag strings
+	utils.SanitizeTag(tag)
 
 	tag.ID = id
 	tag.UserID = userId

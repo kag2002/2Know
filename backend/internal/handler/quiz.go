@@ -81,6 +81,32 @@ func (h *QuizHandler) GetPublicQuizByID(c fiber.Ctx) error {
 	return c.JSON(quiz)
 }
 
+func (h *QuizHandler) GetPublicQuizMetadata(c fiber.Ctx) error {
+	id := c.Params("id")
+
+	quiz, err := h.svc.GetPublicQuizByID(id)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Quiz not found or not published"})
+	}
+
+	// SECURITY: Pre-fetch data leak prevention. 
+	// Return a Data Transfer Object (DTO) that absolutely omits Question Content and Options.
+	// Fill questions array with empty maps so frontend `quiz.questions.length` still works.
+	safeQuestions := make([]fiber.Map, len(quiz.Questions))
+	
+	return c.JSON(fiber.Map{
+		"id":                 quiz.ID,
+		"title":              quiz.Title,
+		"subject":            quiz.Subject,
+		"grade_level":        quiz.GradeLevel,
+		"time_limit_minutes": quiz.TimeLimitMinutes,
+		"description":        quiz.Description,
+		"require_fullscreen": quiz.RequireFullscreen,
+		"disable_copy_paste": quiz.DisableCopyPaste,
+		"questions":          safeQuestions,
+	})
+}
+
 func (h *QuizHandler) DeleteQuiz(c fiber.Ctx) error {
 	id := c.Params("id")
 	userId := getUserIdFromToken(c)

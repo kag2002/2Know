@@ -87,7 +87,13 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		// Wait forcefully if another identical request is currently grading/saving
 		mu.Lock()
 		// Ensure the lock remains strictly held until CreateResult is safely committed to the Postgres DB at the bottom of the handler
-		defer mu.Unlock()
+		defer func() {
+			mu.Unlock()
+			// PERFORMANCE: Evict lock from memory after 5 minutes to prevent unbounded sync.Map growth
+			time.AfterFunc(5*time.Minute, func() {
+				s.locks.Delete(lockKey)
+			})
+		}()
 
 		attempts, err := s.repo.GetAttemptCount(quiz.ID, result.StudentIdentifier)
 		if err == nil && attempts >= int64(quiz.MaxAttempts) {

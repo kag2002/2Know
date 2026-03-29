@@ -39,6 +39,15 @@ func SanitizeNote(n *model.Note) {
 	n.Content = policy.Sanitize(n.Content)
 }
 
+// SanitizeTag strips malicious scripts from Tag representations.
+func SanitizeTag(t *model.Tag) {
+	if t == nil {
+		return
+	}
+	t.Name = policy.Sanitize(t.Name)
+	t.Color = policy.Sanitize(t.Color)
+}
+
 // SanitizeResult aggressively cleans all Student Answers to prevent Essay Stored XSS against Teachers.
 func SanitizeResult(r *model.TestResult) {
 	if r == nil || r.Answers == nil {
@@ -73,3 +82,46 @@ func SanitizeMap(m map[string]interface{}) {
 		}
 	}
 }
+
+// SanitizeStudent strips XSS payloads from student-submitted profile data.
+func SanitizeStudent(s *model.Student) {
+	if s == nil {
+		return
+	}
+	s.FullName = policy.Sanitize(s.FullName)
+	s.Email = policy.Sanitize(s.Email)
+}
+
+// SanitizeClass strips XSS payloads from class metadata to protect the dashboard.
+func SanitizeClass(c *model.Class) {
+	if c == nil {
+		return
+	}
+	c.Name = policy.Sanitize(c.Name)
+	c.Description = policy.Sanitize(c.Description)
+}
+
+// SanitizeExtras strips XSS payloads from Title fields across OmrBatch, Rubric, and ShareLink.
+func SanitizeOmrBatch(b *model.OmrBatch) {
+	if b == nil {
+		return
+	}
+	b.Title = policy.Sanitize(b.Title)
+}
+
+func SanitizeRubric(r *model.Rubric) {
+	if r == nil {
+		return
+	}
+	r.Title = policy.Sanitize(r.Title)
+	r.Subject = policy.Sanitize(r.Subject)
+	r.Target = policy.Sanitize(r.Target)
+}
+
+func SanitizeShareLink(l *model.ShareLink) {
+	if l == nil {
+		return
+	}
+	l.Title = policy.Sanitize(l.Title)
+}
+

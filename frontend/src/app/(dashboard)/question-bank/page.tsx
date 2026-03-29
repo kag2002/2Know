@@ -33,6 +33,16 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
+// Custom hook to debounce fast typing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 interface Question {
   id: string;
   type: string;
@@ -50,6 +60,7 @@ export default function QuestionBankPage() {
   
   // Filter States
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300); // 300ms delay to prevent O(N) lag on every keystroke
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
@@ -100,15 +111,15 @@ export default function QuestionBankPage() {
   const folders = useMemo(() => Array.from(new Set(questions.filter(q => q.folder).map(q => q.folder))), [questions]);
   const tags = useMemo(() => Array.from(new Set(questions.flatMap(q => q.tags || []))), [questions]);
 
-  // Filtered Data
+  // Filtered Data (Debounced & Limited to prevent DOM chokes)
   const filteredQuestions = useMemo(() => {
     return questions.filter(q => {
-      const matchesSearch = q.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = q.content.toLowerCase().includes(debouncedSearch.toLowerCase());
       const matchesFolder = selectedFolder ? q.folder === selectedFolder : true;
       const matchesTag = selectedTag ? q.tags?.includes(selectedTag) : true;
       return matchesSearch && matchesFolder && matchesTag;
-    });
-  }, [questions, searchQuery, selectedFolder, selectedTag]);
+    }).slice(0, 100); // Limit to 100 DOM elements maximum to sustain 60fps scrolling
+  }, [questions, debouncedSearch, selectedFolder, selectedTag]);
 
   return (
     <div className="flex h-[calc(100vh-6rem)] gap-6">

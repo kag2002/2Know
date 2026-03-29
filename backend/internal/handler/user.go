@@ -5,10 +5,13 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
+	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/crypto/bcrypt"
 
 	"backend/internal/repository"
 )
+
+var userSanitizer = bluemonday.UGCPolicy()
 
 type UserHandler struct {
 	repo repository.UserRepository
@@ -73,7 +76,8 @@ func (h *UserHandler) UpdateProfile(c fiber.Ctx) error {
 	}
 
 	if strings.TrimSpace(req.FullName) != "" {
-		user.FullName = strings.TrimSpace(req.FullName)
+		// SECURITY: Strip Stored XSS payloads from display name
+		user.FullName = userSanitizer.Sanitize(strings.TrimSpace(req.FullName))
 	}
 	if req.AvatarURL != nil {
 		user.AvatarURL = req.AvatarURL
@@ -111,6 +115,10 @@ func (h *UserHandler) ChangePassword(c fiber.Ctx) error {
 	var req ChangePasswordRequest
 	if err := c.Bind().JSON(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	if req.CurrentPassword == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Mật khẩu hiện tại không được để trống"})
 	}
 
 	if len(req.NewPassword) < 6 || len(req.NewPassword) > 72 {

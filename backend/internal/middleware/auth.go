@@ -48,6 +48,13 @@ func Protected() fiber.Handler {
 		// Store user data (the claims) in locals for the next handlers
 		c.Locals("user", token)
 
+		// SECURITY: Extract and store userID directly for consistent access across all handlers
+		if claims, ok := token.Claims.(jwt.MapClaims); ok {
+			if sub, exists := claims["sub"].(string); exists {
+				c.Locals("userID", sub)
+			}
+		}
+
 		// Go to next middleware
 		return c.Next()
 	}

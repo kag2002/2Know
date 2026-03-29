@@ -4,11 +4,13 @@ import (
 	crypto_rand "crypto/rand"
 	"fmt"
 	"math/big"
+	"os"
 
 	"github.com/gofiber/fiber/v3"
 
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 // ==================== OMR Batch Handler ====================
@@ -36,6 +38,14 @@ func (h *OmrBatchHandler) CreateBatch(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&batch); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
+
+	if err := utils.ValidateStruct(&batch); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
+	// SECURITY: Strip Stored XSS payloads
+	utils.SanitizeOmrBatch(&batch)
+
 	batch.UserID = userID
 	if err := h.svc.CreateBatch(&batch); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create batch"})
@@ -50,6 +60,13 @@ func (h *OmrBatchHandler) UpdateBatch(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&batch); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
+
+	if err := utils.ValidateStruct(&batch); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
+	// SECURITY: Strip Stored XSS payloads
+	utils.SanitizeOmrBatch(&batch)
 	
 	// SECURITY: Mass Assignment Object Hijacking
 	batch.ID = id
@@ -95,6 +112,14 @@ func (h *RubricHandler) CreateRubric(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&rubric); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
+
+	if err := utils.ValidateStruct(&rubric); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
+	// SECURITY: Strip Stored XSS payloads
+	utils.SanitizeRubric(&rubric)
+
 	rubric.UserID = userID
 	if err := h.svc.CreateRubric(&rubric); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create rubric"})
@@ -109,6 +134,13 @@ func (h *RubricHandler) UpdateRubric(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&rubric); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
+
+	if err := utils.ValidateStruct(&rubric); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
+	// SECURITY: Strip Stored XSS payloads
+	utils.SanitizeRubric(&rubric)
 	
 	// SECURITY: Mass Assignment Object Hijacking
 	rubric.ID = id
@@ -154,13 +186,22 @@ func (h *ShareLinkHandler) CreateLink(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&link); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
+
+	// SECURITY: Strip Stored XSS payloads
+	utils.SanitizeShareLink(&link)
+
 	link.UserID = userID
 	if link.ShareCode == "" {
 		// SECURITY: Use crypto/rand for unpredictable 6-char alphanumeric codes (36^6 = 2.1B possibilities)
 		link.ShareCode = "2K-" + generateSecureCode(6)
 	}
 	if link.URL == "" {
-		link.URL = fmt.Sprintf("http://localhost:3000/test/%s", link.QuizID)
+		// SECURITY: Use env-based APP_URL to prevent hardcoded localhost in Production
+		appURL := os.Getenv("APP_URL")
+		if appURL == "" {
+			appURL = "http://localhost:3000"
+		}
+		link.URL = fmt.Sprintf("%s/test/%s", appURL, link.QuizID)
 	}
 	if err := h.svc.CreateLink(&link); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create share link"})
@@ -186,6 +227,9 @@ func (h *ShareLinkHandler) UpdateLink(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&link); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
 	}
+
+	// SECURITY: Strip Stored XSS payloads
+	utils.SanitizeShareLink(&link)
 	
 	// SECURITY: Mass Assignment Object Hijacking
 	link.ID = id

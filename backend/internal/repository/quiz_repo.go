@@ -36,7 +36,7 @@ func (r *quizRepository) CreateQuiz(quiz *model.Quiz) error {
 func (r *quizRepository) GetQuizzes(teacherID string) ([]model.Quiz, error) {
 	var quizzes []model.Quiz
 	err := r.db.Model(&model.Quiz{}).
-		Select("quizzes.*, COUNT(test_results.id) as submissions, COALESCE(AVG(test_results.score), 0) as avg_score").
+		Select("quizzes.id, quizzes.title, quizzes.subject, quizzes.grade_level, quizzes.quiz_type, quizzes.status, quizzes.access_type, quizzes.time_limit_minutes, quizzes.created_at, COUNT(test_results.id) as submissions, COALESCE(AVG(test_results.score), 0) as avg_score").
 		Joins("LEFT JOIN test_results ON test_results.quiz_id = quizzes.id AND test_results.deleted_at IS NULL").
 		Where("quizzes.teacher_id = ?", teacherID).
 		Group("quizzes.id").

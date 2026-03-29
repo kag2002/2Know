@@ -37,7 +37,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
   useEffect(() => {
     const loadQuizInfo = async () => {
       try {
-        const data = await apiFetch(`/test/quiz/${id}`, { requireAuth: false });
+        const data = await apiFetch(`/test/quiz/${id}/metadata`, { requireAuth: false });
         if (!data.questions) data.questions = [];
         setQuiz(data);
       } catch (err: any) {

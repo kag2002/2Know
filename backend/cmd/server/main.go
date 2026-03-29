@@ -125,6 +125,7 @@ func main() {
 
 	// Public test routes (Guest)
 	app.Get("/api/test/quiz/:id", quizHandler.GetPublicQuizByID)
+	app.Get("/api/test/quiz/:id/metadata", quizHandler.GetPublicQuizMetadata)
 	app.Post("/api/test/submit", middleware.SubmitLimiter(), resultHandler.SubmitTest)
 
 	// Protected block

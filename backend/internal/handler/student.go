@@ -7,6 +7,7 @@ import (
 
 	"backend/internal/model"
 	"backend/internal/service"
+	"backend/internal/utils"
 )
 
 type StudentHandler struct {
@@ -64,6 +65,13 @@ func (h *StudentHandler) CreateStudent(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input data"})
 	}
 
+	if err := utils.ValidateStruct(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
+	// SECURITY: Strip Stored XSS payloads from Student data
+	utils.SanitizeStudent(&req)
+
 	if err := h.studentService.CreateStudent(teacherID, &req); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create student"})
 	}
@@ -107,6 +115,13 @@ func (h *StudentHandler) UpdateStudent(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input data"})
 	}
+
+	if err := utils.ValidateStruct(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
+	// SECURITY: Strip Stored XSS payloads from Student data
+	utils.SanitizeStudent(&req)
 
 	// SECURITY: Prevent Student Robbery (Mass Assignment)
 	// Force GORM to ignore structural reassignment by zeroing out ID and ClassID
