@@ -13,6 +13,9 @@ type Question struct {
 	Points      float64        `gorm:"default:10.0" json:"points" validate:"min=0,max=100"`
 	Content     string         `gorm:"type:text;not null" json:"content" validate:"required,max=5000"`
 	Explanation string         `gorm:"type:text" json:"explanation"`
+	Difficulty  string         `gorm:"type:varchar(20);default:'medium'" json:"difficulty" validate:"omitempty,oneof=easy medium hard"`
+	Folder      string         `gorm:"type:varchar(255);index" json:"folder"`
+	Tags        []string       `gorm:"type:jsonb;serializer:json" json:"tags,omitempty"`
 	OrderIndex  int            `gorm:"default:0" json:"order_index"`
 	CreatedAt   time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt   time.Time      `gorm:"autoUpdateTime" json:"updated_at"`

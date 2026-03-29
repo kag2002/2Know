@@ -22,6 +22,11 @@ func SanitizeQuestion(q *model.Question) {
 	}
 	q.Content = policy.Sanitize(q.Content)
 	q.Explanation = policy.Sanitize(q.Explanation)
+	q.Difficulty = policy.Sanitize(q.Difficulty)
+	q.Folder = policy.Sanitize(q.Folder)
+	for i := range q.Tags {
+		q.Tags[i] = policy.Sanitize(q.Tags[i])
+	}
 	for i := range q.Options {
 		q.Options[i].Content = policy.Sanitize(q.Options[i].Content)
 	}
