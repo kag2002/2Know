@@ -160,7 +160,7 @@ export default function StudentsPage() {
     try {
       await apiFetch(`/students/${editingStudent.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ name: editingStudent.name, email: editingStudent.email }),
+        body: JSON.stringify({ full_name: editingStudent.name, email: editingStudent.email }),
       });
       toast.success("Cập nhật thông tin học sinh thành công!");
       setIsEditDialogOpen(false);

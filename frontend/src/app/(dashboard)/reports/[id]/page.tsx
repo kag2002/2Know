@@ -21,7 +21,7 @@ import { useTranslation } from "@/context/LanguageContext";
 interface ResultItem {
   id: string;
   student_name: string;
-  student_email: string;
+  student_identifier: string;
   score: number;
   total_correct: number;
   total_questions: number;
@@ -55,7 +55,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       headers.join(","),
       ...results.map(r => [
         sanitizeCsvCell(r.student_name || 'Guest'),
-        sanitizeCsvCell(r.student_email || ''),
+        sanitizeCsvCell(r.student_identifier || ''),
         r.score,
         r.total_correct,
         r.time_taken_seconds,
@@ -118,7 +118,7 @@ export default function ReportDetailPage({ params }: { params: Promise<{ id: str
       .sort((a, b) => b.score - a.score)
       .slice(0, 5)
       .map(r => ({
-        name: r.student_name || r.student_email || "Guest",
+        name: r.student_name || r.student_identifier || "Guest",
         score: r.score,
         time: `${Math.floor(r.time_taken_seconds / 60)}:${String(r.time_taken_seconds % 60).padStart(2, "0")}`,
         violations: r.tab_switch_count || 0,
