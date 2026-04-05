@@ -78,7 +78,7 @@ func (h *NoteHandler) UpdateNote(c fiber.Ctx) error {
 	}
 
 	id := c.Params("id")
-	
+
 	var params map[string]interface{}
 	if err := c.Bind().JSON(&params); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})

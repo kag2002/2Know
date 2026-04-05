@@ -23,7 +23,7 @@ func (h *QuizHandler) CreateQuiz(c fiber.Ctx) error {
 	if err := c.Bind().JSON(&quiz); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
-	
+
 	if err := utils.ValidateStruct(&quiz); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
@@ -93,7 +93,7 @@ func (h *QuizHandler) GetPublicQuizMetadata(c fiber.Ctx) error {
 	// Return a Data Transfer Object (DTO) that absolutely omits Question Content and Options.
 	// Fill questions array with empty maps so frontend `quiz.questions.length` still works without transferring payload over HTTP.
 	safeQuestions := make([]fiber.Map, count)
-	
+
 	return c.JSON(fiber.Map{
 		"id":                 quiz.ID,
 		"title":              quiz.Title,
@@ -148,4 +148,20 @@ func (h *QuizHandler) UpdateQuiz(c fiber.Ctx) error {
 
 	// Just return success message, the frontend reloads the list anyway
 	return c.JSON(fiber.Map{"message": "Quiz updated successfully"})
+}
+
+// GetQuizStats returns aggregate stats for the quizzes list page summary cards
+func (h *QuizHandler) GetQuizStats(c fiber.Ctx) error {
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	stats, err := h.svc.GetQuizStats(userId)
+	if err != nil {
+		log.Printf("Error fetching quiz stats: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to load quiz stats"})
+	}
+
+	return c.JSON(stats)
 }

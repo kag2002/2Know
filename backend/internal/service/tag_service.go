@@ -1,7 +1,9 @@
 package service
 
-import "backend/internal/model"
-import "backend/internal/repository"
+import (
+	"backend/internal/model"
+	"backend/internal/repository"
+)
 
 type TagService interface {
 	GetTags(userID string) ([]model.Tag, error)

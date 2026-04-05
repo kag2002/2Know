@@ -26,11 +26,11 @@ type ScoreDist struct {
 }
 
 type DashboardStats struct {
-	TotalQuizzes     int64
-	ActiveQuizzes    int64
-	TotalSubmissions int64
-	WeekSubmissions  int64
-	AvgScore         float64
+	TotalQuizzes      int64
+	ActiveQuizzes     int64
+	TotalSubmissions  int64
+	WeekSubmissions   int64
+	AvgScore          float64
 	TotalClasses      int64
 	TotalStudents     int64
 	TotalQuestions    int64

@@ -126,7 +126,7 @@ func (h *StudentHandler) UpdateStudent(c fiber.Ctx) error {
 	// SECURITY: Prevent Student Robbery (Mass Assignment)
 	// Force GORM to ignore structural reassignment by zeroing out ID and ClassID
 	req.ID = studentID
-	req.ClassID = "" 
+	req.ClassID = ""
 
 	// SECURITY: IDOR Protection
 	if err := h.studentService.UpdateStudent(studentID, teacherID, &req); err != nil {
@@ -135,4 +135,3 @@ func (h *StudentHandler) UpdateStudent(c fiber.Ctx) error {
 
 	return c.JSON(req)
 }
-

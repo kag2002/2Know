@@ -6,10 +6,11 @@ import (
 	"os"
 
 	"backend/internal/model"
+	"time"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"time"
 )
 
 var DB *gorm.DB
@@ -43,7 +44,7 @@ func ConnectDB() {
 		&model.User{},
 		&model.Quiz{},
 		&model.Question{},
-		&model.Option{},
+		&model.QuizQuestion{},
 		&model.Class{},
 		&model.Student{},
 		&model.TestResult{},

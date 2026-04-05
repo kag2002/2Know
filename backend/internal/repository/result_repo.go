@@ -15,13 +15,13 @@ type ResultRepository interface {
 	VerifyQuizExists(quizID string) error
 	GetPendingResults(teacherID string) ([]model.TestResult, error)
 	GetResultsByStudentIDs(studentIDs []string) ([]model.TestResult, error)
-	GetStudentHistory(studentID string, teacherID string) ([]struct{
-		ID string `json:"id"`
-		QuizTitle string `json:"quiz_title"`
-		Score float64 `json:"score"`
-		Status string `json:"status"`
-		CreatedAt string `json:"created_at"`
-		TimeTakenSeconds int `json:"time_taken_seconds"`
+	GetStudentHistory(studentID string, teacherID string) ([]struct {
+		ID               string  `json:"id"`
+		QuizTitle        string  `json:"quiz_title"`
+		Score            float64 `json:"score"`
+		Status           string  `json:"status"`
+		CreatedAt        string  `json:"created_at"`
+		TimeTakenSeconds int     `json:"time_taken_seconds"`
 	}, error)
 	GetAttemptCount(quizID string, studentIdentifier string) (int64, error)
 }
@@ -84,21 +84,21 @@ func (r *resultRepository) GetResultsByStudentIDs(studentIDs []string) ([]model.
 	return results, err
 }
 
-func (r *resultRepository) GetStudentHistory(studentID string, teacherID string) ([]struct{
-	ID string `json:"id"`
-	QuizTitle string `json:"quiz_title"`
-	Score float64 `json:"score"`
-	Status string `json:"status"`
-	CreatedAt string `json:"created_at"`
-	TimeTakenSeconds int `json:"time_taken_seconds"`
+func (r *resultRepository) GetStudentHistory(studentID string, teacherID string) ([]struct {
+	ID               string  `json:"id"`
+	QuizTitle        string  `json:"quiz_title"`
+	Score            float64 `json:"score"`
+	Status           string  `json:"status"`
+	CreatedAt        string  `json:"created_at"`
+	TimeTakenSeconds int     `json:"time_taken_seconds"`
 }, error) {
-	var history []struct{
-		ID string `json:"id"`
-		QuizTitle string `json:"quiz_title"`
-		Score float64 `json:"score"`
-		Status string `json:"status"`
-		CreatedAt string `json:"created_at"`
-		TimeTakenSeconds int `json:"time_taken_seconds"`
+	var history []struct {
+		ID               string  `json:"id"`
+		QuizTitle        string  `json:"quiz_title"`
+		Score            float64 `json:"score"`
+		Status           string  `json:"status"`
+		CreatedAt        string  `json:"created_at"`
+		TimeTakenSeconds int     `json:"time_taken_seconds"`
 	}
 
 	err := r.db.Table("test_results").

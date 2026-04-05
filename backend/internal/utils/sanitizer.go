@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"strings"
+
 	"backend/internal/model"
 
 	"github.com/microcosm-cc/bluemonday"
@@ -27,9 +29,7 @@ func SanitizeQuestion(q *model.Question) {
 	for i := range q.Tags {
 		q.Tags[i] = policy.Sanitize(q.Tags[i])
 	}
-	for i := range q.Options {
-		q.Options[i].Content = policy.Sanitize(q.Options[i].Content)
-	}
+	// TODO: Consider sanitizing nested datatypes.JSON strings if necessary, though Map sanitizer handles most endpoints.
 }
 
 // SanitizeQuiz strips malicious scripts from Quiz metadata to protect the Student taking it.
@@ -63,12 +63,17 @@ func SanitizeResult(r *model.TestResult) {
 	if r == nil || r.Answers == nil {
 		return
 	}
-	for k, v := range r.Answers {
-		runes := []rune(v)
-		if len(runes) > 2000 {
-			v = string(runes[:2000]) // Truncate to shield against OOM Postgres attacks
+	for k, vObj := range r.Answers {
+		if vStr, ok := vObj.(string); ok {
+			runes := []rune(vStr)
+			if len(runes) > 2000 {
+				vStr = string(runes[:2000]) // Shield OOM
+			}
+			r.Answers[k] = policy.Sanitize(vStr)
+		} else if vMap, okMap := vObj.(map[string]interface{}); okMap {
+			SanitizeMap(vMap)
+			r.Answers[k] = vMap
 		}
-		r.Answers[k] = policy.Sanitize(v)
 	}
 }
 
@@ -143,5 +148,18 @@ func SanitizeMaterial(m *model.Material) {
 	m.Title = policy.Sanitize(m.Title)
 	m.Description = policy.Sanitize(m.Description)
 	m.LinkURL = policy.Sanitize(m.LinkURL)
-}
 
+	// SECURITY: Strict URL schema enforcement to block javascript:alert(1) stored XSS
+	if m.LinkURL != "" {
+		lowerURL := strings.ToLower(m.LinkURL)
+		if !strings.HasPrefix(lowerURL, "http://") && !strings.HasPrefix(lowerURL, "https://") {
+			// If missing schema but starts with www, auto-patch for UX
+			if strings.HasPrefix(lowerURL, "www.") {
+				m.LinkURL = "https://" + m.LinkURL
+			} else {
+				// Strip dangerous URIs completely
+				m.LinkURL = ""
+			}
+		}
+	}
+}

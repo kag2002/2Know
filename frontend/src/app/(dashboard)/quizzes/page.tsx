@@ -24,7 +24,19 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { AnimatedNumber } from "@/components/ui/animated-number";
+import { 
+  FileTextIcon, CheckCircleIcon, LayersIcon, UsersIcon
+} from "lucide-react";
 
+interface QuizStats {
+  total: number;
+  active: number;
+  total_questions: number;
+  total_submissions: number;
+}
 
 interface Quiz {
   id: string;
@@ -40,6 +52,7 @@ export default function QuizzesPage() {
   const { t } = useTranslation();
   const confirm = useConfirm();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [stats, setStats] = useState<QuizStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -57,8 +70,14 @@ export default function QuizzesPage() {
     const fetchIt = async () => {
       try {
         setLoading(true);
-        const data = await apiFetch("/quizzes");
-        if (isMounted) setQuizzes(data || []);
+        const [quizzesData, statsData] = await Promise.all([
+          apiFetch("/quizzes"),
+          apiFetch("/quizzes/stats").catch(() => null)
+        ]);
+        if (isMounted) {
+          setQuizzes(quizzesData || []);
+          setStats(statsData);
+        }
       } catch (err: any) {
         if (isMounted) setError(t("quizzes.loadError"));
       } finally {
@@ -74,8 +93,12 @@ export default function QuizzesPage() {
   const loadQuizzes = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch("/quizzes");
-      setQuizzes(data || []);
+      const [quizzesData, statsData] = await Promise.all([
+        apiFetch("/quizzes"),
+        apiFetch("/quizzes/stats").catch(() => null)
+      ]);
+      setQuizzes(quizzesData || []);
+      setStats(statsData);
     } catch (err: any) {
       setError(t("quizzes.loadError"));
     } finally {
@@ -144,6 +167,63 @@ export default function QuizzesPage() {
           </Button>
         </Link>
       </div>
+
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <Card className="border-none shadow-sm bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/20 dark:to-background">
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center shrink-0">
+                <FileTextIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t("quizzes.totalQuizzes") || "Tổng Bài Kiểm Tra"}</p>
+                <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  <AnimatedNumber value={stats.total} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-none shadow-sm bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-background">
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                <CheckCircleIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t("quizzes.activeQuizzes") || "Đang Hoạt Động"}</p>
+                <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  <AnimatedNumber value={stats.active} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-background">
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center shrink-0">
+                <LayersIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t("quizzes.totalQuestions") || "Câu Hỏi Đã Tạo"}</p>
+                <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  <AnimatedNumber value={stats.total_questions} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background">
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0">
+                <UsersIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{t("quizzes.totalSubmissions") || "Lượt Nộp Bài"}</p>
+                <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                  <AnimatedNumber value={stats.total_submissions} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="bg-background rounded-xl shadow-sm border overflow-hidden">
         {/* Toolbar */}
@@ -253,7 +333,7 @@ export default function QuizzesPage() {
                     </div>
                     <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200 dark:border-slate-800">
                       <Users className="w-4 h-4 text-emerald-500" />
-                      <span className="font-semibold text-foreground">{quiz.submissions || 0}</span> lược nộp
+                      <span className="font-semibold text-foreground">{quiz.submissions || 0}</span> lượt nộp
                     </div>
                     {(quiz.submissions || 0) > 0 && (
                       <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200 dark:border-slate-800">
@@ -293,10 +373,11 @@ export default function QuizzesPage() {
                       </DropdownMenuItem>
                       <DropdownMenuItem className="gap-2" onClick={async () => {
                         try {
-                          await apiFetch('/quizzes', { method: 'POST', body: JSON.stringify({ title: quiz.title + ' (Copy)', subject: quiz.subject, status: 'draft' }) });
-                          // Workaround: reload by triggering state refresh (if loadQuizzes was exported we'd use it, 
-                          // instead we just do a quick window location reload or rely on UI optimistic updates later)
-                          window.location.reload(); 
+                          const created = await apiFetch('/quizzes', { method: 'POST', body: JSON.stringify({ title: quiz.title + ' (Copy)', subject: quiz.subject, status: 'draft' }) });
+                          if (created?.id) {
+                            setQuizzes(prev => [{ ...quiz, id: created.id, title: quiz.title + ' (Copy)', status: 'draft', submissions: 0, avg_score: 0, created_at: new Date().toISOString() }, ...prev]);
+                            toast.success(t("quizzes.duplicateSuccess") || "Đã tạo bản sao bài kiểm tra");
+                          }
                         } catch { toast.error(t("quizzes.duplicateError")); }
                       }}><Copy className="w-4 h-4 text-slate-400"/> {t("quizzes.duplicate")}</DropdownMenuItem>
                       <DropdownMenuItem className="gap-2" onClick={() => {
@@ -400,7 +481,3 @@ export default function QuizzesPage() {
   );
 }
 
-// Ensure Input is defined locally since we dropped the import for brevity
-function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${props.className}`} />
-}

@@ -98,7 +98,7 @@ RẤT QUAN TRỌNG: Bạn CHỈ ĐƯỢC PHÉP trả về MỘT mảng JSON nguy
 	defer resp.Body.Close()
 
 	bodyBytes, _ := io.ReadAll(resp.Body)
-	
+
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("OpenAI Error: %s", string(bodyBytes))
 	}

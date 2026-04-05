@@ -128,7 +128,7 @@ func (h *ClassHandler) UpdateClass(c fiber.Ctx) error {
 
 	// SECURITY: Strip Stored XSS payloads from Class metadata
 	utils.SanitizeClass(&class)
-	
+
 	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking)
 	class.ID = id
 	class.TeacherID = userId
@@ -139,4 +139,21 @@ func (h *ClassHandler) UpdateClass(c fiber.Ctx) error {
 	}
 
 	return c.JSON(class)
+}
+
+// GetClassAnalytics returns per-student performance data for the Analytics tab
+func (h *ClassHandler) GetClassAnalytics(c fiber.Ctx) error {
+	id := c.Params("id")
+	userId := getUserIdFromToken(c)
+	if userId == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	analytics, err := h.svc.GetClassAnalytics(id, userId)
+	if err != nil {
+		log.Printf("Error fetching class analytics: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to load analytics"})
+	}
+
+	return c.JSON(analytics)
 }

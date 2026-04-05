@@ -5,6 +5,7 @@ import (
 
 	"backend/internal/model"
 	"backend/internal/repository"
+	"backend/internal/utils"
 )
 
 type QuizService interface {
@@ -15,6 +16,7 @@ type QuizService interface {
 	GetPublicQuizMetadata(id string) (*model.Quiz, int64, error)
 	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
 	DeleteQuiz(id, teacherID string) error
+	GetQuizStats(teacherID string) (*model.QuizStatsDTO, error)
 }
 
 type quizService struct {
@@ -52,11 +54,9 @@ func (s *quizService) GetPublicQuizByID(id string) (*model.Quiz, error) {
 		return quiz, nil
 	}
 
-	// SECURITY: Strip the IsCorrect flags from options so students can't inspect network payload to cheat
+	// SECURITY: Strip the cheat vectors from the polymorphic JSON array so students can't inspect network payload
 	for i := range quiz.Questions {
-		for j := range quiz.Questions[i].Options {
-			quiz.Questions[i].Options[j].IsCorrect = false
-		}
+		quiz.Questions[i].Metadata = utils.ScrubMetadataAnswers(quiz.Questions[i].Metadata)
 	}
 
 	return quiz, nil
@@ -72,4 +72,8 @@ func (s *quizService) DeleteQuiz(id, teacherID string) error {
 
 func (s *quizService) UpdateQuiz(id string, teacherID string, params map[string]interface{}) error {
 	return s.repo.UpdateQuiz(id, teacherID, params)
+}
+
+func (s *quizService) GetQuizStats(teacherID string) (*model.QuizStatsDTO, error) {
+	return s.repo.GetQuizStats(teacherID)
 }

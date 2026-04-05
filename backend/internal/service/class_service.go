@@ -12,6 +12,7 @@ type ClassService interface {
 	UpdateClass(teacherID string, class *model.Class) error
 	AddStudent(classID, teacherID string, student *model.Student) error
 	DeleteClass(id, teacherID string) error
+	GetClassAnalytics(classID, teacherID string) (*model.ClassAnalyticsDTO, error)
 }
 
 type classService struct {
@@ -50,4 +51,8 @@ func (s *classService) DeleteClass(id, teacherID string) error {
 
 func (s *classService) UpdateClass(teacherID string, class *model.Class) error {
 	return s.repo.UpdateClass(class, teacherID)
+}
+
+func (s *classService) GetClassAnalytics(classID, teacherID string) (*model.ClassAnalyticsDTO, error) {
+	return s.repo.GetClassAnalytics(classID, teacherID)
 }

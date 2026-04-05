@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"log"
 
 	"github.com/gofiber/fiber/v3"
@@ -66,11 +65,11 @@ func (h *QuestionHandler) BatchCreateQuestions(c fiber.Ctx) error {
 	var body struct {
 		Questions []model.Question `json:"questions"`
 	}
-	
+
 	if err := c.Bind().JSON(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body format"})
 	}
-	
+
 	if len(body.Questions) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Questions array cannot be empty"})
 	}
@@ -100,7 +99,7 @@ func (h *QuestionHandler) BatchCreateQuestions(c fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Successfully created batch questions",
-		"count": len(body.Questions),
+		"count":   len(body.Questions),
 	})
 }
 
@@ -141,7 +140,7 @@ func (h *QuestionHandler) UpdateQuestion(c fiber.Ctx) error {
 
 	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking & Relocation)
 	delete(params, "id")
-	delete(params, "quiz_id")
+	// Note: quiz_id is no longer part of question, it's M2M now.
 	delete(params, "created_at")
 
 	// SECURITY: Strip Stored XSS payloads from arbitrary map fields
@@ -156,24 +155,6 @@ func (h *QuestionHandler) UpdateQuestion(c fiber.Ctx) error {
 
 // SECURITY: Structural Integrity bounds to prevent Next.js UI mapping failures
 func validateQuestionLogic(q *model.Question) error {
-	if q.Type == "multiple_choice" {
-		if len(q.Options) < 2 {
-			return errors.New("multiple choice questions must have at least 2 options")
-		}
-		hasCorrect := false
-		for _, opt := range q.Options {
-			if opt.IsCorrect {
-				hasCorrect = true
-				break
-			}
-		}
-		if !hasCorrect {
-			return errors.New("multiple choice questions must have at least 1 correct option")
-		}
-	} else if q.Type == "true_false" {
-		if len(q.Options) != 2 {
-			return errors.New("true/false questions must have exactly 2 options")
-		}
-	}
+	// TODO: Add robust datatypes.JSON validation for Multiple Choice Metadata formats
 	return nil
 }

@@ -15,6 +15,7 @@ type QuizRepository interface {
 	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
 	DeleteQuiz(id, teacherID string) error
 	GetQuizzesByIDs(ids []string) ([]model.Quiz, error)
+	GetQuizStats(teacherID string) (*model.QuizStatsDTO, error)
 }
 
 type quizRepository struct {
@@ -99,4 +100,28 @@ func (r *quizRepository) GetQuizzesByIDs(ids []string) ([]model.Quiz, error) {
 	}
 	err := r.db.Select("id", "title").Where("id IN ?", ids).Find(&quizzes).Error
 	return quizzes, err
+}
+
+func (r *quizRepository) GetQuizStats(teacherID string) (*model.QuizStatsDTO, error) {
+	var dto model.QuizStatsDTO
+
+	// Count total quizzes
+	r.db.Model(&model.Quiz{}).Where("teacher_id = ? AND deleted_at IS NULL", teacherID).Count(&dto.Total)
+
+	// Count active (published) quizzes
+	r.db.Model(&model.Quiz{}).Where("teacher_id = ? AND status = 'published' AND deleted_at IS NULL", teacherID).Count(&dto.Active)
+
+	// Count total questions across all quizzes owned by teacher
+	r.db.Model(&model.Question{}).
+		Joins("JOIN quizzes ON quizzes.id = questions.quiz_id AND quizzes.deleted_at IS NULL").
+		Where("quizzes.teacher_id = ? AND questions.deleted_at IS NULL", teacherID).
+		Count(&dto.TotalQuestions)
+
+	// Count total submissions
+	r.db.Model(&model.TestResult{}).
+		Joins("JOIN quizzes ON quizzes.id = test_results.quiz_id AND quizzes.deleted_at IS NULL").
+		Where("quizzes.teacher_id = ? AND test_results.deleted_at IS NULL", teacherID).
+		Count(&dto.TotalSubmissions)
+
+	return &dto, nil
 }

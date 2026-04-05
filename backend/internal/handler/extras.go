@@ -67,7 +67,7 @@ func (h *OmrBatchHandler) UpdateBatch(c fiber.Ctx) error {
 
 	// SECURITY: Strip Stored XSS payloads
 	utils.SanitizeOmrBatch(&batch)
-	
+
 	// SECURITY: Mass Assignment Object Hijacking
 	batch.ID = id
 	batch.UserID = userID
@@ -141,7 +141,7 @@ func (h *RubricHandler) UpdateRubric(c fiber.Ctx) error {
 
 	// SECURITY: Strip Stored XSS payloads
 	utils.SanitizeRubric(&rubric)
-	
+
 	// SECURITY: Mass Assignment Object Hijacking
 	rubric.ID = id
 	rubric.UserID = userID
@@ -230,7 +230,7 @@ func (h *ShareLinkHandler) UpdateLink(c fiber.Ctx) error {
 
 	// SECURITY: Strip Stored XSS payloads
 	utils.SanitizeShareLink(&link)
-	
+
 	// SECURITY: Mass Assignment Object Hijacking
 	link.ID = id
 	link.UserID = userID

@@ -48,7 +48,7 @@ func (h *StatsHandler) ExportCSV(c fiber.Ctx) error {
 	if userId == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
-	
+
 	stats, err := h.svc.GetDashboardOverview(userId)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to load dashboard stats"})
@@ -66,7 +66,6 @@ func (h *StatsHandler) ExportCSV(c fiber.Ctx) error {
 	csvOutput += fmt.Sprintf("Total Questions,%d\n", stats.TotalQuestions)
 	csvOutput += fmt.Sprintf("Total Submissions,%d\n", stats.TotalSubmissions)
 	csvOutput += fmt.Sprintf("Average Score,%.2f\n", stats.AvgScore)
-	
+
 	return c.SendString(csvOutput)
 }
-

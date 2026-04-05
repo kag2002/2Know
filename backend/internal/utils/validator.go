@@ -21,7 +21,7 @@ func ValidateStruct(s interface{}) error {
 		return nil
 	}
 
-	// This check is only needed for standard parsing. 
+	// This check is only needed for standard parsing.
 	// If it's not ValidationErrors, return generically
 	validationErrs, ok := err.(validator.ValidationErrors)
 	if !ok {

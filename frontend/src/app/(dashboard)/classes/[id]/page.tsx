@@ -26,7 +26,8 @@ import { useTranslation } from "@/context/LanguageContext";
 import { toast } from "sonner";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Files, Presentation, Link as LinkIcon } from "lucide-react";
+import { Files, Presentation, Link as LinkIcon, ScatterChart as ScatterChartIcon } from "lucide-react";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, ZAxis } from 'recharts';
 
 interface Student {
   id: string;
@@ -69,20 +70,25 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
   const [isAddingMaterial, setIsAddingMaterial] = useState(false);
 
   // Gradebook State
+  // Gradebook & Analytics State
   const [gradebook, setGradebook] = useState<{ quizzes: any[], results: any[] } | null>(null);
+  const [analytics, setAnalytics] = useState<any>(null);
 
   useEffect(() => {
     const fetchClassData = async () => {
       try {
-        const [data, matsData, gbData] = await Promise.all([
+        const [data, matsData, gbData, analyticsData] = await Promise.all([
            apiFetch(`/classes/${id}`),
            apiFetch(`/classes/${id}/materials`),
-           apiFetch(`/classes/${id}/gradebook`)
-        ]).catch(() => [null, [], null]);
+           apiFetch(`/classes/${id}/gradebook`),
+           apiFetch(`/classes/${id}/analytics`)
+        ]).catch(() => [null, [], null, null]);
         
         if (data && !data.students) data.students = [];
         if (data) setClassData(data);
         if (matsData) setMaterials(matsData);
+        if (gbData) setGradebook(gbData);
+        if (analyticsData) setAnalytics(analyticsData);
         if (gbData) setGradebook(gbData);
       } catch (err) {
         console.error("Failed to load class data:", err);
@@ -230,10 +236,10 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: t("classDetail.headcount"), value: students.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50" },
-          { label: t("classDetail.classAvg"), value: "---", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50" },
-          { label: t("classDetail.excellent"), value: "---", icon: Award, color: "text-amber-500", bg: "bg-amber-50" },
-          { label: t("classDetail.needHelp"), value: "---", icon: TrendingUp, color: "text-rose-500", bg: "bg-rose-50" },
+          { label: t("classDetail.headcount"), value: students.length, icon: Users, color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-900/20" },
+          { label: t("classDetail.classAvg"), value: analytics?.avg_score ? analytics.avg_score.toFixed(2) : "---", icon: BarChart3, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
+          { label: t("classDetail.excellent"), value: analytics?.students ? analytics.students.filter((s: any) => s.avg_score >= 8.0).length : "---", icon: Award, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-900/20" },
+          { label: t("classDetail.needHelp"), value: analytics?.students ? analytics.students.filter((s: any) => s.avg_score > 0 && s.avg_score < 5.0).length : "---", icon: TrendingUp, color: "text-rose-500", bg: "bg-rose-50 dark:bg-rose-900/20" },
         ].map((stat, i) => (
           <Card key={i} className="shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
@@ -253,10 +259,13 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="students" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-[500px] mb-6 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl">
+        <TabsList className="grid w-full grid-cols-4 max-w-[650px] mb-6 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl">
           <TabsTrigger value="students" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> {t("classDetail.tabStudents")}</TabsTrigger>
           <TabsTrigger value="grades" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> {t("classDetail.tabGrades")}</TabsTrigger>
           <TabsTrigger value="materials" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400"> {t("classDetail.tabMaterials")}</TabsTrigger>
+          <TabsTrigger value="analytics" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-indigo-600 dark:data-[state=active]:text-indigo-400">
+            <ScatterChartIcon className="w-4 h-4 mr-2" /> Analytics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="students" className="mt-0 outline-none">
@@ -516,6 +525,103 @@ export default function ClassDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
                 )}
              </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="mt-0 outline-none space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card className="border-none shadow-sm bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/20 dark:to-background">
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Tổng Sinh Viên</p>
+                <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mt-2">{analytics?.total_students || 0}</h3>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-sm bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-background">
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Tỉ Lệ Đạt ({">="} 5.0)</p>
+                <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mt-2">{analytics?.pass_rate ? analytics.pass_rate.toFixed(1) : 0}%</h3>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-background">
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Lượt Nộp Bài</p>
+                <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mt-2">{analytics?.total_submissions || 0}</h3>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background">
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground">Điểm Trung Bình</p>
+                <h3 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mt-2">{analytics?.avg_score ? analytics.avg_score.toFixed(2) : '0.0'}</h3>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border-none shadow-sm h-full">
+            <CardHeader>
+              <CardTitle className="text-lg">Phân Bố Kết Quả Học Tập (Nỗ Lực vs Kết Quả)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px] w-full">
+                {analytics?.students && analytics.students.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
+                      <XAxis 
+                        type="number" 
+                        dataKey="attempts" 
+                        name="Số Lượt Nộp" 
+                        label={{ value: "Số lượt nộp bài", position: "bottom", offset: 0 }}
+                        tick={{fontSize: 12}}
+                        allowDecimals={false}
+                      />
+                      <YAxis 
+                        type="number" 
+                        dataKey="avg_score" 
+                        name="Điểm Trung Bình" 
+                        domain={[0, 10]}
+                        label={{ value: "Điểm TB", angle: -90, position: "left", offset: 0 }}
+                        tick={{fontSize: 12}}
+                      />
+                      <ZAxis type="number" range={[100, 100]} />
+                      <RechartsTooltip 
+                        cursor={{ strokeDasharray: '3 3' }}
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="bg-white dark:bg-slate-900 border shadow-lg rounded-lg p-3 text-sm">
+                                <p className="font-bold text-indigo-600 dark:text-indigo-400 mb-1">{data.student_name} ({data.student_id})</p>
+                                <p className="text-slate-600 dark:text-slate-300">Điểm TB: <span className="font-medium">{data.avg_score.toFixed(1)}</span></p>
+                                <p className="text-slate-600 dark:text-slate-300">Số bài đã nộp: <span className="font-medium">{data.attempts}</span></p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Scatter data={analytics.students} name="Sinh viên">
+                        {analytics.students.map((entry: any, index: number) => {
+                          let color = "#ef4444"; 
+                          if (entry.avg_score >= 8.0) {
+                            color = "#10b981"; 
+                          } else if (entry.avg_score >= 5.0 && entry.attempts >= 3) {
+                            color = "#3b82f6"; 
+                          } else if (entry.avg_score >= 5.0) {
+                            color = "#f59e0b"; 
+                          }
+                          return <Cell key={`cell-${index}`} fill={color} opacity={0.8} />;
+                        })}
+                      </Scatter>
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
+                    <BarChart3 className="w-10 h-10 mb-4 opacity-50" />
+                    <p>Chưa có đủ dữ liệu bài thi để hiển thị biểu đồ</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>

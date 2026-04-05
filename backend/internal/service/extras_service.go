@@ -70,7 +70,9 @@ type ShareLinkService interface {
 	DeleteLink(id, userID string) error
 }
 
-type shareLinkService struct{ repo repository.ShareLinkRepository }
+type shareLinkService struct {
+	repo repository.ShareLinkRepository
+}
 
 func NewShareLinkService(repo repository.ShareLinkRepository) ShareLinkService {
 	return &shareLinkService{repo: repo}

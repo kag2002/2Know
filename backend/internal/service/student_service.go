@@ -44,7 +44,7 @@ func (s *studentService) GetStudentsByTeacherID(teacherID string) ([]repository.
 		} else {
 			status = "danger"
 		}
-		
+
 		// If they haven't taken any tests, mark as "average" or "unknown"
 		if st.Tests == 0 {
 			status = "average"

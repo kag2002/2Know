@@ -1,29 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronRight, Settings, Users, BookOpen, Flag, CheckCircle, Clock, Award, Share2, QrCode, Link as LinkIcon } from "lucide-react";
+import { ChevronRight, Settings, Users, BookOpen, Flag, CheckCircle, Clock, Award, Share2, QrCode, Link as LinkIcon, Loader2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
+import { useTranslation } from "@/context/LanguageContext";
 import { QuestionBuilder, QuestionPayload } from "@/components/dashboard/QuestionBuilder";
 
 const steps = [
-  { id: 1, title: "Cài đặt chung", icon: Settings },
-  { id: 2, title: "Người tham gia", icon: Users },
-  { id: 3, title: "Câu hỏi", icon: BookOpen },
-  { id: 4, title: "Cấu hình OMR", icon: CheckCircle }, // If applicable
-  { id: 5, title: "Thời gian", icon: Clock },
-  { id: 6, title: "Thang điểm", icon: Award },
-  { id: 7, title: "Chống gian lận", icon: Flag },
-  { id: 8, title: "Xuất bản", icon: Share2 },
+  { id: 1, title: "Loại bài", icon: Flag },
+  { id: 2, title: "Cài đặt chung", icon: Settings },
+  { id: 3, title: "Người tham gia", icon: Users },
+  { id: 4, title: "Câu hỏi", icon: BookOpen },
+  { id: 5, title: "Cấu hình OMR", icon: CheckCircle },
+  { id: 6, title: "Thời gian", icon: Clock },
+  { id: 7, title: "Thang điểm", icon: Award },
+  { id: 8, title: "Chống gian lận", icon: Flag },
+  { id: 9, title: "Xuất bản", icon: Share2 },
 ];
-
-import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
-import { useTranslation } from "@/context/LanguageContext";
-import { toast } from "sonner";
 
 export default function QuizBuilderWizard() {
   const { t } = useTranslation();
@@ -40,9 +39,28 @@ export default function QuizBuilderWizard() {
     time_limit_minutes: 0,
     max_attempts: 1,
     quiz_type: "online",
+    quiz_mode: "exam",
     omr_template: "",
     access_type: "public",
+    require_fullscreen: false,
+    disable_copy_paste: false,
   });
+
+  // Class list for "Người tham gia" step
+  const [myClasses, setMyClasses] = useState<{id: string; name: string; subject: string}[]>([]);
+
+  useEffect(() => {
+    apiFetch("/classes").then(d => setMyClasses(Array.isArray(d) ? d : [])).catch(() => {});
+  }, []);
+
+  const applyPreset = (preset: "strict" | "homework") => {
+    if (preset === "strict") {
+      setFormData(prev => ({ ...prev, quiz_mode: "exam", require_fullscreen: true, disable_copy_paste: true, max_attempts: 1 }));
+    } else {
+      setFormData(prev => ({ ...prev, quiz_mode: "practice", require_fullscreen: false, disable_copy_paste: false, max_attempts: 99 }));
+    }
+    setCurrentStep(2);
+  };
 
   // Lifted Question State
   const [questions, setQuestions] = useState<QuestionPayload[]>([]);
@@ -53,14 +71,14 @@ export default function QuizBuilderWizard() {
 
   const handleSave = async (status: string = "draft") => {
     if (!formData.title) {
-      alert(t("quizCreate.alertNoTitle"));
-      setCurrentStep(1);
+      toast.warning(t("quizCreate.alertNoTitle") || "Vui lòng nhập tên bài kiểm tra!");
+      setCurrentStep(2); // step 2 = Cài đặt chung
       return;
     }
 
     if (status === "published" && questions.length === 0) {
-      alert(t("quizCreate.alertNoQuestions"));
-      setCurrentStep(3);
+      toast.warning(t("quizCreate.alertNoQuestions") || "Vui lòng thêm ít nhất 1 câu hỏi trước khi xuất bản!");
+      setCurrentStep(4);
       return;
     }
 
@@ -85,7 +103,7 @@ export default function QuizBuilderWizard() {
       });
       router.push("/quizzes");
     } catch (err: any) {
-      alert(t("quizCreate.saveError") + err.message);
+      toast.error((t("quizCreate.saveError") || "Lỗi lưu bài: ") + err.message);
     } finally {
       setLoading(false);
     }
@@ -170,9 +188,55 @@ export default function QuizBuilderWizard() {
                   Cấu hình các thông số cho phần {steps[currentStep - 1].title.toLowerCase()}.
                 </p>
               </div>
-              
+
               {/* Dynamic content for current step */}
               {currentStep === 1 && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { value: "exam", label: "Thi", desc: "Một lần làm, có chấm điểm.", emoji: "🎯" },
+                      { value: "practice", label: "Luyện tập", desc: "Nhiều lần làm lại với phản hồi học tập.", emoji: "📚" },
+                      { value: "survey", label: "Khảo sát", desc: "Phản hồi ẩn danh, không chấm điểm.", emoji: "📋" },
+                    ].map(mode => (
+                      <button
+                        key={mode.value}
+                        onClick={() => updateForm("quiz_mode", mode.value)}
+                        className={`p-5 rounded-xl border-2 text-left transition-all ${
+                          formData.quiz_mode === mode.value
+                            ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-sm"
+                            : "border-border hover:border-muted-foreground/50 hover:bg-muted/30"
+                        }`}
+                      >
+                        <span className="text-3xl">{mode.emoji}</span>
+                        <h3 className="font-bold mt-3 text-sm">{mode.label}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">{mode.desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="border-t pt-5">
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Preset nhanh</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => applyPreset("strict")}
+                        className="border rounded-xl p-4 text-left hover:bg-muted transition-colors group"
+                      >
+                        <span className="font-semibold text-sm flex items-center gap-2">🔒 Thi nghiêm ngặt</span>
+                        <p className="text-xs text-muted-foreground mt-1">Fullscreen + Không copy-paste + 1 lần làm</p>
+                      </button>
+                      <button
+                        onClick={() => applyPreset("homework")}
+                        className="border rounded-xl p-4 text-left hover:bg-muted transition-colors group"
+                      >
+                        <span className="font-semibold text-sm flex items-center gap-2">📤 Nộp bài tập</span>
+                        <p className="text-xs text-muted-foreground mt-1">Mở, học sinh nộp, không giới hạn lần làm</p>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 2: Cài đặt chung */}
+              {currentStep === 2 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -229,7 +293,8 @@ export default function QuizBuilderWizard() {
                 </div>
               )}
 
-              {currentStep === 2 && (
+              {/* STEP 3: Người tham gia */}
+              {currentStep === 3 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="grid gap-6">
                     <div className="border rounded-lg p-5 flex items-start gap-4">
@@ -253,16 +318,20 @@ export default function QuizBuilderWizard() {
                         </div>
                         <div className="bg-background p-4 border rounded-md">
                           <div className="flex flex-col gap-2">
-                            <label className="text-xs font-semibold text-muted-foreground">DANH SÁCH LỚP HỌC CỦA BẠN</label>
+                            <label className="text-xs font-semibold text-muted-foreground">DANH SÁCH Lᶪ HỌC CỦA BẠN</label>
                             <div className="space-y-2 mt-2 max-h-[150px] overflow-y-auto pr-2">
-                              {['Lớp 11A1 - Toán', 'Lớp 11A2 - Toán', 'Đội tuyển HSG Lớp 10'].map(cls => (
-                                <div key={cls} className="flex items-center space-x-2 border p-2.5 rounded-md hover:bg-muted cursor-pointer">
-                                  <input type="checkbox" id={cls} className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                                  <label htmlFor={cls} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
-                                    {cls}
-                                  </label>
-                                </div>
-                              ))}
+                              {myClasses.length === 0 ? (
+                                <p className="text-sm text-muted-foreground py-2">Bạn chưa có lớp nào. Tạo lớp tại trang Lớp học.</p>
+                              ) : (
+                                myClasses.map(cls => (
+                                  <div key={cls.id} className="flex items-center space-x-2 border p-2.5 rounded-md hover:bg-muted cursor-pointer">
+                                    <input type="checkbox" id={cls.id} className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                                    <label htmlFor={cls.id} className="text-sm font-medium leading-none cursor-pointer">
+                                      {cls.name} — {cls.subject}
+                                    </label>
+                                  </div>
+                                ))
+                              )}
                             </div>
                           </div>
                         </div>
@@ -272,11 +341,13 @@ export default function QuizBuilderWizard() {
                 </div>
               )}
 
-              {currentStep === 3 && (
+              {/* STEP 4: Câu hỏi */}
+              {currentStep === 4 && (
                 <QuestionBuilder questions={questions} setQuestions={setQuestions} />
               )}
 
-              {currentStep === 4 && (
+              {/* STEP 5: Cấu hình OMR */}
+              {currentStep === 5 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="grid gap-4">
                     <div className="flex flex-col gap-2">
@@ -288,7 +359,6 @@ export default function QuizBuilderWizard() {
                       </select>
                       <p className="text-xs text-muted-foreground">Chọn mẫu phiếu tô trắc nghiệm được hệ thống chuẩn hóa để in cho học sinh.</p>
                     </div>
-
                     <div className="flex flex-col gap-2 mt-4">
                       <label className="text-sm font-medium">Bố cục câu hỏi</label>
                       <div className="grid grid-cols-2 gap-4">
@@ -303,7 +373,6 @@ export default function QuizBuilderWizard() {
                         </div>
                       </div>
                     </div>
-                    
                     <div className="mt-6 flex items-center justify-between border p-4 rounded-lg bg-muted">
                       <div>
                         <h4 className="text-sm font-medium">Nhận diện SBD tự động</h4>
@@ -317,7 +386,8 @@ export default function QuizBuilderWizard() {
                 </div>
               )}
 
-              {currentStep === 5 && (
+              {/* STEP 6: Thời gian */}
+              {currentStep === 6 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -350,7 +420,8 @@ export default function QuizBuilderWizard() {
                 </div>
               )}
 
-              {currentStep === 6 && (
+              {/* STEP 7: Thang điểm */}
+              {currentStep === 7 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="grid gap-6">
                     <div className="border rounded-lg p-5 flex items-center justify-between bg-muted">
@@ -362,7 +433,6 @@ export default function QuizBuilderWizard() {
                         <div className="w-4 h-4 bg-background rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
                       </div>
                     </div>
-
                     <div className="border rounded-lg p-5 flex items-center justify-between">
                       <div>
                         <h4 className="font-medium text-sm">Hình phạt điểm (Trừ điểm khi làm sai)</h4>
@@ -376,7 +446,8 @@ export default function QuizBuilderWizard() {
                 </div>
               )}
 
-              {currentStep === 7 && (
+              {/* STEP 8: Chống gian lận */}
+              {currentStep === 8 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="grid gap-4">
                     <div className="border rounded-lg p-5 flex items-center justify-between bg-emerald-50/50 border-emerald-200">
@@ -410,7 +481,8 @@ export default function QuizBuilderWizard() {
                 </div>
               )}
 
-              {currentStep === 8 && (
+              {/* STEP 9: Xuất bản */}
+              {currentStep === 9 && (
                 <div className="space-y-6 animate-in fade-in duration-300">
                   <div className="flex flex-col items-center justify-center text-center p-8 bg-muted border border-green-200 rounded-xl">
                     <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4">
@@ -421,14 +493,11 @@ export default function QuizBuilderWizard() {
                       Bài kiểm tra của bạn đã được cấu hình. Chọn Xuất bản để cho phép học viên truy cập ngay bài thi.
                     </p>
                   </div>
-
-                  {/* QR Code + Share Link */}
                   <div className="border rounded-xl p-6 bg-background space-y-6">
                     <h4 className="font-semibold text-card-foreground text-sm flex items-center gap-2">
                       <QrCode className="w-4 h-4 text-indigo-500" /> Truy cập nhanh
                     </h4>
                     <div className="flex flex-col md:flex-row items-center gap-6">
-                      {/* QR Code */}
                       <div className="p-4 bg-background border-2 border-dashed border-indigo-200 rounded-xl flex flex-col items-center shrink-0">
                         <QRCodeSVG
                           value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/test/demo`}
@@ -440,8 +509,6 @@ export default function QuizBuilderWizard() {
                         />
                         <p className="text-xs text-muted-foreground mt-3 font-medium">Quét mẫu mã QR</p>
                       </div>
-
-                      {/* Share Link + Options */}
                       <div className="flex-1 space-y-4 w-full">
                         <div>
                           <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">Dự kiến Đường dẫn chia sẻ</label>

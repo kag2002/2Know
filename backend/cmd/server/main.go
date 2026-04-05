@@ -134,6 +134,7 @@ func main() {
 	// Quiz endpoints
 	api.Get("/quizzes", quizHandler.GetQuizzes)
 	api.Post("/quizzes", quizHandler.CreateQuiz)
+	api.Get("/quizzes/stats", quizHandler.GetQuizStats) // MUST be before /quizzes/:id
 	api.Get("/quizzes/:id", quizHandler.GetQuizByID)
 	api.Patch("/quizzes/:id", quizHandler.UpdateQuiz)
 	api.Delete("/quizzes/:id", quizHandler.DeleteQuiz)
@@ -157,6 +158,7 @@ func main() {
 	api.Post("/classes", classHandler.CreateClass)
 	api.Get("/classes/:id", classHandler.GetClassByID)
 	api.Get("/classes/:id/gradebook", resultHandler.GetClassGradebook)
+	api.Get("/classes/:id/analytics", classHandler.GetClassAnalytics)
 	api.Patch("/classes/:id", classHandler.UpdateClass)
 	api.Delete("/classes/:id", classHandler.DeleteClass)
 	api.Post("/classes/:id/students", classHandler.AddStudent)

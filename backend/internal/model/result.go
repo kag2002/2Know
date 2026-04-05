@@ -19,8 +19,8 @@ type TestResult struct {
 	TotalIncorrect   int     `gorm:"default:0" json:"total_incorrect"`
 	TimeTakenSeconds int     `gorm:"default:0" json:"time_taken_seconds" validate:"min=0"`
 
-	// JSON payload mapping Question ID to Option ID selected (or Essay text)
-	Answers map[string]string `gorm:"type:jsonb;serializer:json" json:"answers" validate:"max=200"`
+	// JSON payload mapping Question ID to their dynamic answer format
+	Answers map[string]interface{} `gorm:"type:jsonb;serializer:json" json:"answers" validate:"max=200"`
 
 	// JSON payload mapping Question ID to points awarded by teacher
 	GradedAnswers map[string]float64 `gorm:"type:jsonb;serializer:json" json:"graded_answers,omitempty"`
@@ -29,8 +29,8 @@ type TestResult struct {
 	Status         string `gorm:"type:varchar(50);default:'completed';index" json:"status"` // completed, abandoned, cheating_flagged
 	TabSwitchCount int    `gorm:"default:0" json:"tab_switch_count"`
 
-	CreatedAt time.Time      `gorm:"autoCreateTime;index" json:"created_at"`
-	UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	CreatedAt time.Time `gorm:"autoCreateTime;index" json:"created_at"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 	// PERFORMANCE: Composite Index for LEFT JOIN quiz listing queries
 	DeletedAt gorm.DeletedAt `gorm:"index;index:idx_quiz_deleted,priority:2" json:"-"`
 }

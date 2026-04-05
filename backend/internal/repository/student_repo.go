@@ -25,7 +25,7 @@ func NewStudentRepository(db *gorm.DB) StudentRepository {
 // StudentWithMetrics represents the aggregated data needed by the frontend Global Student Directory UI
 type StudentWithMetrics struct {
 	ID        string  `json:"id"`
-	Name      string  `json:"name"` // Mapped from FullName
+	Name      string  `json:"name"`      // Mapped from FullName
 	StudentID string  `json:"studentId"` // Mapped from StudentID
 	Email     string  `json:"email"`
 	Class     string  `json:"class"` // Mapped from Class Name
@@ -36,7 +36,7 @@ type StudentWithMetrics struct {
 
 func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentWithMetrics, error) {
 	var results []StudentWithMetrics
-	
+
 	// Complex JOIN to retrieve students, their class names, and aggregated test scores
 	err := r.db.Table("students").
 		Select(`

@@ -3,6 +3,7 @@ package service
 import (
 	"backend/internal/model"
 	"backend/internal/repository"
+	"errors"
 )
 
 type QuestionService interface {
@@ -27,12 +28,8 @@ func (s *questionService) GetQuestions(teacherID string) ([]model.Question, erro
 }
 
 func (s *questionService) CreateQuestion(teacherID string, question *model.Question) error {
-	// Verify the teacher owns the quiz if QuizID is present.
-	if question.QuizID != "" {
-		if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
-			return err
-		}
-	}
+	// Automatically enforce global ownership
+	question.TeacherID = teacherID
 	return s.repo.CreateQuestion(question)
 }
 
@@ -40,18 +37,12 @@ func (s *questionService) CreateBatchQuestions(teacherID string, questions []mod
 	if len(questions) == 0 {
 		return nil
 	}
-	
-	// If the batch belongs to a quiz, verify ownership logic
-	// But in the AI generate context, they usually go straight to Question Bank (QuizID = "")
-	// We'll trust the caller to enforce ownership if QuizID is present.
-	for _, q := range questions {
-		if q.QuizID != "" {
-			if err := s.repo.VerifyQuizOwnership(q.QuizID, teacherID); err != nil {
-				return err
-			}
-		}
+
+	// Automatically enforce global ownership
+	for i := range questions {
+		questions[i].TeacherID = teacherID
 	}
-	
+
 	return s.repo.CreateBatchQuestions(questions)
 }
 
@@ -68,10 +59,9 @@ func (s *questionService) DeleteQuestion(teacherID, questionID string) error {
 		return err
 	}
 
-	if question.QuizID != "" {
-		if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
-			return err
-		}
+	if question.TeacherID != teacherID {
+		// Attempted to delete another teacher's question
+		return errors.New("unauthorized")
 	}
 
 	return s.repo.DeleteQuestion(question)
@@ -83,10 +73,8 @@ func (s *questionService) UpdateQuestion(teacherID, questionID string, params ma
 		return err
 	}
 
-	if question.QuizID != "" {
-		if err := s.repo.VerifyQuizOwnership(question.QuizID, teacherID); err != nil {
-			return err
-		}
+	if question.TeacherID != teacherID {
+		return errors.New("unauthorized")
 	}
 
 	return s.repo.UpdateQuestion(questionID, params)
