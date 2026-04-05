@@ -81,7 +81,7 @@ export default function ClassesPage() {
 
   const handleCreateClass = async () => {
     if (!newClass.name || !newClass.subject || !newClass.grade) {
-      toast.warning("Vui lòng điền đầy đủ thông tin!");
+      toast.warning(t("dashboard.classes.alertFillAll"));
       return;
     }
     
@@ -96,14 +96,14 @@ export default function ClassesPage() {
       setNewClass({ name: "", subject: "", grade: "", school_year: "2025-2026" });
       loadClasses();
     } catch (err: any) {
-      toast.error("Lỗi: " + err.message);
+      toast.error(t("classes.createError") + err.message);
       setLoading(false);
     }
   };
 
   const handleEditClass = async () => {
     if (!editingClass || !editingClass.name || !editingClass.subject) {
-      toast.warning("Vui lòng điền đủ thông tin!");
+      toast.warning(t("dashboard.classes.alertFillAll"));
       return;
     }
     setLoading(true);
@@ -116,11 +116,11 @@ export default function ClassesPage() {
           grade: editingClass.grade,
         }),
       });
-      toast.success("Cập nhật thông tin lớp thành công!");
+      toast.success(t("dashboard.classes.updateSuccess"));
       setIsEditDialogOpen(false);
       loadClasses();
     } catch (err: any) {
-      toast.error("Lỗi cập nhật: " + err.message);
+      toast.error(t("classes.updateErrorToast") + err.message);
       setLoading(false);
     }
   };
@@ -261,9 +261,9 @@ export default function ClassesPage() {
                       <DropdownMenuItem onClick={() => window.location.href = `/reports?search=${encodeURIComponent(cls.name)}`}>{t("classes.benchmarkReport")}</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive" onClick={async () => {
                         const ok = await confirm({
-                          title: "Xóa lớp học",
-                          description: "Bạn có chắc muốn xóa lớp học này? Tất cả học sinh trong lớp sẽ bị gỡ liên kết.",
-                          confirmLabel: "Xóa lớp",
+                          title: t("common.delete") || "Xóa lớp học",
+                          description: t("classes.confirmDelete") || "Bạn có chắc muốn xóa lớp học này? Tất cả học sinh trong lớp sẽ bị gỡ liên kết.",
+                          confirmLabel: t("common.delete") || "Xóa lớp",
                           variant: "danger"
                         });
                         if (!ok) return;

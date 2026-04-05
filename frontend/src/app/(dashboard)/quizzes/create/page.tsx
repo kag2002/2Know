@@ -12,21 +12,25 @@ import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
 import { QuestionBuilder, QuestionPayload } from "@/components/dashboard/QuestionBuilder";
 
+import { useSearchParams } from "next/navigation";
+
 const steps = [
-  { id: 1, title: "Loại bài", icon: Flag },
-  { id: 2, title: "Cài đặt chung", icon: Settings },
-  { id: 3, title: "Người tham gia", icon: Users },
-  { id: 4, title: "Câu hỏi", icon: BookOpen },
-  { id: 5, title: "Cấu hình OMR", icon: CheckCircle },
-  { id: 6, title: "Thời gian", icon: Clock },
-  { id: 7, title: "Thang điểm", icon: Award },
-  { id: 8, title: "Chống gian lận", icon: Flag },
-  { id: 9, title: "Xuất bản", icon: Share2 },
+  { id: 1, titleKey: "quizCreate.stepType", icon: Flag },
+  { id: 2, titleKey: "quizCreate.stepGeneral", icon: Settings },
+  { id: 3, titleKey: "quizCreate.stepParticipants", icon: Users },
+  { id: 4, titleKey: "quizCreate.stepQuestions", icon: BookOpen },
+  { id: 5, titleKey: "quizCreate.stepOMR", icon: CheckCircle },
+  { id: 6, titleKey: "quizCreate.stepTime", icon: Clock },
+  { id: 7, titleKey: "quizCreate.stepGrading", icon: Award },
+  { id: 8, titleKey: "quizCreate.stepAntiCheat", icon: Flag },
+  { id: 9, titleKey: "quizCreate.stepPublish", icon: Share2 },
 ];
 
 export default function QuizBuilderWizard() {
   const { t } = useTranslation();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams?.get("edit");
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -49,9 +53,58 @@ export default function QuizBuilderWizard() {
   // Class list for "Người tham gia" step
   const [myClasses, setMyClasses] = useState<{id: string; name: string; subject: string}[]>([]);
 
+  // Lifted Question State
+  const [questions, setQuestions] = useState<QuestionPayload[]>([]);
+
   useEffect(() => {
     apiFetch("/classes").then(d => setMyClasses(Array.isArray(d) ? d : [])).catch(() => {});
-  }, []);
+
+    if (editId) {
+      setLoading(true);
+      // Fetch Quiz Meta
+      apiFetch(`/quizzes/${editId}`).then((q) => {
+        if (q) {
+          setFormData({
+            title: q.title || "",
+            description: q.description || "",
+            subject: q.subject || "",
+            grade_level: q.grade_level || "",
+            time_limit_minutes: q.time_limit_minutes || 0,
+            max_attempts: q.max_attempts || 1,
+            quiz_type: q.quiz_type || "online",
+            quiz_mode: q.quiz_mode || "exam",
+            omr_template: q.omr_template || "",
+            access_type: q.access_type || "public",
+            require_fullscreen: q.require_fullscreen || false,
+            disable_copy_paste: q.disable_copy_paste || false,
+          });
+        }
+      }).catch(() => toast.error(t("quizCreate.alertNoOldData")));
+
+      // Fetch Quiz Questions
+      apiFetch(`/quizzes/${editId}/questions`).then((qs: any[]) => {
+        if (qs && Array.isArray(qs)) {
+          const parsed = qs.map((q) => {
+            let opts = Array.from({length:4},()=>({text:"", isCorrect:false}));
+            if (q.metadata && q.metadata.options && Array.isArray(q.metadata.options)) {
+              opts = q.metadata.options.map((o: any) => ({
+                text: o.content || "",
+                isCorrect: o.is_correct || false
+              }));
+            }
+            return {
+              id: q.id,
+              type: q.type === "multiple_choice" ? "Trắc nghiệm" : q.type === "multiple_answers" ? "Nhiều đáp án" : "Tự luận",
+              points: q.points || 10,
+              content: q.content || "",
+              options: opts
+            };
+          });
+          setQuestions(parsed);
+        }
+      }).finally(() => setLoading(false));
+    }
+  }, [editId]);
 
   const applyPreset = (preset: "strict" | "homework") => {
     if (preset === "strict") {
@@ -61,9 +114,6 @@ export default function QuizBuilderWizard() {
     }
     setCurrentStep(2);
   };
-
-  // Lifted Question State
-  const [questions, setQuestions] = useState<QuestionPayload[]>([]);
 
   const updateForm = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -86,11 +136,11 @@ export default function QuizBuilderWizard() {
     try {
       // Transform QuestionPayload to match the new Global Bank JSONB model
       const formattedQuestions = questions.map((q, idx) => ({
+        id: q.id && !String(q.id).startsWith("temp-") ? q.id : undefined, // Keep ID to trigger M2M Linking instead of duplication!
         type: q.type === "Trắc nghiệm" ? "multiple_choice" : q.type === "Nhiều đáp án" ? "multiple_answers" : "essay",
         points: Number(q.points) || 10,
         content: q.content,
-        // order_index is physically removed from the JSON payload map into the association via M2M,
-        // but for creation purposes we just stuff the options array safely inside the new polymorphism:
+        // Order is intrinsically preserved by Array order which the Backend loops through.
         metadata: {
           options: q.options.map((opt, optIdx) => ({
             label: String.fromCharCode(65 + optIdx), // A, B, C, D
@@ -100,11 +150,20 @@ export default function QuizBuilderWizard() {
         }
       }));
 
-      await apiFetch("/quizzes", {
-        method: "POST",
-        body: JSON.stringify({ ...formData, status, questions: formattedQuestions })
-      });
-      router.push("/quizzes");
+      if (editId) {
+        await apiFetch(`/quizzes/${editId}`, {
+          method: "PATCH",
+          body: JSON.stringify({ ...formData, status, questions: formattedQuestions })
+        });
+        toast.success(t("dashboard.quizzes.updateSuccess"));
+      } else {
+        await apiFetch("/quizzes", {
+          method: "POST",
+          body: JSON.stringify({ ...formData, status, questions: formattedQuestions })
+        });
+        toast.success(t("dashboard.quizzes.createSuccess"));
+      }
+      setTimeout(() => router.push("/quizzes"), 1500);
     } catch (err: any) {
       toast.error((t("quizCreate.saveError") || "Lỗi lưu bài: ") + err.message);
     } finally {
@@ -118,7 +177,7 @@ export default function QuizBuilderWizard() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("quizCreate.title")}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Bước {currentStep} / {steps.length}: {steps[currentStep - 1].title}
+            Bước {currentStep} / {steps.length}: {t(steps[currentStep - 1].titleKey)}
           </p>
         </div>
         <div className="flex gap-3">
@@ -166,7 +225,7 @@ export default function QuizBuilderWizard() {
                         <span className="text-[10px]">{step.id}</span>
                       )}
                     </div>
-                    <span className="flex-1 text-left">{step.title}</span>
+                    <span className="flex-1 text-left">{t(step.titleKey)}</span>
                     {isActive && <ChevronRight className="w-4 h-4 text-emerald-500" />}
                   </button>
                 );
@@ -185,10 +244,10 @@ export default function QuizBuilderWizard() {
                     const Icon = steps[currentStep - 1].icon;
                     return <Icon className="w-5 h-5 text-emerald-600" />;
                   })()}
-                  {steps[currentStep - 1].title}
+                  {t(steps[currentStep - 1].titleKey)}
                 </h2>
                 <p className="text-muted-foreground text-sm mt-1">
-                  Cấu hình các thông số cho phần {steps[currentStep - 1].title.toLowerCase()}.
+                  {t("quizCreate.stepConfigDesc") || "Cấu hình các thông số cho phần"} {t(steps[currentStep - 1].titleKey).toLowerCase()}.
                 </p>
               </div>
 

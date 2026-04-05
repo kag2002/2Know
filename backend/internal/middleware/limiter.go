@@ -18,7 +18,7 @@ func GlobalLimiter() fiber.Handler {
 		},
 		LimitReached: func(c fiber.Ctx) error {
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
+				"error": "Too many requests. Please try again later.",
 			})
 		},
 	})
@@ -34,7 +34,7 @@ func AuthLimiter() fiber.Handler {
 		},
 		LimitReached: func(c fiber.Ctx) error {
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Tài khoản của bạn đã thực hiện quá nhiều thao tác đăng nhập/đăng ký. Vui lòng thử lại sau 1 phút.",
+				"error": "Too many auth attempts. Please try again in 1 minute.",
 			})
 		},
 	})
@@ -50,7 +50,7 @@ func AILimiter() fiber.Handler {
 		},
 		LimitReached: func(c fiber.Ctx) error {
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Hệ thống AI đang xử lý quá tải thao tác từ bạn. Vui lòng đợi 1 phút để tiếp tục tạo đề.",
+				"error": "AI quota exceeded. Please wait 1 minute before generating again.",
 			})
 		},
 	})
@@ -74,7 +74,7 @@ func SubmitLimiter() fiber.Handler {
 		},
 		LimitReached: func(c fiber.Ctx) error {
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Bạn đã gửi quá nhiều bài nộp. Vui lòng đợi 1 phút trước khi thử lại.",
+				"error": "Too many submissions. Please wait 1 minute before trying again.",
 			})
 		},
 	})

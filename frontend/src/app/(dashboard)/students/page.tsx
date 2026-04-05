@@ -77,7 +77,7 @@ export default function StudentsPage() {
         }
       } catch (err: any) {
         if (isMounted) {
-          toast.error("Không thể tải dữ liệu: " + err.message);
+          toast.error(t("students.loadError") + err.message);
         }
       } finally {
         if (isMounted) {
@@ -122,7 +122,7 @@ export default function StudentsPage() {
 
   const handleAddStudent = async () => {
     if (!newStudent.name || !newStudent.student_id || !newStudent.class_id) {
-      toast.warning("Vui lòng điền họ tên, mã học sinh và chọn lớp!");
+      toast.warning(t("dashboard.students.alertFillAll"));
       return;
     }
     
@@ -144,7 +144,7 @@ export default function StudentsPage() {
       setIsDialogOpen(false);
       setNewStudent({ name: "", email: "", student_id: "", class_id: "" });
     } catch (err: any) {
-      toast.error("Lỗi: " + err.message);
+      toast.error(t("students.createError") + err.message);
     } finally {
       setLoading(false);
     }
@@ -152,7 +152,7 @@ export default function StudentsPage() {
 
   const handleEditStudent = async () => {
     if (!editingStudent || !editingStudent.name || !editingStudent.email) {
-      toast.warning("Vui lòng điền đủ họ tên và email!");
+      toast.warning(t("dashboard.students.alertFillBasic"));
       return;
     }
     
@@ -162,7 +162,7 @@ export default function StudentsPage() {
         method: "PATCH",
         body: JSON.stringify({ full_name: editingStudent.name, email: editingStudent.email }),
       });
-      toast.success("Cập nhật thông tin học sinh thành công!");
+      toast.success(t("dashboard.students.updateSuccess"));
       setIsEditDialogOpen(false);
       
       // Update local state without full reload
@@ -170,7 +170,7 @@ export default function StudentsPage() {
         s.id === editingStudent.id ? { ...s, name: editingStudent.name, email: editingStudent.email } : s
       ));
     } catch (err: any) {
-      toast.error("Lỗi cập nhật: " + err.message);
+      toast.error(t("students.updateErrorToast") + err.message);
     } finally {
       setLoading(false);
     }
@@ -372,18 +372,18 @@ export default function StudentsPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-rose-600 focus:text-rose-600 gap-2" onClick={async () => {
                             const ok = await confirm({
-                              title: "Xóa học sinh",
-                              description: `Bạn có chắc muốn xóa "${student.name}" khỏi hệ thống? Hành động này không thể hoàn tác.`,
-                              confirmLabel: "Xóa vĩnh viễn",
+                              title: t("common.delete") + " " + student.name,
+                              description: t("students.confirmDelete") || `Bạn có chắc muốn xóa "${student.name}" khỏi hệ thống? Hành động này không thể hoàn tác.`,
+                              confirmLabel: t("common.delete") || "Xóa vĩnh viễn",
                               variant: "danger"
                             });
                             if (!ok) return;
                             try {
                               await apiFetch(`/students/${student.id}`, { method: 'DELETE' });
                               setAllStudents(prev => prev.filter(s => s.id !== student.id));
-                              toast.success("Đã xóa học sinh thành công!");
+                              toast.success(t("dashboard.students.deleteSuccess"));
                             } catch (err: any) {
-                              toast.error("Lỗi xóa: " + err.message);
+                              toast.error(t("students.deleteErrorToast") + err.message);
                             }
                           }}>
                             <Trash2 className="w-4 h-4 text-rose-500" /> <span className="text-rose-600">{t("students.deleteBtn")}</span>

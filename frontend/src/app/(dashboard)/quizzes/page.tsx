@@ -119,7 +119,7 @@ export default function QuizzesPage() {
 
   const handleEditQuiz = async () => {
     if (!editingQuiz || !editingQuiz.title || !editingQuiz.subject) {
-      toast.warning("Vui lòng nhập tên và môn học bài kiểm tra!");
+      toast.warning(t("dashboard.rubrics.requireNameSubject"));
       return;
     }
     try {
@@ -130,7 +130,7 @@ export default function QuizzesPage() {
           subject: editingQuiz.subject
         })
       });
-      toast.success("Cập nhật bài kiểm tra thành công!");
+      toast.success(t("dashboard.quizzes.updateSuccess"));
       setIsEditDialogOpen(false);
       loadQuizzes();
     } catch { toast.error(t("quizzes.editError") || "Lỗi cập nhật bài kiểm tra"); }
@@ -138,7 +138,7 @@ export default function QuizzesPage() {
 
   const handleCreateShare = async () => {
     if (!shareConfig.title) {
-      toast.warning("Vui lòng nhập tên chiến dịch chia sẻ!");
+      toast.warning(t("quizzes.shareCampaignEmpty"));
       return;
     }
     try {
@@ -146,12 +146,12 @@ export default function QuizzesPage() {
         method: "POST",
         body: JSON.stringify(shareConfig)
       });
-      toast.success("Tạo link chia sẻ thành công!");
+      toast.success(t("quizzes.shareCreateSuccess"));
       setIsShareDialogOpen(false);
       // Optional: Redirect them to Sharing page or encourage them to view it
       setTimeout(() => window.location.href = '/sharing', 1000);
     } catch (err: any) {
-      toast.error("Lỗi khi tạo chia sẻ: " + err.message);
+      toast.error(t("quizzes.shareCreateError") + err.message);
     }
   };
 
@@ -394,9 +394,9 @@ export default function QuizzesPage() {
                       }}><Users className="w-4 h-4 text-slate-400"/> {t("quizzes.assignClass")}</DropdownMenuItem>
                       <DropdownMenuItem className="gap-2 text-rose-600 focus:text-rose-600" onClick={async () => {
                           const ok = await confirm({
-                            title: "Xóa bài kiểm tra",
-                            description: `Bạn có chắc muốn xóa bài kiểm tra này? Tất cả dữ liệu bài nộp liên quan cũng sẽ bị mất.`,
-                            confirmLabel: "Xóa",
+                            title: t("quizzes.deleteQuiz") || "Xóa bài kiểm tra",
+                            description: t("quizzes.confirmDelete") || `Bạn có chắc muốn xóa bài kiểm tra này? Tất cả dữ liệu bài nộp liên quan cũng sẽ bị mất.`,
+                            confirmLabel: t("common.delete") || "Xóa",
                             variant: "danger"
                           });
                           if (!ok) return;

@@ -28,7 +28,7 @@ type ExamVersion struct {
 // GenerateOMRVersions shuffles question order and option order to generate multiple unique exam tests
 func GenerateOMRVersions(quiz *model.Quiz, numVersions int) ([]ExamVersion, error) {
 	if len(quiz.Questions) == 0 {
-		return nil, fmt.Errorf("quiz không có câu hỏi nào để trộn")
+		return nil, fmt.Errorf("quiz has no questions to shuffle")
 	}
 
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))

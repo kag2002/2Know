@@ -262,7 +262,7 @@ export default function RubricsPage() {
                         });
                         loadRubrics();
                         toast.success(t("rubrics.cloneSuccess") || "Đã nhân bản Rubric");
-                      } catch { toast.error("Lỗi nhân bản Rubric") }
+                        } catch { toast.error(t("dashboard.rubrics.cloneError")) }
                     }}><Copy className="w-4 h-4"/> {t("rubrics.duplicate")}</DropdownMenuItem>
                     <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive" onClick={() => handleDelete(rubric.id)}><Trash2 className="w-4 h-4"/> Xóa</DropdownMenuItem>
                   </DropdownMenuContent>

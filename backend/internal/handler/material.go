@@ -37,7 +37,7 @@ func (h *MaterialHandler) CreateMaterial(c fiber.Ctx) error {
 	utils.SanitizeMaterial(&req)
 
 	if err := h.materialService.CreateMaterial(classID, userID, &req); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể tạo tài liệu. Vui lòng thử lại sau."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create material. Please try again later."})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(req)
@@ -53,7 +53,7 @@ func (h *MaterialHandler) GetMaterials(c fiber.Ctx) error {
 
 	materials, err := h.materialService.GetMaterialsByClass(classID, userID)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể tải tài liệu. Vui lòng thử lại sau."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch materials. Please try again later."})
 	}
 
 	return c.JSON(materials)
@@ -69,7 +69,7 @@ func (h *MaterialHandler) DeleteMaterial(c fiber.Ctx) error {
 	materialID := c.Params("materialId")
 
 	if err := h.materialService.DeleteMaterial(materialID, classID, userID); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể xoá tài liệu. Vui lòng thử lại sau."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete material. Please try again later."})
 	}
 
 	return c.SendStatus(fiber.StatusNoContent)

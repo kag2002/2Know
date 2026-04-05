@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Loader2, AlertTriangle, Clock, Target, CheckCircle2, XCircle } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
+import { useTranslation } from "@/context/LanguageContext";
+
 interface QuestionAnalyticsModalProps {
   quizId: string | null;
   open: boolean;
@@ -12,6 +14,7 @@ interface QuestionAnalyticsModalProps {
 }
 
 export function QuestionAnalyticsModal({ quizId, open, onOpenChange }: QuestionAnalyticsModalProps) {
+  const { t } = useTranslation();
   const [quiz, setQuiz] = useState<any>(null);
   const [analytics, setAnalytics] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,7 +37,7 @@ export function QuestionAnalyticsModal({ quizId, open, onOpenChange }: QuestionA
     ]).then(([quizData, analyticsData]) => {
       if (!isMounted) return;
       if (!quizData || !analyticsData) {
-        setError("Không thể lấy dữ liệu thống kê. Vui lòng thử lại sau.");
+        setError(t("dashboard.reports.exportError") || "Không thể lấy dữ liệu thống kê. Vui lòng thử lại sau.");
       } else {
         setQuiz(quizData);
         setAnalytics(analyticsData);

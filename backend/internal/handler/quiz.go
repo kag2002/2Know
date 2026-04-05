@@ -148,21 +148,23 @@ func (h *QuizHandler) UpdateQuiz(c fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
 
-	var params map[string]interface{}
-	if err := c.Bind().JSON(&params); err != nil {
+	var quiz model.Quiz
+	if err := c.Bind().JSON(&quiz); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
+	if err := utils.ValidateStruct(&quiz); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
+	}
+
 	// SECURITY: Prevent Mass Assignment Vulnerability (Entity Relocation)
-	// Never allow the user to modify primary keys or ownership links
-	delete(params, "id")
-	delete(params, "teacher_id")
-	delete(params, "created_at")
+	quiz.ID = id
+	quiz.TeacherID = userId
+	
+	// SECURITY: Strip Stored XSS payloads from all quiz fields and nested questions
+	utils.SanitizeQuiz(&quiz)
 
-	// SECURITY: Strip Stored XSS payloads from arbitrary map fields
-	utils.SanitizeMap(params)
-
-	if err := h.svc.UpdateQuiz(id, userId, params); err != nil {
+	if err := h.svc.UpdateQuiz(userId, &quiz); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to update quiz"})
 	}
 

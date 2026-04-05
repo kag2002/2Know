@@ -86,14 +86,35 @@ RẤT QUAN TRỌNG: Bạn CHỈ ĐƯỢC PHÉP trả về MỘT mảng JSON nguy
 	}
 
 	jsonValue, _ := json.Marshal(reqBody)
-	req, _ := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(jsonValue))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-
 	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Do(req)
+
+	var resp *http.Response
+	var err error
+	maxRetries := 2
+
+	for attempt := 0; attempt <= maxRetries; attempt++ {
+		// Re-create the request body buffer for each attempt because client.Do drains it
+		req, _ := http.NewRequest("POST", "https://api.openai.com/v1/chat/completions", bytes.NewBuffer(jsonValue))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+apiKey)
+
+		resp, err = client.Do(req)
+		if err == nil && resp.StatusCode == http.StatusOK {
+			break // Success
+		}
+		
+		if resp != nil {
+			resp.Body.Close()
+		}
+
+		if attempt < maxRetries {
+			// Retry after 1s, then 2s
+			time.Sleep(time.Duration(attempt+1) * time.Second)
+		}
+	}
+
 	if err != nil {
-		return nil, errors.New("Failed to reach OpenAI servers")
+		return nil, errors.New("Failed to reach OpenAI servers after retries")
 	}
 	defer resp.Body.Close()
 

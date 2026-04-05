@@ -44,7 +44,7 @@ func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errMsg})
 		}
 
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Hệ thống không thể xử lý bài nộp. Vui lòng thử lại sau."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "System could not process submission. Please try again later."})
 	}
 
 	// SECURITY & FEATURE: Trigger Real-time WebSocket Broadcast
@@ -120,7 +120,7 @@ func (h *ResultHandler) GradeSubmission(c fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": errMsg})
 		}
 
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể chấm bài. Vui lòng thử lại sau."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to grade submission. Please try again later."})
 	}
 
 	return c.JSON(fiber.Map{"message": "Graded successfully"})
@@ -137,7 +137,7 @@ func (h *ResultHandler) GetClassGradebook(c fiber.Ctx) error {
 	gradebook, err := h.svc.GetClassGradebook(userId, classId)
 	if err != nil {
 		log.Printf("Error fetching gradebook: %v", err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Không thể tải bảng điểm. Vui lòng thử lại sau."})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch gradebook. Please try again later."})
 	}
 
 	return c.JSON(gradebook)

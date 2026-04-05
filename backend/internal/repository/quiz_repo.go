@@ -12,7 +12,7 @@ type QuizRepository interface {
 	GetQuizByID(id, teacherID string) (*model.Quiz, error)
 	GetPublicQuizByID(id string) (*model.Quiz, error)
 	GetPublicQuizMetadata(id string) (*model.Quiz, int64, error)
-	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
+	UpdateQuiz(teacherID string, quiz *model.Quiz) error
 	DeleteQuiz(id, teacherID string) error
 	GetQuizzesByIDs(ids []string) ([]model.Quiz, error)
 	GetQuizStats(teacherID string) (*model.QuizStatsDTO, error)
@@ -28,10 +28,51 @@ func NewQuizRepository(db *gorm.DB) QuizRepository {
 
 func (r *quizRepository) CreateQuiz(quiz *model.Quiz) error {
 	tx := r.db.Begin()
+
+	// Capture incoming questions to prevent GORM M2M auto-duplication bugs
+	incomingQuestions := quiz.Questions
+	quiz.Questions = nil // Clear nested association to handle manually
+
 	if err := tx.Create(quiz).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
+
+	// Manually construct M2M and Questions
+	for i, q := range incomingQuestions {
+		// Enforce global ownership
+		q.TeacherID = quiz.TeacherID
+
+		if q.ID == "" || len(q.ID) < 10 || q.ID[:4] == "temp" {
+			// Brand new question created by user inline
+			q.ID = "" // Ensure clean UUID generation
+			if err := tx.Create(&q).Error; err != nil {
+				tx.Rollback()
+				return err
+			}
+		} else {
+			// Verify it exists AND belongs to the teacher to prevent IDOR
+			var count int64
+			tx.Model(&model.Question{}).Where("id = ? AND teacher_id = ?", q.ID, quiz.TeacherID).Count(&count)
+			if count == 0 {
+				continue // Skip unauthorized or deleted questions
+			}
+		}
+
+		// Manually map to M2M to enforce order_index and default points
+		quizQuestion := model.QuizQuestion{
+			QuizID:     quiz.ID,
+			QuestionID: q.ID,
+			OrderIndex: i,
+			Points:     q.Points, // the points the teacher designated for this test
+		}
+
+		if err := tx.Create(&quizQuestion).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
 	return tx.Commit().Error
 }
 
@@ -49,7 +90,9 @@ func (r *quizRepository) GetQuizzes(teacherID string) ([]model.Quiz, error) {
 
 func (r *quizRepository) GetQuizByID(id, teacherID string) (*model.Quiz, error) {
 	var quiz model.Quiz
-	err := r.db.Preload("Questions").
+	err := r.db.Preload("Questions", func(db *gorm.DB) *gorm.DB {
+		return db.Order("quiz_questions.order_index ASC")
+	}).
 		Where("id = ? AND teacher_id = ?", id, teacherID).
 		First(&quiz).Error
 	if err != nil {
@@ -61,7 +104,9 @@ func (r *quizRepository) GetQuizByID(id, teacherID string) (*model.Quiz, error) 
 func (r *quizRepository) GetPublicQuizByID(id string) (*model.Quiz, error) {
 	var quiz model.Quiz
 	// Only load published quizzes for guests
-	err := r.db.Preload("Questions").
+	err := r.db.Preload("Questions", func(db *gorm.DB) *gorm.DB {
+		return db.Order("quiz_questions.order_index ASC")
+	}).
 		Where("id = ? AND status = 'published'", id).
 		First(&quiz).Error
 	if err != nil {
@@ -90,8 +135,57 @@ func (r *quizRepository) DeleteQuiz(id, teacherID string) error {
 	return r.db.Where("id = ? AND teacher_id = ?", id, teacherID).Delete(&model.Quiz{}).Error
 }
 
-func (r *quizRepository) UpdateQuiz(id string, teacherID string, params map[string]interface{}) error {
-	return r.db.Model(&model.Quiz{}).Where("id = ? AND teacher_id = ?", id, teacherID).Updates(params).Error
+func (r *quizRepository) UpdateQuiz(teacherID string, quiz *model.Quiz) error {
+	tx := r.db.Begin()
+
+	// Capture incoming questions
+	incomingQuestions := quiz.Questions
+	quiz.Questions = nil // Clear so Updates doesn't get confused
+
+	// Update scalar fields of Quiz
+	if err := tx.Model(&model.Quiz{}).Where("id = ? AND teacher_id = ?", quiz.ID, teacherID).Updates(quiz).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Purge existing M2M linkages
+	if err := tx.Where("quiz_id = ?", quiz.ID).Delete(&model.QuizQuestion{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Apply new linkages
+	for i, q := range incomingQuestions {
+		q.TeacherID = teacherID
+
+		if q.ID == "" || len(q.ID) < 10 || q.ID[:4] == "temp" {
+			q.ID = ""
+			if err := tx.Create(&q).Error; err != nil {
+				tx.Rollback()
+				return err
+			}
+		} else {
+			var count int64
+			tx.Model(&model.Question{}).Where("id = ? AND teacher_id = ?", q.ID, teacherID).Count(&count)
+			if count == 0 {
+				continue
+			}
+		}
+
+		quizQuestion := model.QuizQuestion{
+			QuizID:     quiz.ID,
+			QuestionID: q.ID,
+			OrderIndex: i,
+			Points:     q.Points,
+		}
+
+		if err := tx.Create(&quizQuestion).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
 }
 
 func (r *quizRepository) GetQuizzesByIDs(ids []string) ([]model.Quiz, error) {

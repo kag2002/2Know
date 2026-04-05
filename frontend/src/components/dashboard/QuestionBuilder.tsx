@@ -142,7 +142,10 @@ const SortableQuestionItem = memo(function SortableQuestionItem({ q, index, upda
   return prevProps.q === nextProps.q && prevProps.index === nextProps.index;
 });
 
+import { useTranslation } from "@/context/LanguageContext";
+
 export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProps) {
+  const { t } = useTranslation();
   const [isBankOpen, setIsBankOpen] = useState(false);
   const [bankQuestions, setBankQuestions] = useState<any[]>([]);
   const [searchBank, setSearchBank] = useState("");
@@ -163,7 +166,7 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
       const data = await apiFetch("/questions");
       setBankQuestions(data || []);
     } catch {
-      toast.error("Không thể tải ngân hàng câu hỏi");
+      toast.error(t("component.questionBuilder.loadError") || "Không thể tải ngân hàng câu hỏi");
     } finally {
       setLoadingBank(false);
     }
@@ -171,7 +174,7 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
 
   const addQuestion = () => {
     if (questions.length >= 200) {
-      toast.warning("Một bài kiểm tra tối đa 200 câu hỏi");
+      toast.warning(t("component.questionBuilder.limitQuestions") || "Một bài kiểm tra tối đa 200 câu hỏi");
       return;
     }
     setQuestions([
@@ -248,7 +251,7 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
     setQuestions(prev => {
       const updated = [...prev];
       if (updated[qIndex].options.length >= 8) {
-        toast.warning("Tối đa 8 đáp án cho mỗi câu hỏi");
+        toast.warning(t("component.questionBuilder.limitOptions") || "Tối đa 8 đáp án cho mỗi câu hỏi");
         return prev;
       }
       const updatedQ = { ...updated[qIndex], options: [...updated[qIndex].options, { text: "", isCorrect: false }] };
@@ -261,7 +264,7 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
     setQuestions(prev => {
       const updated = [...prev];
       if (updated[qIndex].options.length <= 2) {
-        toast.warning("Phải có ít nhất 2 đáp án");
+        toast.warning(t("component.questionBuilder.minOptions") || "Phải có ít nhất 2 đáp án");
         return prev;
       }
       const remainingOptions = updated[qIndex].options.filter((_, i) => i !== optIndex);
@@ -396,17 +399,17 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
                )
             })}
             {bankQuestions.length === 0 && !loadingBank && (
-              <p className="text-center text-muted-foreground py-8">Ngân hàng câu hỏi trống</p>
+              <p className="text-center text-muted-foreground py-8">{t("questionBank.alertEmpty") || "Ngân hàng câu hỏi trống"}</p>
             )}
           </div>
           <DialogFooter className="pt-4 mt-auto">
-            <Button variant="outline" onClick={() => setIsBankOpen(false)}>Hủy</Button>
+            <Button variant="outline" onClick={() => setIsBankOpen(false)}>{t("common.cancel") || "Hủy"}</Button>
             <Button 
                disabled={selectedBankIds.length === 0} 
                onClick={() => {
                  const selectedQ = bankQuestions.filter(q => selectedBankIds.includes(q.id));
                  const formatted = selectedQ.map(q => ({
-                   id: q.id, // Generate a temporary ID so it triggers creation as a brand new question linked to this quiz if needed, but since it's an existing ID, the backend might handle it. Wait, the endpoint expects payload. If no ID => creates. If exists => maybe updates? Actually just pass the structure.
+                   id: q.id,
                    type: "Trắc nghiệm",
                    points: q.points || 10,
                    content: q.content,
@@ -418,10 +421,10 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
                  setQuestions([...questions, ...formatted]);
                  setIsBankOpen(false);
                  setSelectedBankIds([]);
-                 toast.success(`Đã thêm ${formatted.length} câu hỏi vào bài kiểm tra`);
+                 toast.success(t("dashboard.questions.addSuccess", { count: formatted.length }) || `Đã thêm ${formatted.length} câu hỏi vào bài kiểm tra`);
                }}
             >
-              Thêm {selectedBankIds.length} câu đã chọn
+              {t("common.add")} {selectedBankIds.length} {t("dashboard.questions.selectedLabel") || "câu đã chọn"}
             </Button>
           </DialogFooter>
         </DialogContent>

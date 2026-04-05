@@ -14,7 +14,7 @@ type QuizService interface {
 	GetQuizByID(id, teacherID string) (*model.Quiz, error)
 	GetPublicQuizByID(id string) (*model.Quiz, error)
 	GetPublicQuizMetadata(id string) (*model.Quiz, int64, error)
-	UpdateQuiz(id string, teacherID string, params map[string]interface{}) error
+	UpdateQuiz(teacherID string, quiz *model.Quiz) error
 	DeleteQuiz(id, teacherID string) error
 	GetQuizStats(teacherID string) (*model.QuizStatsDTO, error)
 }
@@ -70,8 +70,9 @@ func (s *quizService) DeleteQuiz(id, teacherID string) error {
 	return s.repo.DeleteQuiz(id, teacherID)
 }
 
-func (s *quizService) UpdateQuiz(id string, teacherID string, params map[string]interface{}) error {
-	return s.repo.UpdateQuiz(id, teacherID, params)
+func (s *quizService) UpdateQuiz(teacherID string, quiz *model.Quiz) error {
+	quiz.TeacherID = teacherID
+	return s.repo.UpdateQuiz(teacherID, quiz)
 }
 
 func (s *quizService) GetQuizStats(teacherID string) (*model.QuizStatsDTO, error) {

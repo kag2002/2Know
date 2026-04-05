@@ -77,7 +77,7 @@ export default function QuestionBankPage() {
         const data = await apiFetch("/questions");
         if (isMounted) setQuestions(data || []);
       } catch (err: any) {
-        if (isMounted) toast.error("Không thể tải danh sách câu hỏi", { description: err.message });
+        if (isMounted) toast.error(t("questionBank.loadError") + err.message);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -94,7 +94,7 @@ export default function QuestionBankPage() {
       const data = await apiFetch("/questions");
       setQuestions(data || []);
     } catch (err: any) {
-      toast.error("Không thể tải danh sách câu hỏi", { description: err.message });
+      toast.error(t("questionBank.loadError") + err.message);
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,7 @@ export default function QuestionBankPage() {
 
   const handleEditQuestion = async () => {
     if (!editingQuestion || !editingQuestion.content) {
-      toast.warning("Nội dung câu hỏi không được để trống!");
+      toast.warning(t("dashboard.questions.alertContent"));
       return;
     }
     setLoading(true);
@@ -122,11 +122,11 @@ export default function QuestionBankPage() {
           : q
       ));
       
-      toast.success("Cập nhật câu hỏi thành công!");
+      toast.success(t("dashboard.questions.updateSuccess"));
       setIsEditDialogOpen(false);
       setLoading(false);
     } catch {
-      toast.error("Lỗi khi cập nhật câu hỏi");
+      toast.error(t("dashboard.questions.updateError"));
       setLoading(false);
     }
   };
@@ -136,10 +136,10 @@ export default function QuestionBankPage() {
     try {
       await apiFetch(`/questions/${deleteId}`, { method: 'DELETE' });
       setQuestions(prev => prev.filter(q => q.id !== deleteId));
-      toast.success("Xóa câu hỏi thành công");
+      toast.success(t("dashboard.questions.deleteSuccess"));
       setIsDeleteDialogOpen(false);
     } catch (err: any) {
-      toast.error("Lỗi khi xóa câu hỏi", { description: err.message });
+      toast.error(t("questionBank.deleteErrorToast") + err.message);
     }
   };
 
@@ -336,9 +336,9 @@ export default function QuestionBankPage() {
                           }}>{t("questionBank.clone")}</DropdownMenuItem>
                           <DropdownMenuItem className="text-rose-600" onClick={async () => {
                             const ok = await confirm({
-                              title: "Xóa câu hỏi",
-                              description: "Bạn có chắc muốn xóa vĩnh viễn câu hỏi này khỏi Ngân hàng?",
-                              confirmLabel: "Xóa vĩnh viễn",
+                              title: t("common.delete") || "Xóa câu hỏi",
+                              description: t("questionBank.confirmDelete") || "Bạn có chắc muốn xóa vĩnh viễn câu hỏi này khỏi Ngân hàng?",
+                              confirmLabel: t("common.delete") || "Xóa vĩnh viễn",
                               variant: "danger"
                             });
                             if (!ok) return;

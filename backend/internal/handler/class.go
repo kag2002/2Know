@@ -87,6 +87,9 @@ func (h *ClassHandler) AddStudent(c fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Validation failed: " + err.Error()})
 	}
 
+	// SECURITY: Strip Stored XSS payloads from Student data (Name, Notes, etc)
+	utils.SanitizeStudent(&student)
+
 	if err := h.svc.AddStudent(classId, userId, &student); err != nil {
 		log.Printf("Error adding student: %v", err)
 		// Usually a 403 or 404 from verify ownership, sending 400 for simplicity here

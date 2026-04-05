@@ -51,7 +51,7 @@ function LoginForm() {
       login(data.token, data.user);
       toast.success(t("auth.loginSuccess"));
     } catch (err: any) {
-      setError(err.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+      setError(err.message || t("auth.errLoginFailed") || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
       toast.error(t("auth.loginError"));
     } finally {
       setIsLoading(false);

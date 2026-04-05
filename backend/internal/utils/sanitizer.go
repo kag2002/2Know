@@ -41,6 +41,13 @@ func SanitizeQuiz(q *model.Quiz) {
 	q.Description = policy.Sanitize(q.Description)
 	q.Subject = policy.Sanitize(q.Subject)
 	q.GradeLevel = policy.Sanitize(q.GradeLevel)
+
+	// SECURITY: Also sanitize any nested questions passed during Quiz creation
+	if len(q.Questions) > 0 {
+		for i := range q.Questions {
+			SanitizeQuestion(&q.Questions[i])
+		}
+	}
 }
 
 // SanitizeNote strips malicious scripts from Teacher notes to protect the dashboard.

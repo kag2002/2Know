@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, GraduationCap, Eye, EyeOff, CheckCircle, ArrowRight } from "lucide-react";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirm: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +32,10 @@ export default function RegisterPage() {
   const strengthMeta = (() => {
     switch(strengthScore) {
       case 0: return { label: "", color: "bg-slate-200 dark:bg-slate-800", width: "w-0" };
-      case 1: return { label: "Yếu", color: "bg-rose-500", width: "w-1/4" };
-      case 2: return { label: "Trung bình", color: "bg-amber-500", width: "w-2/4" };
-      case 3: return { label: "Khá", color: "bg-indigo-500", width: "w-3/4" };
-      case 4: return { label: "Mạnh", color: "bg-emerald-500", width: "w-full" };
+      case 1: return { label: t("auth.pwWeak") || "Yếu", color: "bg-rose-500", width: "w-1/4" };
+      case 2: return { label: t("auth.pwMedium") || "Trung bình", color: "bg-amber-500", width: "w-2/4" };
+      case 3: return { label: t("auth.pwGood") || "Khá", color: "bg-indigo-500", width: "w-3/4" };
+      case 4: return { label: t("auth.pwStrong") || "Mạnh", color: "bg-emerald-500", width: "w-full" };
       default: return { label: "", color: "bg-slate-200", width: "w-0" };
     }
   })();
@@ -43,11 +45,11 @@ export default function RegisterPage() {
     setError("");
 
     if (formData.password.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự.");
+      setError(t("auth.errPwShort") || "Mật khẩu phải có ít nhất 6 ký tự.");
       return;
     }
     if (formData.password !== formData.confirm) {
-      setError("Mật khẩu xác nhận không khớp.");
+      setError(t("auth.errPwMismatch") || "Mật khẩu xác nhận không khớp.");
       return;
     }
 
@@ -60,7 +62,7 @@ export default function RegisterPage() {
       });
       router.push("/login?registered=success");
     } catch (err: any) {
-      setError(err.message || "Không thể đăng ký. Email có thể đã tồn tại.");
+      setError(err.message || t("auth.errRegisterFailed") || "Không thể đăng ký. Email có thể đã tồn tại.");
     } finally {
       setIsLoading(false);
     }

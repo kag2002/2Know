@@ -36,7 +36,7 @@ export default function CreateQuestionPage() {
   };
 
   const removeOption = (id: number) => {
-    if (options.length <= 2) return toast.warning("Phải có ít nhất 2 đáp án!");
+    if (options.length <= 2) return toast.warning(t("dashboard.questions.contentRequired"));
     setOptions(options.filter(o => o.id !== id));
   };
 
