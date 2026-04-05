@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,7 @@ type OmrBatch struct {
 	SheetsScanned int            `gorm:"default:0" json:"sheets_scanned"`
 	TotalSheets   int            `gorm:"default:0" json:"total_sheets"`
 	Status        string         `gorm:"type:varchar(20);default:'ready'" json:"status"` // ready, scanning, completed
+	Versions      datatypes.JSON `gorm:"type:jsonb" json:"versions,omitempty"`           // Mapping for generated AnswerKeys per Exam Code
 	CreatedAt     time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt     time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`

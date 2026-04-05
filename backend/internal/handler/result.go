@@ -12,10 +12,11 @@ import (
 
 type ResultHandler struct {
 	svc service.ResultService
+	hub *LeaderboardHub
 }
 
-func NewResultHandler(svc service.ResultService) *ResultHandler {
-	return &ResultHandler{svc: svc}
+func NewResultHandler(svc service.ResultService, hub *LeaderboardHub) *ResultHandler {
+	return &ResultHandler{svc: svc, hub: hub}
 }
 
 func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
@@ -44,6 +45,20 @@ func (h *ResultHandler) SubmitTest(c fiber.Ctx) error {
 		}
 
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Hệ thống không thể xử lý bài nộp. Vui lòng thử lại sau."})
+	}
+
+	// SECURITY & FEATURE: Trigger Real-time WebSocket Broadcast
+	scorePayload := map[string]interface{}{
+		"action":       "SCORE_UPDATE",
+		"student_id":   result.StudentIdentifier,
+		"student_name": result.StudentName,
+		"score":        result.Score,
+		"correct":      result.TotalCorrect,
+		"time_taken":   result.TimeTakenSeconds,
+		"status":       result.Status,
+	}
+	if h.hub != nil {
+		h.hub.BroadcastLiveScore(result.QuizID, scorePayload)
 	}
 
 	// SECURITY: Minimize response — only return essential fields, not full model with answers

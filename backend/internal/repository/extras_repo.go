@@ -10,6 +10,7 @@ import (
 
 type OmrBatchRepository interface {
 	FindByUserID(userID string) ([]model.OmrBatch, error)
+	FindByID(id, userID string) (*model.OmrBatch, error)
 	Create(batch *model.OmrBatch) error
 	Update(id, userID string, batch *model.OmrBatch) error
 	Delete(id, userID string) error
@@ -25,6 +26,12 @@ func (r *omrBatchRepository) FindByUserID(userID string) ([]model.OmrBatch, erro
 	var items []model.OmrBatch
 	err := r.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&items).Error
 	return items, err
+}
+
+func (r *omrBatchRepository) FindByID(id, userID string) (*model.OmrBatch, error) {
+	var item model.OmrBatch
+	err := r.db.Where("id = ? AND user_id = ?", id, userID).First(&item).Error
+	return &item, err
 }
 
 func (r *omrBatchRepository) Create(batch *model.OmrBatch) error {

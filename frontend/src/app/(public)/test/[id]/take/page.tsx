@@ -20,7 +20,10 @@ interface Option {
 interface Question {
   id: string;
   content: string;
-  options: Option[];
+  metadata?: {
+    options?: Option[];
+    [key: string]: any;
+  };
 }
 
 interface QuizData {
@@ -280,7 +283,7 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
             </h2>
             
             <div className="space-y-4">
-              {(currentQ.options || []).map((opt) => {
+              {(currentQ.metadata?.options || []).map((opt: any) => {
                 const isSelected = answers[currentQ.id] === opt.id;
                 return (
                   <label 

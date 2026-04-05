@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/logger"
@@ -94,7 +95,7 @@ func main() {
 	aiSvc := service.NewAIService()
 	noteSvc := service.NewNoteService(noteRepo)
 	tagSvc := service.NewTagService(tagRepo)
-	omrSvc := service.NewOmrBatchService(omrRepo)
+	omrSvc := service.NewOmrBatchService(omrRepo, quizRepo)
 	rubricSvc := service.NewRubricService(rubricRepo)
 	shareLinkSvc := service.NewShareLinkService(shareLinkRepo)
 
@@ -103,13 +104,17 @@ func main() {
 		authSvc.Register("demo@2know.edu.vn", "demo123", "Giáo viên Demo")
 	}
 
+	// Initialize Gamification Websocket Hub
+	leaderboardHub := handler.NewLeaderboardHub(resultSvc)
+	go leaderboardHub.PollLeaderboard()
+
 	// Initialize Handlers
 	authHandler := handler.NewAuthHandler(authSvc)
 	statsHandler := handler.NewStatsHandler(statsSvc)
 	classHandler := handler.NewClassHandler(classSvc)
 	quizHandler := handler.NewQuizHandler(quizSvc)
 	questionHandler := handler.NewQuestionHandler(questionSvc)
-	resultHandler := handler.NewResultHandler(resultSvc)
+	resultHandler := handler.NewResultHandler(resultSvc, leaderboardHub)
 	studentHandler := handler.NewStudentHandler(studentSvc)
 	materialHandler := handler.NewMaterialHandler(materialSvc)
 	aiHandler := handler.NewAIHandler(aiSvc)
@@ -205,6 +210,7 @@ func main() {
 	api.Post("/omr/batches", omrHandler.CreateBatch)
 	api.Patch("/omr/batches/:id", omrHandler.UpdateBatch)
 	api.Delete("/omr/batches/:id", omrHandler.DeleteBatch)
+	api.Post("/omr/batches/:id/generate", omrHandler.GenerateVersions)
 
 	// Rubric endpoints
 	api.Get("/rubrics", rubricHandler.GetRubrics)
@@ -217,6 +223,10 @@ func main() {
 	api.Post("/shares", shareLinkHandler.CreateLink)
 	api.Patch("/shares/:id", shareLinkHandler.UpdateLink)
 	api.Delete("/shares/:id", shareLinkHandler.DeleteLink)
+
+	// Live Websocket endpoints (Exempt from JWT Auth Header requirement since browsers block it on WS)
+	ws := app.Group("/ws", handler.WebsocketUpgrade)
+	ws.Get("/live/:id", websocket.New(leaderboardHub.ServeLeaderboard))
 
 	port := os.Getenv("PORT")
 	if port == "" {

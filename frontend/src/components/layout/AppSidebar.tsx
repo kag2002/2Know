@@ -19,7 +19,8 @@ import {
   ChevronDown,
   BarChart3,
   ScanLine,
-  BookOpen
+  BookOpen,
+  Dices
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -78,6 +79,12 @@ export function AppSidebar() {
       links: [
         { icon: StickyNote, tKey: "sidebar.notes", href: "/notes" },
         { icon: Tags, tKey: "sidebar.tags", href: "/tags" },
+      ],
+    },
+    {
+      tKey: "sidebar.group.tools", // We can add translation for this later, or use raw for now
+      links: [
+        { icon: Dices, tKey: "sidebar.tools.wheel", href: "/tools/wheel" },
       ],
     },
   ];

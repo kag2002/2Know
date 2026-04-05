@@ -29,7 +29,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("indigo");
-  const [fullName, setFullName] = useState(user?.name || "");
+  const [fullName, setFullName] = useState((user as any)?.full_name || (user as any)?.name || "");
   const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
 
   const tabs = [
@@ -54,7 +54,7 @@ export default function SettingsPage() {
         method: "PATCH",
         body: JSON.stringify({ full_name: fullName }),
       });
-      updateUser({ name: fullName });
+      updateUser({ full_name: fullName });
       toast.success(t("settings.account.save") + " ✓");
     } catch (err: any) {
       toast.error(t("settings.saveError") + err.message);
@@ -131,7 +131,7 @@ export default function SettingsPage() {
                 {/* Avatar */}
                 <div className="flex items-center gap-6">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg ring-4 ring-white">
-                    {user?.name?.[0]?.toUpperCase() || "U"}
+                    {((user as any)?.full_name?.[0] || (user as any)?.name?.[0] || "U").toUpperCase()}
                   </div>
                   <div>
                     <Button variant="outline" size="sm" onClick={() => toast.info(t("settings.account.avatarWip") || "Tính năng thay đổi Ảnh đại diện đang được phát triển.")}>{t("settings.account.changeAvatar")}</Button>

@@ -21,6 +21,7 @@ interface TestQuizData {
   require_fullscreen: boolean;
   disable_copy_paste: boolean;
   questions_count?: number;
+  questions?: Question[];
 }
 
 export default function TestIntroPage({ params }: { params: Promise<{ id: string }> }) {
@@ -114,7 +115,7 @@ export default function TestIntroPage({ params }: { params: Promise<{ id: string
             </div>
             <div>
               <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-0.5">{t("testIntro.quantity")}</p>
-              <p className="font-bold text-foreground text-lg">{quiz.questions.length || 0} {t("testIntro.questions")}</p>
+              <p className="font-bold text-foreground text-lg">{quiz.questions?.length || quiz.questions_count || 0} {t("testIntro.questions")}</p>
             </div>
           </div>
           <div className="flex flex-col items-center text-center gap-2 p-5 rounded-xl bg-muted hover:bg-muted border border-border transition-colors">

@@ -1,8 +1,13 @@
 package service
 
 import (
+	"encoding/json"
+	"errors"
+
 	"backend/internal/model"
 	"backend/internal/repository"
+	"backend/internal/utils"
+	"gorm.io/datatypes"
 )
 
 // --- OmrBatch Service ---
@@ -12,12 +17,16 @@ type OmrBatchService interface {
 	CreateBatch(batch *model.OmrBatch) error
 	UpdateBatch(id, userID string, batch *model.OmrBatch) error
 	DeleteBatch(id, userID string) error
+	GenerateVersions(id, userID string, numVersions int) ([]utils.ExamVersion, error)
 }
 
-type omrBatchService struct{ repo repository.OmrBatchRepository }
+type omrBatchService struct {
+	repo     repository.OmrBatchRepository
+	quizRepo repository.QuizRepository
+}
 
-func NewOmrBatchService(repo repository.OmrBatchRepository) OmrBatchService {
-	return &omrBatchService{repo: repo}
+func NewOmrBatchService(repo repository.OmrBatchRepository, quizRepo repository.QuizRepository) OmrBatchService {
+	return &omrBatchService{repo: repo, quizRepo: quizRepo}
 }
 
 func (s *omrBatchService) GetBatches(userID string) ([]model.OmrBatch, error) {
@@ -31,6 +40,39 @@ func (s *omrBatchService) UpdateBatch(id, userID string, batch *model.OmrBatch) 
 }
 func (s *omrBatchService) DeleteBatch(id, userID string) error {
 	return s.repo.Delete(id, userID)
+}
+
+func (s *omrBatchService) GenerateVersions(id, userID string, numVersions int) ([]utils.ExamVersion, error) {
+	batch, err := s.repo.FindByID(id, userID)
+	if err != nil {
+		return nil, errors.New("batch not found or unauthorized")
+	}
+
+	quiz, err := s.quizRepo.GetQuizByID(batch.QuizID, userID)
+	if err != nil {
+		return nil, errors.New("quiz not found")
+	}
+
+	versions, err := utils.GenerateOMRVersions(quiz, numVersions)
+	if err != nil {
+		return nil, err
+	}
+
+	// Dump answer keys into JSONB field
+	keysMap := make(map[string]map[string]string)
+	for _, v := range versions {
+		keysMap[v.ExamCode] = v.AnswerKey
+	}
+
+	keysBytes, _ := json.Marshal(keysMap)
+	batch.Versions = datatypes.JSON(keysBytes)
+
+	// Update the batch in Database
+	if err := s.repo.Update(batch.ID, userID, batch); err != nil {
+		return nil, errors.New("failed to save generated versions to database")
+	}
+
+	return versions, nil
 }
 
 // --- Rubric Service ---

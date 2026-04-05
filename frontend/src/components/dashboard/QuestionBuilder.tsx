@@ -410,7 +410,7 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
                    type: "Trắc nghiệm",
                    points: q.points || 10,
                    content: q.content,
-                   options: q.options && q.options.length > 0 ? q.options : [
+                   options: q.metadata?.options && q.metadata.options.length > 0 ? q.metadata.options : [
                      { text: "", isCorrect: true },
                      { text: "", isCorrect: false }
                    ]

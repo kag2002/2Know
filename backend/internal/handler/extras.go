@@ -87,6 +87,29 @@ func (h *OmrBatchHandler) DeleteBatch(c fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Batch deleted"})
 }
 
+func (h *OmrBatchHandler) GenerateVersions(c fiber.Ctx) error {
+	userID := getUserIdFromToken(c)
+	id := c.Params("id")
+
+	var req struct {
+		NumVersions int `json:"num_versions"`
+	}
+	if err := c.Bind().JSON(&req); err != nil {
+		req.NumVersions = 4 // Default
+	}
+	if req.NumVersions <= 0 || req.NumVersions > 10 {
+		req.NumVersions = 4
+	}
+
+	versions, err := h.svc.GenerateVersions(id, userID, req.NumVersions)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	
+	// Trả về JSON để Frontend render giao diện OMR bằng React-PDF
+	return c.JSON(versions)
+}
+
 // ==================== Rubric Handler ====================
 
 type RubricHandler struct {

@@ -84,17 +84,20 @@ export default function QuizBuilderWizard() {
 
     setLoading(true);
     try {
-      // Transform QuestionPayload to match the Go GORM model
+      // Transform QuestionPayload to match the new Global Bank JSONB model
       const formattedQuestions = questions.map((q, idx) => ({
         type: q.type === "Trắc nghiệm" ? "multiple_choice" : q.type === "Nhiều đáp án" ? "multiple_answers" : "essay",
         points: Number(q.points) || 10,
         content: q.content,
-        order_index: idx,
-        options: q.options.map((opt, optIdx) => ({
-          label: String.fromCharCode(65 + optIdx), // A, B, C, D
-          content: opt.text,
-          is_correct: opt.isCorrect
-        }))
+        // order_index is physically removed from the JSON payload map into the association via M2M,
+        // but for creation purposes we just stuff the options array safely inside the new polymorphism:
+        metadata: {
+          options: q.options.map((opt, optIdx) => ({
+            label: String.fromCharCode(65 + optIdx), // A, B, C, D
+            content: opt.text,
+            is_correct: opt.isCorrect
+          }))
+        }
       }));
 
       await apiFetch("/quizzes", {

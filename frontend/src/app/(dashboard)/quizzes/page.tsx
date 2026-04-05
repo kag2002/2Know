@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, MoreHorizontal, Clock, Users, Play, Copy, Edit2, Trash2, Share2 } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Clock, Users, Play, Copy, Edit2, Trash2, Share2, MonitorPlay } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
@@ -364,6 +364,9 @@ export default function QuizzesPage() {
                     <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuItem className="gap-2" onClick={() => { setEditingQuiz(quiz); setIsEditDialogOpen(true); }}>
                         <Edit2 className="w-4 h-4 text-slate-400"/> Cài đặt bài kiểm tra
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2" onClick={() => window.open(`/quizzes/${quiz.id}/live`, '_blank')}>
+                        <MonitorPlay className="w-4 h-4 text-indigo-500"/> Trình chiếu Live Rank
                       </DropdownMenuItem>
                       <DropdownMenuItem className="gap-2" onClick={() => { 
                         setShareConfig({ quiz_id: quiz.id, title: `Chia sẻ: ${quiz.title}`, type: "public" });
