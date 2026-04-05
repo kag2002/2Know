@@ -39,6 +39,8 @@ func SanitizeQuiz(q *model.Quiz) {
 	}
 	q.Title = policy.Sanitize(q.Title)
 	q.Description = policy.Sanitize(q.Description)
+	q.Subject = policy.Sanitize(q.Subject)
+	q.GradeLevel = policy.Sanitize(q.GradeLevel)
 }
 
 // SanitizeNote strips malicious scripts from Teacher notes to protect the dashboard.
@@ -46,7 +48,9 @@ func SanitizeNote(n *model.Note) {
 	if n == nil {
 		return
 	}
+	n.Title = policy.Sanitize(n.Title)
 	n.Content = policy.Sanitize(n.Content)
+	n.Color = policy.Sanitize(n.Color)
 }
 
 // SanitizeTag strips malicious scripts from Tag representations.
@@ -58,21 +62,31 @@ func SanitizeTag(t *model.Tag) {
 	t.Color = policy.Sanitize(t.Color)
 }
 
-// SanitizeResult aggressively cleans all Student Answers to prevent Essay Stored XSS against Teachers.
+// SanitizeResult aggressively cleans all Student-submitted data to prevent Stored XSS against Teachers.
 func SanitizeResult(r *model.TestResult) {
-	if r == nil || r.Answers == nil {
+	if r == nil {
 		return
 	}
-	for k, vObj := range r.Answers {
-		if vStr, ok := vObj.(string); ok {
-			runes := []rune(vStr)
-			if len(runes) > 2000 {
-				vStr = string(runes[:2000]) // Shield OOM
+
+	// SECURITY: Sanitize student identity fields — these are rendered in teacher dashboards,
+	// grading views, and WebSocket broadcasts. Without this, a student can inject
+	// <script>alert(1)</script> as their name → Stored XSS in teacher's browser.
+	r.StudentName = policy.Sanitize(r.StudentName)
+	r.StudentIdentifier = policy.Sanitize(r.StudentIdentifier)
+
+	// Sanitize all answer payloads (critical for essay questions rendered by teachers)
+	if r.Answers != nil {
+		for k, vObj := range r.Answers {
+			if vStr, ok := vObj.(string); ok {
+				runes := []rune(vStr)
+				if len(runes) > 2000 {
+					vStr = string(runes[:2000]) // Shield OOM
+				}
+				r.Answers[k] = policy.Sanitize(vStr)
+			} else if vMap, okMap := vObj.(map[string]interface{}); okMap {
+				SanitizeMap(vMap)
+				r.Answers[k] = vMap
 			}
-			r.Answers[k] = policy.Sanitize(vStr)
-		} else if vMap, okMap := vObj.(map[string]interface{}); okMap {
-			SanitizeMap(vMap)
-			r.Answers[k] = vMap
 		}
 	}
 
