@@ -44,14 +44,16 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
-  const [startTime] = useState<number>(Date.now());
+  const [questionTimes, setQuestionTimes] = useState<Record<string, number>>({});
   const [answers, setAnswers] = useState<Record<string, string>>({}); // QuestionID -> OptionID
   const answersRef = useRef(answers);
   const timeElapsedRef = useRef(timeElapsed);
+  const questionTimesRef = useRef(questionTimes);
 
   // Sync refs so handleAutoSubmit inside useEffect always sees latest truth without re-binding
   useEffect(() => { answersRef.current = answers; }, [answers]);
   useEffect(() => { timeElapsedRef.current = timeElapsed; }, [timeElapsed]);
+  useEffect(() => { questionTimesRef.current = questionTimes; }, [questionTimes]);
 
   const [flagged, setFlagged] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,27 +121,50 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
     };
   }, []);
 
-  // Secure System-Clock Timer
+  // Secure System-Clock Timer (Accumulator Pattern to Prevent AFK Time Skew)
   useEffect(() => {
     if (timerPaused || loading || !quiz) return;
+    
+    // Khởi tạo trạm gác thời gian nội bộ, không phụ thuộc tuyệt đối vào StartTime mở tab
+    let lastTick = Date.now();
+    
     const timer = setInterval(() => {
       const now = Date.now();
-      const trueElapsed = Math.floor((now - startTime) / 1000);
-      setTimeElapsed(trueElapsed);
+      const deltaSeconds = Math.floor((now - lastTick) / 1000);
       
-      if (quiz.time_limit_minutes > 0) {
-        const totalSeconds = quiz.time_limit_minutes * 60;
-        const remaining = totalSeconds - trueElapsed;
-        if (remaining <= 0) {
-           setTimeLeft(0);
-           clearInterval(timer);
-        } else {
-           setTimeLeft(remaining);
+      if (deltaSeconds >= 1) {
+        setTimeElapsed(prevElapsed => {
+          const newElapsed = prevElapsed + deltaSeconds;
+          
+          if (quiz.time_limit_minutes > 0) {
+            const totalSeconds = quiz.time_limit_minutes * 60;
+            const remaining = totalSeconds - newElapsed;
+            if (remaining <= 0) {
+               setTimeLeft(0);
+               clearInterval(timer);
+               // isLeft=0 will trigger autoSubmit watcher implicitly
+            } else {
+               setTimeLeft(remaining);
+            }
+          }
+          return newElapsed;
+        });
+
+        // Tracking Question Time
+        if (quiz.questions && quiz.questions[currentIdx]) {
+           const activeQId = quiz.questions[currentIdx].id;
+           setQuestionTimes(prev => ({
+              ...prev,
+              [activeQId]: (prev[activeQId] || 0) + deltaSeconds
+           }));
         }
+
+        lastTick = now;
       }
-    }, 1000);
+    }, 500); // Poll frequently but increment only per second bounds
+    
     return () => clearInterval(timer);
-  }, [timerPaused, loading, quiz, startTime]);
+  }, [timerPaused, loading, quiz, currentIdx]);
 
   // Auto-Submit Watcher
   useEffect(() => {
@@ -183,7 +208,10 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
 
   const submitPayload = async (switches: number): Promise<boolean> => {
     try {
-      const timeTaken = timeElapsed; // STRICT TIME ELAPSED, NO NEGATIVE DATA CORRUPTION
+      // SECURITY: Use refs to avoid stale closure reads during timer-triggered auto-submit
+      const timeTaken = timeElapsedRef.current;
+      const currentQuestionTimes = questionTimesRef.current;
+      const currentAnswers = answersRef.current;
       const studentName = sessionStorage.getItem("student_name") || "Guest Student";
       const studentId = sessionStorage.getItem("student_sbd") || ("GUEST-" + Math.floor(Math.random() * 10000));
 
@@ -195,7 +223,8 @@ export default function TakeTestPage({ params }: { params: Promise<{ id: string 
           student_name: studentName,
           student_identifier: studentId,
           time_taken_seconds: timeTaken,
-          answers: answers, // Map of QuestionID -> AnswerString/OptionID
+          question_times: currentQuestionTimes,
+          answers: currentAnswers,
           tab_switch_count: switches
         })
       });

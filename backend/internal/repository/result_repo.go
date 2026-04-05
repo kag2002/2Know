@@ -23,6 +23,11 @@ type ResultRepository interface {
 		CreatedAt        string  `json:"created_at"`
 		TimeTakenSeconds int     `json:"time_taken_seconds"`
 	}, error)
+	GetStudentMastery(studentID string, teacherID string) ([]struct {
+		Subject  string  `json:"subject"`
+		MaxScore float64 `json:"max_score"`
+		Attempts int     `json:"attempts"`
+	}, error)
 	GetAttemptCount(quizID string, studentIdentifier string) (int64, error)
 }
 
@@ -110,6 +115,27 @@ func (r *resultRepository) GetStudentHistory(studentID string, teacherID string)
 		Scan(&history).Error
 
 	return history, err
+}
+
+func (r *resultRepository) GetStudentMastery(studentID string, teacherID string) ([]struct {
+	Subject  string  `json:"subject"`
+	MaxScore float64 `json:"max_score"`
+	Attempts int     `json:"attempts"`
+}, error) {
+	var mastery []struct {
+		Subject  string  `json:"subject"`
+		MaxScore float64 `json:"max_score"`
+		Attempts int     `json:"attempts"`
+	}
+
+	err := r.db.Table("test_results").
+		Select("COALESCE(NULLIF(quizzes.subject, ''), 'Khác') as subject, MAX(test_results.score) as max_score, COUNT(test_results.id) as attempts").
+		Joins("JOIN quizzes ON quizzes.id = test_results.quiz_id").
+		Where("test_results.student_id = ? AND quizzes.teacher_id = ? AND test_results.status != 'cheating_flagged'", studentID, teacherID).
+		Group("COALESCE(NULLIF(quizzes.subject, ''), 'Khác')").
+		Scan(&mastery).Error
+
+	return mastery, err
 }
 
 func (r *resultRepository) GetAttemptCount(quizID string, studentIdentifier string) (int64, error) {

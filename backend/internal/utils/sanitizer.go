@@ -75,6 +75,19 @@ func SanitizeResult(r *model.TestResult) {
 			r.Answers[k] = vMap
 		}
 	}
+
+	// SECURITY (Phase 2 Hardening): Sanitize QuestionTimes to prevent data injection & OOM
+	if r.QuestionTimes != nil {
+		if len(r.QuestionTimes) > 200 {
+			r.QuestionTimes = nil // More entries than any real quiz → discard entirely
+		} else {
+			for k, v := range r.QuestionTimes {
+				if v < 0 || v > 7200 { // Cap at 2 hours per question max
+					r.QuestionTimes[k] = 0
+				}
+			}
+		}
+	}
 }
 
 // SanitizeMap recursively scrubs all strings within a dynamic map to prevent Stored XSS inside Mass-Assignment safe PATCH requests.

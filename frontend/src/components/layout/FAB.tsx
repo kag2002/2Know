@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Users, BookOpen, FileText, X } from "lucide-react";
+import { Plus, Users, BookOpen, FileText, X, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/context/LanguageContext";
 
@@ -14,12 +14,17 @@ export default function GlobalFAB() {
   const actions = [
     { icon: FileText, label: t("sidebar.quizzes") || "Bài kiểm tra", route: "/quizzes", color: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" },
     { icon: Users, label: t("sidebar.students") || "Học sinh", route: "/students", color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" },
-    { icon: BookOpen, label: t("sidebar.classes") || "Lớp học", route: "/classes", color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400" }
+    { icon: BookOpen, label: t("sidebar.classes") || "Lớp học", route: "/classes", color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400" },
+    { icon: Sparkles, label: "2Know AI", action: "OPEN_AI", color: "text-purple-600 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-400" }
   ];
 
-  const handleAction = (route: string) => {
+  const handleAction = (item: any) => {
     setIsOpen(false);
-    router.push(route);
+    if (item.action === "OPEN_AI") {
+      window.dispatchEvent(new CustomEvent('toggle-ai-sidebar'));
+    } else if (item.route) {
+      router.push(item.route);
+    }
   };
 
   return (
@@ -40,7 +45,7 @@ export default function GlobalFAB() {
                  animate={{ opacity: 1, x: 0 }}
                  exit={{ opacity: 0, x: 20 }}
                  transition={{ delay: i * 0.05 }}
-                 onClick={() => handleAction(action.route)}
+                 onClick={() => handleAction(action)}
                  className="flex items-center gap-3 px-4 py-2.5 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:shadow-xl ring-1 ring-slate-200 dark:ring-slate-700 hover:ring-indigo-500 transition-all font-semibold text-sm text-slate-700 dark:text-slate-200 group"
                >
                  <span className="group-hover:-translate-x-1 transition-transform">{action.label}</span>

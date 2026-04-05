@@ -17,7 +17,11 @@ func Protected(db *gorm.DB) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		secret := os.Getenv("JWT_SECRET")
 		if secret == "" {
-			secret = "super_secret_jwt_key_please_change_in_prod"
+			// SECURITY: Never use a hardcoded fallback. AuthService already crashes on empty secret,
+			// but this guard ensures no bypasses if that check is accidentally removed.
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Server configuration error. Contact administrator.",
+			})
 		}
 
 		authHeader := c.Get("Authorization")

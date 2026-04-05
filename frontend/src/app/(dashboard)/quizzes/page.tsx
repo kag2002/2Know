@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, MoreHorizontal, Clock, Users, Play, Copy, Edit2, Trash2, Share2, MonitorPlay } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Clock, Users, Play, Copy, Edit2, Trash2, Share2, MonitorPlay, BarChart2 } from "lucide-react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { useTranslation } from "@/context/LanguageContext";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { QuestionAnalyticsModal } from "@/components/dashboard/QuestionAnalyticsModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,6 +62,7 @@ export default function QuizzesPage() {
 
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [shareConfig, setShareConfig] = useState({ title: "", type: "public", quiz_id: "" });
+  const [analyticsQuizId, setAnalyticsQuizId] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -368,6 +370,9 @@ export default function QuizzesPage() {
                       <DropdownMenuItem className="gap-2" onClick={() => window.open(`/quizzes/${quiz.id}/live`, '_blank')}>
                         <MonitorPlay className="w-4 h-4 text-indigo-500"/> Trình chiếu Live Rank
                       </DropdownMenuItem>
+                      <DropdownMenuItem className="gap-2" onClick={() => setAnalyticsQuizId(quiz.id)}>
+                        <BarChart2 className="w-4 h-4 text-emerald-500"/> Thống kê Câu hỏi
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="gap-2" onClick={() => { 
                         setShareConfig({ quiz_id: quiz.id, title: `Chia sẻ: ${quiz.title}`, type: "public" });
                         setIsShareDialogOpen(true);
@@ -480,6 +485,13 @@ export default function QuizzesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Tính năng Phase 2: Analytics Modal */}
+      <QuestionAnalyticsModal 
+        quizId={analyticsQuizId} 
+        open={!!analyticsQuizId} 
+        onOpenChange={(open) => !open && setAnalyticsQuizId(null)} 
+      />
     </div>
   );
 }

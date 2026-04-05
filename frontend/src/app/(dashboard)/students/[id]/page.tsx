@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User, Mail, Phone, BookOpen, Clock, Calendar } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, BookOpen, Clock, Calendar, Target } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/context/LanguageContext";
 import { apiFetch } from "@/lib/api";
@@ -15,15 +15,18 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
   const [loading, setLoading] = useState(true);
 
   const [history, setHistory] = useState<any[]>([]);
+  const [mastery, setMastery] = useState<any[]>([]);
 
   useEffect(() => {
     Promise.all([
       apiFetch(`/students/${id}`),
-      apiFetch(`/students/${id}/history`)
+      apiFetch(`/students/${id}/history`),
+      apiFetch(`/students/${id}/mastery`)
     ])
-      .then(([studentData, historyData]) => {
+      .then(([studentData, historyData, masteryData]) => {
         setStudent(studentData);
         setHistory(historyData || []);
+        setMastery(masteryData || []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -67,7 +70,37 @@ export default function StudentProfilePage({ params }: { params: Promise<{ id: s
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 shadow-sm">
+        <Card className="md:col-span-1 shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2"><Target className="w-5 h-5 text-rose-500"/> Hồ sơ Năng Lực</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5 text-sm">
+            {mastery.length === 0 ? (
+              <div className="text-center text-muted-foreground py-4">Chưa đủ dữ liệu phân tích.</div>
+            ) : (
+              mastery.map((m, idx) => {
+                // Score out of 10 usually, calculate percentage
+                const percent = Math.min(100, Math.max(0, m.max_score * 10));
+                return (
+                  <div key={idx} className="space-y-1">
+                     <div className="flex justify-between items-center text-xs font-semibold">
+                       <span className="text-slate-700 dark:text-slate-300">{m.subject}</span>
+                       <span className={`${percent >= 80 ? 'text-emerald-600' : percent >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{m.max_score.toFixed(1)} <span className="font-normal text-muted-foreground hidden sm:inline ml-1">(Đã thử {m.attempts} lần)</span></span>
+                     </div>
+                     <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                       <div 
+                         className={`h-full rounded-full ${percent >= 80 ? 'bg-emerald-500' : percent >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`} 
+                         style={{ width: `${percent}%` }}
+                       />
+                     </div>
+                  </div>
+                )
+              })
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-3 shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2"><BookOpen className="w-5 h-5 text-emerald-500"/> {t("studentProfile.studyHistory") || "Lịch sử học tập"}</CardTitle>
           </CardHeader>

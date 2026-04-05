@@ -25,6 +25,9 @@ type TestResult struct {
 	// JSON payload mapping Question ID to points awarded by teacher
 	GradedAnswers map[string]float64 `gorm:"type:jsonb;serializer:json" json:"graded_answers,omitempty"`
 
+	// JSON payload mapping Question ID to seconds spent viewing
+	QuestionTimes map[string]int `gorm:"type:jsonb;serializer:json" json:"question_times,omitempty"`
+
 	// PERFORMANCE: Add Index to Status and CreatedAt to enable hyper-fast B-Tree lookup & sorting for heavy analytics / grading endpoints
 	Status         string `gorm:"type:varchar(50);default:'completed';index" json:"status"` // completed, abandoned, cheating_flagged
 	TabSwitchCount int    `gorm:"default:0" json:"tab_switch_count"`

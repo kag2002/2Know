@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Breadcrumb } from "@/components/layout/Breadcrumb";
 import { CommandPalette } from "@/components/layout/CommandPalette";
 import GlobalFAB from "@/components/layout/FAB";
+import { AiAssistantSidebar } from "@/components/layout/AiAssistantSidebar";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -23,6 +24,7 @@ export default function DashboardLayout({
           </Suspense>
         </main>
       </div>
+      <AiAssistantSidebar />
       <GlobalFAB />
       <CommandPalette />
     </div>

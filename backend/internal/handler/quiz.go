@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/gofiber/fiber/v3"
@@ -76,6 +77,25 @@ func (h *QuizHandler) GetPublicQuizByID(c fiber.Ctx) error {
 	quiz, err := h.svc.GetPublicQuizByID(id)
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Quiz not found or not published"})
+	}
+
+	// SECURITY: Strip isCorrect answer keys from Metadata so students cannot
+	// inspect DevTools → Network → Response to see correct answers.
+	for i := range quiz.Questions {
+		quiz.Questions[i].Explanation = "" // Never expose explanations during test
+		var meta map[string]interface{}
+		if err := json.Unmarshal(quiz.Questions[i].Metadata, &meta); err == nil {
+			if opts, ok := meta["options"].([]interface{}); ok {
+				for _, optRaw := range opts {
+					if opt, ok := optRaw.(map[string]interface{}); ok {
+						delete(opt, "isCorrect")
+					}
+				}
+			}
+			if sanitized, err := json.Marshal(meta); err == nil {
+				quiz.Questions[i].Metadata = sanitized
+			}
+		}
 	}
 
 	return c.JSON(quiz)

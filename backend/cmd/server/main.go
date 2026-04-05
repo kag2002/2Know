@@ -175,6 +175,7 @@ func main() {
 	api.Get("/students", studentHandler.GetStudents)
 	api.Get("/students/:id", studentHandler.GetStudentByID)
 	api.Get("/students/:id/history", resultHandler.GetStudentHistory)
+	api.Get("/students/:id/mastery", resultHandler.GetStudentMastery)
 	api.Post("/students", studentHandler.CreateStudent)
 	api.Patch("/students/:id", studentHandler.UpdateStudent)
 	api.Delete("/students/:id", studentHandler.DeleteStudent)
@@ -198,6 +199,7 @@ func main() {
 	// Grading & Results endpoints
 	api.Get("/grading/pending", resultHandler.GetPendingGradings)
 	api.Post("/grading/:id", resultHandler.GradeSubmission)
+	api.Get("/quizzes/:quizId/analytics/questions", resultHandler.GetQuestionAnalytics)
 
 	// User Profile endpoints
 	userHandler := handler.NewUserHandler(userRepo)

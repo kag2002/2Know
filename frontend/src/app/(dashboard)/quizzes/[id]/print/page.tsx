@@ -72,7 +72,7 @@ export default function OMRPrintPage({ params }: { params: Promise<{ id: string 
       <div className="flex-1 w-full bg-slate-200/50 dark:bg-slate-900 p-2 sm:p-6 overflow-hidden">
         <div className="w-full h-full max-w-5xl mx-auto rounded-xl overflow-hidden shadow-2xl border border-slate-300 dark:border-slate-800 bg-white ring-4 ring-black/5">
            <PDFViewer style={{ width: '100%', height: '100%', border: 'none' }}>
-              <OMRSheet quizTitle={quiz.title} numberOfQuestions={questionsCount} />
+              <OMRSheet quizTitle={quiz.title} numberOfQuestions={questionsCount} questions={quiz.questions} />
            </PDFViewer>
         </div>
       </div>

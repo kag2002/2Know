@@ -80,7 +80,16 @@ func (h *UserHandler) UpdateProfile(c fiber.Ctx) error {
 		user.FullName = userSanitizer.Sanitize(strings.TrimSpace(req.FullName))
 	}
 	if req.AvatarURL != nil {
-		user.AvatarURL = req.AvatarURL
+		// SECURITY: Validate URL scheme to prevent SSRF (http://169.254.x.x) and XSS (javascript:)
+		url := strings.TrimSpace(*req.AvatarURL)
+		if url != "" && !strings.HasPrefix(url, "https://") {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Avatar URL must use HTTPS"})
+		}
+		if len(url) > 500 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Avatar URL too long"})
+		}
+		sanitized := userSanitizer.Sanitize(url)
+		user.AvatarURL = &sanitized
 	}
 
 	if err := h.repo.UpdateUser(user); err != nil {

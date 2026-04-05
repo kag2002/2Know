@@ -158,3 +158,35 @@ func (h *ResultHandler) GetStudentHistory(c fiber.Ctx) error {
 
 	return c.JSON(history)
 }
+
+func (h *ResultHandler) GetStudentMastery(c fiber.Ctx) error {
+	studentId := c.Params("id")
+	teacherID := getUserIdFromToken(c)
+
+	if teacherID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	mastery, err := h.svc.GetStudentMastery(studentId, teacherID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch student mastery"})
+	}
+
+	return c.JSON(mastery)
+}
+
+func (h *ResultHandler) GetQuestionAnalytics(c fiber.Ctx) error {
+	quizId := c.Params("quizId")
+	teacherID := getUserIdFromToken(c)
+
+	if teacherID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+
+	analytics, err := h.svc.GetQuestionAnalytics(teacherID, quizId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch question analytics"})
+	}
+
+	return c.JSON(analytics)
+}

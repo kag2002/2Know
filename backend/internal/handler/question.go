@@ -140,6 +140,7 @@ func (h *QuestionHandler) UpdateQuestion(c fiber.Ctx) error {
 
 	// SECURITY: Prevent Mass Assignment Vulnerability (Object Hijacking & Relocation)
 	delete(params, "id")
+	delete(params, "teacher_id") // Prevent ownership takeover
 	// Note: quiz_id is no longer part of question, it's M2M now.
 	delete(params, "created_at")
 

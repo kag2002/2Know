@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -25,6 +26,12 @@ type ResultService interface {
 		CreatedAt        string  `json:"created_at"`
 		TimeTakenSeconds int     `json:"time_taken_seconds"`
 	}, error)
+	GetStudentMastery(studentID string, teacherID string) ([]struct {
+		Subject  string  `json:"subject"`
+		MaxScore float64 `json:"max_score"`
+		Attempts int     `json:"attempts"`
+	}, error)
+	GetQuestionAnalytics(teacherID, quizID string) (map[string]map[string]interface{}, error)
 }
 
 type resultService struct {
@@ -141,16 +148,31 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 		isCorrect := false
 
 		switch q.Type {
-		case "multiple_choice", "true_false":
-			// Basic Match
+		case "multiple_choice", "true_false", "Trắc nghiệm":
 			var studentString string
 			if str, ok := studentAnswerObj.(string); ok {
 				studentString = str
 			}
-			// Extract correct answer from JSONB Metadata
-			// For Mock phase, we assume the Frontend handles strict grading until Strategy pattern is fully written
+
 			if studentString != "" {
-				isCorrect = true // Mocked
+				// SAFE UNMARSHAL: Ngăn chặn Panic Crash khi gặp mảng rỗng
+				var meta struct {
+					Options []struct {
+						ID        string `json:"id"`
+						Text      string `json:"text"`
+						IsCorrect bool   `json:"isCorrect"`
+					} `json:"options"`
+				}
+
+				if err := json.Unmarshal(q.Metadata, &meta); err == nil {
+					for _, opt := range meta.Options {
+						// Frontend TestTaking gửi opt.id qua API
+						if opt.ID == studentString && opt.IsCorrect {
+							isCorrect = true
+							break
+						}
+					}
+				}
 			}
 		default:
 			// Complex JSON match
@@ -169,12 +191,15 @@ func (s *resultService) SubmitTest(result *model.TestResult) error {
 	result.TotalIncorrect = totalIncorrect
 	result.Score = earnedPoints
 
-	if result.TabSwitchCount >= 3 {
-		result.Status = "cheating_flagged"
-	} else if hasEssay {
-		result.Status = "pending"
-	} else {
-		result.Status = "completed"
+	// SECURITY: Only assign status if not already flagged by time/speed checks above
+	if result.Status != "cheating_flagged" {
+		if result.TabSwitchCount >= 3 {
+			result.Status = "cheating_flagged"
+		} else if hasEssay {
+			result.Status = "pending"
+		} else {
+			result.Status = "completed"
+		}
 	}
 
 	// SECURITY & PERFORMANCE: Map Student UUID to enable the Global Analytics Database hook (Preventing Data Vacuum)
@@ -208,11 +233,78 @@ func (s *resultService) GetStudentHistory(studentID string, teacherID string) ([
 	return s.repo.GetStudentHistory(studentID, teacherID)
 }
 
+func (s *resultService) GetStudentMastery(studentID string, teacherID string) ([]struct {
+	Subject  string  `json:"subject"`
+	MaxScore float64 `json:"max_score"`
+	Attempts int     `json:"attempts"`
+}, error) {
+	return s.repo.GetStudentMastery(studentID, teacherID)
+}
+
 func (s *resultService) GetQuizResults(teacherID, quizID string) ([]model.TestResult, error) {
 	if err := s.repo.VerifyQuizOwnership(quizID, teacherID); err != nil {
 		return nil, err
 	}
 	return s.repo.GetQuizResults(quizID)
+}
+
+func (s *resultService) GetQuestionAnalytics(teacherID, quizID string) (map[string]map[string]interface{}, error) {
+	if err := s.repo.VerifyQuizOwnership(quizID, teacherID); err != nil {
+		return nil, err
+	}
+
+	results, err := s.repo.GetQuizResults(quizID)
+	if err != nil {
+		return nil, err
+	}
+
+	analytics := make(map[string]map[string]interface{})
+
+	for _, res := range results {
+		// SANITY FILTER: Phase 2 anti-cheat logic. Skip flagged records.
+		if res.Status == "cheating_flagged" || res.Status == "abandoned" {
+			continue
+		}
+
+		// Loop through all answered questions in this test result
+		for qId, ansObj := range res.Answers {
+			if _, exists := analytics[qId]; !exists {
+				analytics[qId] = map[string]interface{}{
+					"total_attempts":   0,
+					"time_accumulated": 0,
+					"options":          make(map[string]int),
+				}
+			}
+
+			stats := analytics[qId]
+			stats["total_attempts"] = stats["total_attempts"].(int) + 1
+
+			// Accumulate Option distribution
+			if optStr, ok := ansObj.(string); ok && optStr != "" {
+				optMap := stats["options"].(map[string]int)
+				optMap[optStr]++
+			}
+
+			// Time Accumulator sum
+			if res.QuestionTimes != nil {
+				if t, hasTime := res.QuestionTimes[qId]; hasTime {
+					stats["time_accumulated"] = stats["time_accumulated"].(int) + t
+				}
+			}
+		}
+	}
+
+	// Post-process Average Time
+	for _, stats := range analytics {
+		attempts := stats["total_attempts"].(int)
+		if attempts > 0 {
+			stats["average_time_seconds"] = stats["time_accumulated"].(int) / attempts
+		} else {
+			stats["average_time_seconds"] = 0
+		}
+	}
+
+	return analytics, nil
 }
 
 // PendingGradingResponse maps directly to the React UI pendingSubmissions array
