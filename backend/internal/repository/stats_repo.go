@@ -79,8 +79,9 @@ func (r *statsRepository) GetDashboardStats(teacherID string) (*DashboardStats, 
 		Where("classes.teacher_id = ?", teacherID).
 		Count(&stats.TotalStudents)
 
-	r.db.Model(&model.Question{}).
-		Joins("JOIN quizzes ON quizzes.id = questions.quiz_id").
+	// M2M: Count questions via join table, not direct quiz_id on questions
+	r.db.Model(&model.QuizQuestion{}).
+		Joins("JOIN quizzes ON quizzes.id = quiz_questions.quiz_id").
 		Where("quizzes.teacher_id = ?", teacherID).
 		Count(&stats.TotalQuestions)
 

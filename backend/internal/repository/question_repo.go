@@ -27,11 +27,10 @@ func NewQuestionRepository(db *gorm.DB) QuestionRepository {
 
 func (r *questionRepository) GetQuestions(teacherID string) ([]model.Question, error) {
 	var questions []model.Question
-	// SECURITY: Scope questions to teacher's quizzes only (prevent cross-tenant data leak)
-	err := r.db.Preload("Options").
-		Joins("JOIN quizzes ON quizzes.id = questions.quiz_id AND quizzes.deleted_at IS NULL").
-		Where("quizzes.teacher_id = ?", teacherID).
-		Order("questions.created_at desc").
+	// SECURITY: Scope questions to teacher's ownership (via teacher_id on question itself)
+	err := r.db.
+		Where("teacher_id = ?", teacherID).
+		Order("created_at desc").
 		Limit(200).
 		Find(&questions).Error
 	return questions, err
@@ -39,7 +38,12 @@ func (r *questionRepository) GetQuestions(teacherID string) ([]model.Question, e
 
 func (r *questionRepository) GetQuizQuestions(quizID string) ([]model.Question, error) {
 	var questions []model.Question
-	err := r.db.Preload("Options").Where("quiz_id = ?", quizID).Order("order_index asc").Find(&questions).Error
+	// M2M: Use quiz_questions join table to find questions belonging to a quiz
+	err := r.db.
+		Joins("JOIN quiz_questions ON quiz_questions.question_id = questions.id").
+		Where("quiz_questions.quiz_id = ?", quizID).
+		Order("quiz_questions.order_index asc").
+		Find(&questions).Error
 	return questions, err
 }
 

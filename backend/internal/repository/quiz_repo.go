@@ -49,7 +49,7 @@ func (r *quizRepository) GetQuizzes(teacherID string) ([]model.Quiz, error) {
 
 func (r *quizRepository) GetQuizByID(id, teacherID string) (*model.Quiz, error) {
 	var quiz model.Quiz
-	err := r.db.Preload("Questions.Options").
+	err := r.db.Preload("Questions").
 		Where("id = ? AND teacher_id = ?", id, teacherID).
 		First(&quiz).Error
 	if err != nil {
@@ -61,7 +61,7 @@ func (r *quizRepository) GetQuizByID(id, teacherID string) (*model.Quiz, error) 
 func (r *quizRepository) GetPublicQuizByID(id string) (*model.Quiz, error) {
 	var quiz model.Quiz
 	// Only load published quizzes for guests
-	err := r.db.Preload("Questions.Options").
+	err := r.db.Preload("Questions").
 		Where("id = ? AND status = 'published'", id).
 		First(&quiz).Error
 	if err != nil {
@@ -80,7 +80,8 @@ func (r *quizRepository) GetPublicQuizMetadata(id string) (*model.Quiz, int64, e
 	}
 
 	var count int64
-	r.db.Model(&model.Question{}).Where("quiz_id = ?", id).Count(&count)
+	// M2M: Count questions via join table, not a direct quiz_id column on questions
+	r.db.Model(&model.QuizQuestion{}).Where("quiz_id = ?", id).Count(&count)
 
 	return &quiz, count, nil
 }
@@ -111,10 +112,10 @@ func (r *quizRepository) GetQuizStats(teacherID string) (*model.QuizStatsDTO, er
 	// Count active (published) quizzes
 	r.db.Model(&model.Quiz{}).Where("teacher_id = ? AND status = 'published' AND deleted_at IS NULL", teacherID).Count(&dto.Active)
 
-	// Count total questions across all quizzes owned by teacher
-	r.db.Model(&model.Question{}).
-		Joins("JOIN quizzes ON quizzes.id = questions.quiz_id AND quizzes.deleted_at IS NULL").
-		Where("quizzes.teacher_id = ? AND questions.deleted_at IS NULL", teacherID).
+	// Count total questions across all quizzes owned by teacher (via M2M join table)
+	r.db.Model(&model.QuizQuestion{}).
+		Joins("JOIN quizzes ON quizzes.id = quiz_questions.quiz_id AND quizzes.deleted_at IS NULL").
+		Where("quizzes.teacher_id = ?", teacherID).
 		Count(&dto.TotalQuestions)
 
 	// Count total submissions
