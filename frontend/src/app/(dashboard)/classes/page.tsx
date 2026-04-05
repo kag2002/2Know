@@ -91,7 +91,7 @@ export default function ClassesPage() {
         method: "POST",
         body: JSON.stringify(newClass),
       });
-      toast.success(`Đã tạo lớp "${newClass.name}" thành công!`);
+      toast.success(t("classes.createSuccessParams", { name: newClass.name }) || `Đã tạo lớp "${newClass.name}" thành công!`);
       setIsDialogOpen(false);
       setNewClass({ name: "", subject: "", grade: "", school_year: "2025-2026" });
       loadClasses();

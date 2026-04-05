@@ -140,7 +140,7 @@ export default function StudentsPage() {
       // Try to re-fetch to get correct aggregations
       const studentsData = await apiFetch("/students");
       setAllStudents(studentsData || []);
-      toast.success(`Đã thêm học sinh "${created.full_name || newStudent.name}" thành công!`);
+      toast.success(t("students.createSuccessParams", { name: created.full_name || newStudent.name }) || `Đã thêm học sinh "${created.full_name || newStudent.name}" thành công!`);
       setIsDialogOpen(false);
       setNewStudent({ name: "", email: "", student_id: "", class_id: "" });
     } catch (err: any) {
@@ -209,9 +209,9 @@ export default function StudentsPage() {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Thêm học sinh mới</DialogTitle>
+              <DialogTitle>{t("students.addNew") || "Thêm học sinh mới"}</DialogTitle>
               <DialogDescription>
-                Nhập thông tin cơ bản để đưa học sinh này vào danh bạ tổng. Học sinh có thể được phân lớp sau.
+                {t("students.addDesc") || "Nhập thông tin cơ bản để đưa học sinh."}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -234,14 +234,14 @@ export default function StudentsPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="s_class">Chọn Lớp Học <span className="text-rose-500">*</span></Label>
+                <Label htmlFor="s_class">{t("students.labelClass") || "Chọn Lớp Học"} <span className="text-rose-500">*</span></Label>
                 <select
                   id="s_class"
                   value={newStudent.class_id}
                   onChange={(e) => setNewStudent({...newStudent, class_id: e.target.value})}
                   className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background cursor-pointer"
                 >
-                  <option value="" disabled>-- Vui lòng chọn lớp --</option>
+                  <option value="" disabled>{t("students.selectClassPrompt") || "-- Vui lòng chọn lớp --"}</option>
                   {availableClasses.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
@@ -296,12 +296,12 @@ export default function StudentsPage() {
       {/* Student Table */}
       <Card className="shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between gap-4">
-          <CardTitle className="text-lg">Danh sách học sinh</CardTitle>
+          <CardTitle className="text-lg">{t("students.listTitle") || "Danh sách học sinh"}</CardTitle>
           <div className="flex items-center gap-3">
             <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
-                placeholder="Tìm tên hoặc mã HS..."
+                placeholder={t("students.searchPlaceholder") || "Tìm tên hoặc mã HS..."}
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="pl-9 h-9 w-full rounded-md border bg-muted text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-background transition-colors px-3"
