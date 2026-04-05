@@ -446,7 +446,7 @@ func (s *resultService) GradeSubmission(teacherID, compositeID string, score flo
 			essayCount++
 		}
 	}
-	if len(res.GradedAnswers) >= essayCount {
+	if len(res.GradedAnswers) >= essayCount && res.Status != "cheating_flagged" {
 		res.Status = "completed"
 	}
 
