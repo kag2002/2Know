@@ -39,6 +39,9 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
         
         // If it's a 5xx error, throw so it can be caught and retried
         if (response.status >= 500 && attempt < maxRetries) {
+          if (typeof window !== 'undefined' && (localStorage.getItem("2know-lang") || "vi") === "vi") {
+             throw new Error(`Lỗi Máy Chủ ${response.status}`);
+          }
           throw new Error(`Server Error ${response.status}`);
         }
 
@@ -63,7 +66,10 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
                 "AI service is currently unavailable. Please try again later.": "Dịch vụ AI đang bận. Vui lòng thử lại sau.",
                 "Unauthorized": "Không có quyền truy cập",
                 "Invalid email or password": "Email hoặc mật khẩu không chính xác",
-                "Email already registered": "Email đã được sử dụng"
+                "Email already registered": "Email đã được sử dụng",
+                "Validation failed": "Dữ liệu chưa hợp lệ. Vui lòng kiểm tra lại.",
+                "Invalid request body": "Lỗi định dạng dữ liệu gửi lên. Vui lòng thử lại.",
+                "record not found": "Không tìm thấy dữ liệu yêu cầu."
              };
              // Simple contains mapping to handle "Validation failed:..." or exact matches
              for (const [enKey, viVal] of Object.entries(viMap)) {
@@ -87,6 +93,12 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
       if (attempt < maxRetries && (error.message.includes('Server Error') || error.message.includes('Failed to fetch'))) {
         await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 500));
         continue;
+      }
+      if (typeof window !== 'undefined' && error.message.includes('Failed to fetch')) {
+        const lang = localStorage.getItem("2know-lang") || "vi";
+        if (lang === "vi") {
+          error.message = "Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng.";
+        }
       }
       throw error;
     }
