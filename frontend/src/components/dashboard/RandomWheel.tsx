@@ -11,6 +11,7 @@ interface RandomWheelProps {
   items: string[];
   colors?: string[];
   onWinner?: (winner: string) => void;
+  onRemoveWinner?: (winner: string) => void;
 }
 
 const DEFAULT_COLORS = [
@@ -24,7 +25,7 @@ const DEFAULT_COLORS = [
   "#14b8a6", // teal-500
 ];
 
-export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner }: RandomWheelProps) {
+export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner, onRemoveWinner }: RandomWheelProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -259,7 +260,10 @@ export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner }: Random
             <h2 className="text-3xl sm:text-4xl font-black text-center text-slate-800 dark:text-white bg-clip-text">
               {winner}
             </h2>
-            <Button size="sm" variant="outline" className="mt-2 text-indigo-600 rounded-full" onClick={() => setWinner(null)}>
+            <Button size="sm" variant="outline" className="mt-2 text-indigo-600 rounded-full" onClick={() => { 
+                if (onRemoveWinner) onRemoveWinner(winner);
+                setWinner(null); 
+            }}>
               <RotateCcw className="w-4 h-4 mr-2" /> Quay lại
             </Button>
           </motion.div>
