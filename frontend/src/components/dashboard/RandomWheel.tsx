@@ -104,11 +104,11 @@ export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner, onRemove
       rotate: newRotation,
       transition: {
         duration: 5,
-        ease: [0.2, 0.8, 0.1, 1], // Custom slow-down curve
+        ease: [0.1, 0, 0.1, 1], // Smoother deceleration curve
       }
     });
 
-    currentRotation.current = newRotation % 360; // normalize
+    currentRotation.current = newRotation; // Do NOT normalize to fix jitter/backward spins
     setIsSpinning(false);
     
     const result = wheelItems[winningSegmentIndex];
@@ -140,7 +140,14 @@ export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner, onRemove
       
       // If 1 item, return a full circle
       if (segments === 1) {
-        return <circle key={index} cx="50" cy="50" r="50" fill={color} />;
+        return (
+          <g key={index}>
+            <circle cx="50" cy="50" r="50" fill={color} />
+            <text x="50" y="50" fill="white" fontSize="4.5" fontWeight="bold" textAnchor="middle" alignmentBaseline="middle" className="drop-shadow-sm select-none">
+              {item.length > 20 ? item.substring(0, 18) + "..." : item}
+            </text>
+          </g>
+        );
       }
       
       const startAngle = (rotation * Math.PI) / 180;
