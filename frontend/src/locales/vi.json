@@ -834,5 +834,16 @@
   "students.loadError": "Không thể tải dữ liệu học sinh: ",
   "students.createError": "Lỗi thêm học sinh: ",
   "students.updateErrorToast": "Lỗi cập nhật học sinh: ",
-  "students.deleteErrorToast": "Lỗi xóa: "
+  "students.deleteErrorToast": "Lỗi xóa: ",
+  "wheel.history": "Lịch sử vòng quay",
+  "wheel.history.empty": "Chưa có lượt quay nào.",
+  "wheel.history.round": "Lần",
+  "wheel.history.result": "Kết quả",
+  "wheel.history.action": "Hành động",
+  "wheel.history.kept": "Giữ lại",
+  "wheel.history.removed": "Loại bỏ",
+  "wheel.history.time": "Thời gian",
+  "wheel.btn.keep": "Tiếp tục (Giữ lại)",
+  "wheel.btn.remove": "Loại bỏ khỏi vòng",
+  "wheel.winner.title": "Người chiến thắng"
 }

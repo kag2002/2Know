@@ -6,12 +6,15 @@ import { Play, RotateCcw, Volume2, VolumeX, Trophy, Sparkles } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import { useTranslation } from "@/context/LanguageContext";
+import { Check, Trash2 } from "lucide-react";
 
 interface RandomWheelProps {
   items: string[];
   colors?: string[];
   onWinner?: (winner: string) => void;
   onRemoveWinner?: (winner: string) => void;
+  onKeepWinner?: (winner: string) => void;
 }
 
 const DEFAULT_COLORS = [
@@ -25,7 +28,8 @@ const DEFAULT_COLORS = [
   "#14b8a6", // teal-500
 ];
 
-export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner, onRemoveWinner }: RandomWheelProps) {
+export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner, onRemoveWinner, onKeepWinner }: RandomWheelProps) {
+  const { t } = useTranslation();
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -255,17 +259,31 @@ export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner, onRemove
           >
             <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest text-sm">
                 <Trophy className="w-5 h-5 fill-emerald-100" />
-                Người chiến thắng
+                {t("wheel.winner.title") || "Người chiến thắng"}
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-center text-slate-800 dark:text-white bg-clip-text">
+            <h2 className="text-3xl sm:text-4xl font-black text-center text-slate-800 dark:text-white bg-clip-text mb-2">
               {winner}
             </h2>
-            <Button size="sm" variant="outline" className="mt-2 text-indigo-600 rounded-full" onClick={() => { 
-                if (onRemoveWinner) onRemoveWinner(winner);
-                setWinner(null); 
-            }}>
-              <RotateCcw className="w-4 h-4 mr-2" /> Quay lại
-            </Button>
+            <div className="flex gap-3 mt-2 w-full">
+              <Button 
+                 variant="outline" 
+                 className="flex-1 text-slate-700 bg-white hover:bg-slate-50 border-slate-200" 
+                 onClick={() => { 
+                   if (onKeepWinner) onKeepWinner(winner);
+                   setWinner(null); 
+                 }}>
+                <Check className="w-4 h-4 mr-2 text-emerald-500" /> {t("wheel.btn.keep") || "Giữ lại"}
+              </Button>
+              <Button 
+                 variant="outline" 
+                 className="flex-1 text-rose-600 hover:bg-rose-50 hover:text-rose-700 border-rose-200 bg-white" 
+                 onClick={() => { 
+                   if (onRemoveWinner) onRemoveWinner(winner);
+                   setWinner(null); 
+                 }}>
+                <Trash2 className="w-4 h-4 mr-2" /> {t("wheel.btn.remove") || "Loại bỏ"}
+              </Button>
+            </div>
           </motion.div>
         )}
       </div>

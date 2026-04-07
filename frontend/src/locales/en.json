@@ -632,5 +632,16 @@
   "students.loadError": "Could not load student data: ",
   "students.createError": "Error adding student: ",
   "students.updateErrorToast": "Error updating student: ",
-  "students.deleteErrorToast": "Error deleting student: "
+  "students.deleteErrorToast": "Error deleting student: ",
+  "wheel.history": "Spin History",
+  "wheel.history.empty": "No spins yet.",
+  "wheel.history.round": "Round",
+  "wheel.history.result": "Result",
+  "wheel.history.action": "Action",
+  "wheel.history.kept": "Kept",
+  "wheel.history.removed": "Removed",
+  "wheel.history.time": "Time",
+  "wheel.btn.keep": "Keep & Spin Again",
+  "wheel.btn.remove": "Remove from list",
+  "wheel.winner.title": "Winner"
 }
