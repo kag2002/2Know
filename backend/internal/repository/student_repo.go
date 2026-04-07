@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"backend/internal/model"
 
 	"gorm.io/gorm"
@@ -27,11 +29,13 @@ type StudentWithMetrics struct {
 	ID        string  `json:"id"`
 	Name      string  `json:"name"`      // Mapped from FullName
 	StudentID string  `json:"studentId"` // Mapped from StudentID
-	Email     string  `json:"email"`
-	Class     string  `json:"class"` // Mapped from Class Name
-	AvgScore  float64 `json:"avgScore"`
-	Tests     int     `json:"tests"`
-	Status    string  `json:"status"` // Computed in Service
+	Email       string     `json:"email"`
+	Phone       *string    `json:"phone,omitempty"`
+	DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
+	Class       string     `json:"class"` // Mapped from Class Name
+	AvgScore    float64    `json:"avgScore"`
+	Tests       int        `json:"tests"`
+	Status      string     `json:"status"` // Computed in Service
 }
 
 func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentWithMetrics, error) {
@@ -44,6 +48,8 @@ func (r *studentRepository) GetStudentsByTeacherID(teacherID string) ([]StudentW
 			students.full_name as name,
 			students.student_id as student_id,
 			students.email as email,
+			students.phone as phone,
+			students.date_of_birth as date_of_birth,
 			classes.name as class,
 			COALESCE(tr.avg_score, 0) as avg_score,
 			COALESCE(tr.tests, 0) as tests

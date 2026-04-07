@@ -40,6 +40,8 @@ interface StudentMetrics {
   name: string;
   studentId: string;
   email: string;
+  phone?: string;
+  date_of_birth?: string | null;
   class: string;
   avgScore: number;
   tests: number;
@@ -57,7 +59,7 @@ export default function StudentsPage() {
   const [filterClass, setFilterClass] = useState("all");
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newStudent, setNewStudent] = useState({ name: "", email: "", student_id: "", class_id: "" });
+  const [newStudent, setNewStudent] = useState({ name: "", email: "", phone: "", date_of_birth: "", student_id: "", class_id: "" });
   const [availableClasses, setAvailableClasses] = useState<{id: string, name: string}[]>([]);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -133,6 +135,8 @@ export default function StudentsPage() {
         body: JSON.stringify({ 
           full_name: newStudent.name, 
           email: newStudent.email, 
+          phone: newStudent.phone,
+          date_of_birth: newStudent.date_of_birth ? new Date(newStudent.date_of_birth).toISOString() : null,
           student_id: newStudent.student_id, 
           class_id: newStudent.class_id 
         }),
@@ -142,7 +146,7 @@ export default function StudentsPage() {
       setAllStudents(studentsData || []);
       toast.success(t("students.createSuccessParams", { name: created.full_name || newStudent.name }) || `Đã thêm học sinh "${created.full_name || newStudent.name}" thành công!`);
       setIsDialogOpen(false);
-      setNewStudent({ name: "", email: "", student_id: "", class_id: "" });
+      setNewStudent({ name: "", email: "", phone: "", date_of_birth: "", student_id: "", class_id: "" });
     } catch (err: any) {
       toast.error(t("students.createError") + err.message);
     } finally {
@@ -160,14 +164,27 @@ export default function StudentsPage() {
     try {
       await apiFetch(`/students/${editingStudent.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ full_name: editingStudent.name, email: editingStudent.email }),
+        body: JSON.stringify({ 
+          full_name: editingStudent.name, 
+          email: editingStudent.email,
+          student_id: editingStudent.studentId,
+          phone: editingStudent.phone,
+          date_of_birth: editingStudent.date_of_birth ? new Date(editingStudent.date_of_birth).toISOString() : null
+        }),
       });
       toast.success(t("dashboard.students.updateSuccess"));
       setIsEditDialogOpen(false);
       
       // Update local state without full reload
       setAllStudents(prev => prev.map(s => 
-        s.id === editingStudent.id ? { ...s, name: editingStudent.name, email: editingStudent.email } : s
+        s.id === editingStudent.id ? { 
+          ...s, 
+          name: editingStudent.name, 
+          email: editingStudent.email,
+          studentId: editingStudent.studentId,
+          phone: editingStudent.phone,
+          date_of_birth: editingStudent.date_of_birth
+        } : s
       ));
     } catch (err: any) {
       toast.error(t("students.updateErrorToast") + err.message);
@@ -255,6 +272,25 @@ export default function StudentsPage() {
                   placeholder="VD: nguyenvana@example.com" 
                   value={newStudent.email} 
                   onChange={(e) => setNewStudent({...newStudent, email: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="s_phone">Số điện thoại</Label>
+                <Input 
+                  id="s_phone" 
+                  type="tel"
+                  placeholder="VD: 0987654321" 
+                  value={newStudent.phone} 
+                  onChange={(e) => setNewStudent({...newStudent, phone: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="s_dob">Ngày sinh</Label>
+                <Input 
+                  id="s_dob" 
+                  type="date"
+                  value={newStudent.date_of_birth} 
+                  onChange={(e) => setNewStudent({...newStudent, date_of_birth: e.target.value})} 
                 />
               </div>
             </div>
@@ -426,12 +462,38 @@ export default function StudentsPage() {
                 />
               </div>
               <div className="grid gap-2">
+                <Label htmlFor="edit-s-sbd">{t("students.labelSBD")}</Label>
+                <Input 
+                  id="edit-s-sbd" 
+                  value={editingStudent.studentId} 
+                  onChange={(e) => setEditingStudent({...editingStudent, studentId: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="edit-s-email">{t("students.labelEmail")}</Label>
                 <Input 
                   id="edit-s-email" 
                   type="email"
                   value={editingStudent.email} 
                   onChange={(e) => setEditingStudent({...editingStudent, email: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-s-phone">Số điện thoại</Label>
+                <Input 
+                  id="edit-s-phone" 
+                  type="tel"
+                  value={editingStudent.phone || ""} 
+                  onChange={(e) => setEditingStudent({...editingStudent, phone: e.target.value})} 
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-s-dob">Ngày sinh</Label>
+                <Input 
+                  id="edit-s-dob" 
+                  type="date"
+                  value={editingStudent.date_of_birth?.split('T')[0] || ""} 
+                  onChange={(e) => setEditingStudent({...editingStudent, date_of_birth: e.target.value})} 
                 />
               </div>
             </div>
