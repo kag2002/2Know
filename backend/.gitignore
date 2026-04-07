@@ -1,2 +1,4 @@
-server
+/server
 tmp_server
+api-server
+.env

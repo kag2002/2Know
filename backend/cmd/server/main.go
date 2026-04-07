@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/contrib/websocket"
@@ -57,7 +58,7 @@ func main() {
 	app.Use(middleware.SecurityHeaders())
 	app.Use(middleware.GlobalLimiter())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: getCorsOrigins(),
 		AllowHeaders: []string{"Origin, Content-Type, Accept, Authorization"},
 	}))
 
@@ -237,4 +238,15 @@ func main() {
 
 	log.Printf("Server starting on port %s", port)
 	log.Fatal(app.Listen(":" + port))
+}
+
+// getCorsOrigins returns allowed CORS origins from env (comma-separated) with localhost fallback
+func getCorsOrigins() []string {
+	origin := os.Getenv("CORS_ORIGIN")
+	if origin != "" {
+		origins := strings.Split(origin, ",")
+		// Always include localhost for local dev
+		return append(origins, "http://localhost:3000")
+	}
+	return []string{"http://localhost:3000"}
 }
