@@ -14,11 +14,11 @@ export default function RandomWheelPage() {
   const [selectedClass, setSelectedClass] = useState<string>("");
   
   // Custom manual list instead of locked students array
-  const [inputText, setInputText] = useState<string>("Nhập tên người chơi\\nMỗi dòng 1 người");
+  const [inputText, setInputText] = useState<string>("");
   const [removeWinner, setRemoveWinner] = useState<boolean>(true);
 
   // Parse items from textarea (split by newline, remove empty)
-  const parsedItems = inputText.split("\\n").map(x => x.trim()).filter(x => x.length > 0);
+  const parsedItems = inputText.split("\n").map(x => x.trim()).filter(x => x.length > 0);
 
   useEffect(() => {
     apiFetch("/classes").then(data => {
@@ -36,7 +36,7 @@ export default function RandomWheelPage() {
        if (cls && cls.students) {
           const names = cls.students.map((s: any) => s.full_name || s.name);
           if (names.length > 0) {
-            setInputText(names.join("\\n"));
+            setInputText(names.join("\n"));
           }
        }
     }).catch(() => {});
@@ -45,12 +45,12 @@ export default function RandomWheelPage() {
   const handleWinnerRemoved = (winner: string) => {
     if (removeWinner) {
       setInputText(prev => {
-        const lines = prev.split("\\n");
+        const lines = prev.split("\n");
         const idx = lines.findIndex(l => l.trim() === winner);
         if (idx !== -1) {
           lines.splice(idx, 1);
         }
-        return lines.join("\\n");
+        return lines.join("\n");
       });
     }
   };
