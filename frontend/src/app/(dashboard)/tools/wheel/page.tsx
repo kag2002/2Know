@@ -79,12 +79,12 @@ export default function RandomWheelPage() {
           <Card className="h-full">
             <CardHeader className="pb-3 border-b bg-muted/30">
               <CardTitle className="flex items-center gap-2 text-base">
-                <Settings2 className="w-4 h-4 text-indigo-500" /> Tùy chỉnh danh sách
+                <Settings2 className="w-4 h-4 text-indigo-500" /> {t("wheel.config.title") || "Tùy chỉnh danh sách"}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 flex flex-col h-[calc(100%-60px)] space-y-5">
                <div className="space-y-2">
-                 <label className="text-sm font-semibold">Tải nhanh từ Lớp học</label>
+                 <label className="text-sm font-semibold">{t("wheel.config.load_class") || "Tải nhanh từ Lớp học"}</label>
                  <div className="flex gap-2">
                    <select 
                      className="flex-1 text-sm p-2 bg-background border rounded-md"
@@ -94,7 +94,7 @@ export default function RandomWheelPage() {
                      {classes.map(c => (
                        <option key={c.id} value={c.id}>{c.name}</option>
                      ))}
-                     {classes.length === 0 && <option value="">Đang tải lớp học...</option>}
+                     {classes.length === 0 && <option value="">{t("wheel.config.loading") || "Đang tải lớp học..."}</option>}
                    </select>
                    <Button size="icon" variant="outline" onClick={loadClassIntoList} title="Dán danh sách lớp vào khung">
                       <Download className="w-4 h-4" />
@@ -105,16 +105,16 @@ export default function RandomWheelPage() {
                <div className="pt-2 border-t flex-grow flex flex-col space-y-2">
                  <div className="flex items-center justify-between">
                     <label className="text-sm font-semibold flex items-center gap-2">
-                        <Users className="w-4 h-4" /> Danh sách vòng quay
+                        <Users className="w-4 h-4" /> {t("wheel.config.list_title") || "Danh sách vòng quay"}
                     </label>
                     <span className="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded-full font-medium">
-                        {parsedItems.length} mục
+                        {parsedItems.length} {t("wheel.config.items") || "mục"}
                     </span>
                  </div>
                  
                  <textarea
                    className="w-full text-sm p-3 border rounded-md flex-grow bg-background resize-y min-h-[300px]"
-                   placeholder="Nhập tên người tham gia ở đây...&#10;Mỗi dòng là một người/vật phẩm mới."
+                   placeholder={t("wheel.config.placeholder") || "Nhập tên người tham gia ở đây...\nMỗi dòng là một người/vật phẩm mới."}
                    value={inputText}
                    onChange={(e) => setInputText(e.target.value)}
                  />

@@ -202,7 +202,7 @@ export function RandomWheel({ items, colors = DEFAULT_COLORS, onWinner, onRemove
       
       <div className="flex w-full justify-between items-center mb-10 z-10">
         <h3 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-emerald-400">
-          VÒNG QUAY MAY MẮN
+          {t("sidebar.tools.wheel")?.toUpperCase() || "VÒNG QUAY MAY MẮN"}
         </h3>
         <Button variant="ghost" size="icon" className="rounded-full bg-white/20 hover:bg-white/40 shadow-sm transition-all" onClick={() => setSoundEnabled(!soundEnabled)}>
           {soundEnabled ? <Volume2 className="w-5 h-5 text-slate-700 dark:text-white" /> : <VolumeX className="w-5 h-5 text-slate-400" />}
