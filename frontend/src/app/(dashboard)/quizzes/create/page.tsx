@@ -56,6 +56,33 @@ export default function QuizBuilderWizard() {
   // Lifted Question State
   const [questions, setQuestions] = useState<QuestionPayload[]>([]);
 
+  const [isRestored, setIsRestored] = useState(false);
+
+  useEffect(() => {
+    if (!editId) {
+      const draft = sessionStorage.getItem("2know_quiz_draft");
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft);
+          if (parsed.formData) setFormData(parsed.formData);
+          if (parsed.currentStep) setCurrentStep(parsed.currentStep);
+          if (parsed.questions) setQuestions(parsed.questions);
+        } catch (e) {}
+      }
+    }
+    setIsRestored(true);
+  }, [editId]);
+
+  useEffect(() => {
+    if (isRestored && !editId) {
+      sessionStorage.setItem("2know_quiz_draft", JSON.stringify({
+        formData,
+        currentStep,
+        questions
+      }));
+    }
+  }, [formData, currentStep, questions, isRestored, editId]);
+
   useEffect(() => {
     apiFetch("/classes").then(d => setMyClasses(Array.isArray(d) ? d : [])).catch(() => {});
 
@@ -84,11 +111,17 @@ export default function QuizBuilderWizard() {
       // Fetch Quiz Questions
       apiFetch(`/quizzes/${editId}/questions`).then((qs: any[]) => {
         if (qs && Array.isArray(qs)) {
+          const decodeHtml = (html: string) => {
+            if (typeof document === 'undefined') return html;
+            const txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+          };
           const parsed = qs.map((q) => {
             let opts = Array.from({length:4},()=>({text:"", isCorrect:false}));
             if (q.metadata && q.metadata.options && Array.isArray(q.metadata.options)) {
               opts = q.metadata.options.map((o: any) => ({
-                text: o.content || "",
+                text: decodeHtml(o.content || ""),
                 isCorrect: o.is_correct || false
               }));
             }
@@ -96,8 +129,9 @@ export default function QuizBuilderWizard() {
               id: q.id,
               type: q.type === "multiple_choice" ? "Trắc nghiệm" : q.type === "multiple_answers" ? "Nhiều đáp án" : "Tự luận",
               points: q.points || 10,
-              content: q.content || "",
-              options: opts
+              content: decodeHtml(q.content || ""),
+              options: opts,
+              explanation: decodeHtml(q.explanation || q.metadata?.explanation || "")
             };
           });
           setQuestions(parsed);
@@ -163,6 +197,7 @@ export default function QuizBuilderWizard() {
         });
         toast.success(t("dashboard.quizzes.createSuccess"));
       }
+      sessionStorage.removeItem("2know_quiz_draft");
       setTimeout(() => router.push("/quizzes"), 1500);
     } catch (err: any) {
       toast.error((t("quizCreate.saveError") || "Lỗi lưu bài: ") + err.message);
@@ -185,13 +220,24 @@ export default function QuizBuilderWizard() {
             Hủy
           </Link>
           <Button 
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            variant={currentStep === 9 ? "outline" : "default"}
+            className={currentStep === 9 ? "" : "bg-emerald-600 hover:bg-emerald-700 text-white"}
             onClick={() => handleSave("draft")}
             disabled={loading}
           >
             {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {t("quizCreate.saveDraft")}
           </Button>
+          {currentStep === 9 && (
+            <Button 
+              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20"
+              onClick={() => handleSave("published")}
+              disabled={loading}
+            >
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {t("quizCreate.publish") || "Xuất bản"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -386,12 +432,12 @@ export default function QuizBuilderWizard() {
                                 <p className="text-sm text-muted-foreground py-2">Bạn chưa có lớp nào. Tạo lớp tại trang Lớp học.</p>
                               ) : (
                                 myClasses.map(cls => (
-                                  <div key={cls.id} className="flex items-center space-x-2 border p-2.5 rounded-md hover:bg-muted cursor-pointer">
-                                    <input type="checkbox" id={cls.id} className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
-                                    <label htmlFor={cls.id} className="text-sm font-medium leading-none cursor-pointer">
-                                      {cls.name} — {cls.subject}
-                                    </label>
-                                  </div>
+                                  <label key={cls.id} className="flex items-center space-x-3 border p-3 rounded-lg hover:bg-muted cursor-pointer transition-colors w-full">
+                                    <input type="checkbox" id={cls.id} className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4 cursor-pointer" />
+                                    <div className="text-sm font-medium leading-none cursor-pointer flex-1">
+                                      {cls.name} <span className="text-muted-foreground font-normal ml-1">— {cls.subject}</span>
+                                    </div>
+                                  </label>
                                 ))
                               )}
                             </div>

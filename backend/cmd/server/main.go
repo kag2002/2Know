@@ -31,8 +31,8 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		BodyLimit:    5 * 1024 * 1024, // Limit request body to 5MB to prevent spam/OOM
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  600 * time.Second,
+		WriteTimeout: 600 * time.Second, // Allow up to 10 mins for AI to generate
 		IdleTimeout:  120 * time.Second,
 		ErrorHandler: func(c fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
@@ -150,6 +150,10 @@ func main() {
 
 	// AI endpoints
 	api.Post("/ai/generate-quiz", middleware.AILimiter(), aiHandler.GenerateQuiz)
+	api.Post("/ai/generate-quiz-stream", middleware.AILimiter(), aiHandler.GenerateQuizStream)
+	api.Post("/ai/refine-quiz", middleware.AILimiter(), aiHandler.RefineQuiz)
+	api.Post("/ai/chat", middleware.AILimiter(), aiHandler.Chat)
+	api.Post("/ai/upload-pdf", middleware.AILimiter(), aiHandler.UploadPDF)
 
 	// Question endpoints
 	api.Get("/quizzes/:quizId/questions", questionHandler.GetQuizQuestions)

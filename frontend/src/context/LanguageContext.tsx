@@ -50,7 +50,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = (key: string, params?: Record<string, string | number>): string => {
     const dict = dictionaries[language];
-    let str = dict[key] || dictionaries["vi"][key] || key;
+    // Return empty string if missing so that `|| "Fallback"` pattern works in components
+    let str = dict[key] || dictionaries["vi"][key] || "";
+    if (!str) return "";
+
     if (params) {
       Object.keys(params).forEach(k => {
         str = str.replace(new RegExp(`{{${k}}}`, 'g'), String(params[k]));

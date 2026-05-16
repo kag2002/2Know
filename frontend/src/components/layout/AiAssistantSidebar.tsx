@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, Send, Bot, User, Loader2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { API_BASE_URL } from "@/lib/api";
+
 export function AiAssistantSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user'|'ai', content: string}[]>([
@@ -28,22 +30,85 @@ export function AiAssistantSidebar() {
     }
   }, [messages, isOpen]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim() || loading || quota <= 0) return;
     
-    setMessages(prev => [...prev, { role: 'user', content: input }]);
+    const userMessage = input.trim();
+    const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
+    setMessages(newMessages);
     setInput("");
     setLoading(true);
 
-    // Xử lý gửi tin nhắn - Demo logic (sẽ được đấu API thật ở version sau)
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem("2know_token");
+      
+      // Prepare payload (convert to system/user role if needed, but LocalAI supports user/assistant)
+      const apiMessages = newMessages.map(m => ({
+        role: m.role === 'ai' ? 'assistant' : 'user',
+        content: m.content
+      }));
+
+      // Add a hidden system prompt for context
+      apiMessages.unshift({
+        role: 'system',
+        content: 'Bạn là trợ lý ảo 2Know AI, chuyên hỗ trợ giáo viên tạo đề thi và giảng dạy. Hãy trả lời ngắn gọn, tự nhiên, bằng tiếng Việt.'
+      });
+
+      const res = await fetch(`${API_BASE_URL}/ai/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ messages: apiMessages })
+      });
+
+      if (!res.ok) {
+        throw new Error(`API Error ${res.status}`);
+      }
+
       setQuota(prev => prev - 1);
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        content: 'Đây là phiên bản Beta. Hiện tại tôi thấy câu hỏi của bạn rất thú vị! Dựa trên Data Analytics, bạn nên áp dụng thiết kế đa lựa chọn trắc nghiệm để đánh giá chính xác hơn. Cần tôi tự động tạo dàn ý bài kiểm tra 15 phút không?' 
-      }]);
+      
+      // Initialize an empty AI message
+      setMessages(prev => [...prev, { role: 'ai', content: '' }]);
+      setLoading(false); // Remove spinner, start streaming text
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      if (!reader) return;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+            try {
+              const data = JSON.parse(line.substring(6));
+              const text = data.choices[0]?.delta?.content || "";
+              if (text) {
+                setMessages(prev => {
+                  const updated = [...prev];
+                  const lastIndex = updated.length - 1;
+                  updated[lastIndex] = { ...updated[lastIndex], content: updated[lastIndex].content + text };
+                  return updated;
+                });
+              }
+            } catch (e) {
+              // Ignore parse errors on incomplete chunks
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Chat error:", err);
+      setMessages(prev => [...prev, { role: 'ai', content: 'Xin lỗi, tôi đang gặp sự cố kết nối. Vui lòng thử lại sau.' }]);
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -91,9 +156,10 @@ export function AiAssistantSidebar() {
                   <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-slate-200 dark:bg-slate-800' : 'bg-indigo-100 dark:bg-indigo-900/30'}`}>
                     {msg.role === 'user' ? <User className="w-4 h-4 text-slate-600 dark:text-slate-400" /> : <Bot className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />}
                   </div>
-                  <div className={`p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 border shadow-sm rounded-tl-none text-slate-700 dark:text-slate-300'}`}>
-                     {msg.content}
-                  </div>
+                  <div 
+                    className={`p-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white dark:bg-slate-800 border shadow-sm rounded-tl-none text-slate-700 dark:text-slate-300'}`}
+                    dangerouslySetInnerHTML={{ __html: msg.content.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
+                  />
                 </div>
               ))}
               {loading && (

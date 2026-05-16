@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { AIGenerator } from "@/components/dashboard/AIGenerator";
 
 export interface QuestionOption {
   text: string;
@@ -22,7 +23,15 @@ export interface QuestionPayload {
   points: number;
   content: string;
   options: QuestionOption[];
+  explanation?: string;
 }
+
+const decodeHtml = (html: string) => {
+  if (typeof document === 'undefined') return html;
+  const txt = document.createElement("textarea");
+  txt.innerHTML = html;
+  return txt.value;
+};
 
 interface QuestionBuilderProps {
   questions: QuestionPayload[];
@@ -133,6 +142,18 @@ const SortableQuestionItem = memo(function SortableQuestionItem({ q, index, upda
                     </button>
                   </div>
                 )}
+
+                <div className="mt-4 pt-4 border-t border-dashed">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 block">
+                    Giải thích đáp án (Tuỳ chọn)
+                  </label>
+                  <textarea
+                    placeholder="Nhập giải thích cho câu trả lời đúng (hiển thị cho học sinh sau khi thi xong)..."
+                    className="w-full text-sm p-3 border rounded-md focus:ring-2 focus:ring-emerald-500/50 outline-none resize-y min-h-[60px] bg-muted/30"
+                    value={q.explanation || ""}
+                    onChange={(e) => updateQuestion(index, 'explanation', e.target.value)}
+                  />
+                </div>
               </div>
             </div>
             )}
@@ -147,6 +168,7 @@ import { useTranslation } from "@/context/LanguageContext";
 export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProps) {
   const { t } = useTranslation();
   const [isBankOpen, setIsBankOpen] = useState(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [bankQuestions, setBankQuestions] = useState<any[]>([]);
   const [searchBank, setSearchBank] = useState("");
   const [loadingBank, setLoadingBank] = useState(false);
@@ -285,7 +307,7 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
         <Button type="button" onClick={addQuestion} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
           <Plus className="w-4 h-4" /> Thêm câu hỏi
         </Button>
-        <Button type="button" variant="outline" className="gap-2 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 hover:bg-indigo-100" onClick={() => window.location.href = '/quizzes/generate'}>
+        <Button type="button" variant="outline" className="gap-2 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 hover:bg-indigo-100" onClick={() => setIsAiModalOpen(true)}>
           <Sparkles className="w-4 h-4" /> AI Tạo tự động
         </Button>
         <Button type="button" variant="outline" className="gap-2" onClick={() => { setIsBankOpen(true); loadBank(); }}>
@@ -412,11 +434,12 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
                    id: q.id,
                    type: "Trắc nghiệm",
                    points: q.points || 10,
-                   content: q.content,
-                   options: q.metadata?.options && q.metadata.options.length > 0 ? q.metadata.options : [
+                   content: decodeHtml(q.content || ""),
+                   options: q.metadata?.options && q.metadata.options.length > 0 ? q.metadata.options.map((o:any) => ({...o, text: decodeHtml(o.text || o.content || "")})) : [
                      { text: "", isCorrect: true },
                      { text: "", isCorrect: false }
-                   ]
+                   ],
+                   explanation: decodeHtml(q.explanation || q.metadata?.explanation || "")
                  }));
                  setQuestions([...questions, ...formatted]);
                  setIsBankOpen(false);
@@ -427,6 +450,24 @@ export function QuestionBuilder({ questions, setQuestions }: QuestionBuilderProp
               {t("common.add")} {selectedBankIds.length} {t("dashboard.questions.selectedLabel") || "câu đã chọn"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Generator Modal */}
+      <Dialog open={isAiModalOpen} onOpenChange={setIsAiModalOpen}>
+        <DialogContent className="max-w-[1200px] sm:max-w-[1200px] w-[95vw] h-[90vh] p-0 overflow-hidden bg-slate-50 dark:bg-slate-950 flex flex-col">
+          <div className="flex justify-between items-center p-3 border-b bg-background">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-500" />
+              AI Tạo tự động
+            </h3>
+            <div className="text-xs text-muted-foreground">
+              Sau khi lưu câu hỏi vào ngân hàng, hãy đóng cửa sổ này và bấm <b>Chọn từ Ngân hàng</b>.
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 bg-background">
+            <AIGenerator isEmbedded onSaved={() => setIsAiModalOpen(false)} />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
